@@ -2,6 +2,8 @@
 
 from fastapi import FastAPI
 
+from app.schemas import HealthResponse, WelcomeResponse
+
 app = FastAPI(
     title="MedAssist API",
     description="Backend foundation for the MedAssist student project.",
@@ -10,11 +12,11 @@ app = FastAPI(
 
 
 @app.get("/", tags=["System"], summary="Check the API welcome message")
-def home() -> dict[str, str]:
-    return {"message": "MedAssist backend is running"}
+def home() -> WelcomeResponse:
+    return WelcomeResponse(message="MedAssist backend is running")
 
 
 @app.get("/health", tags=["System"], summary="Check API liveness")
-def health() -> dict[str, str]:
+def health() -> HealthResponse:
     """Report liveness only; no database or external services are checked."""
-    return {"status": "ok", "service": "medassist-api", "version": app.version}
+    return HealthResponse(status="ok", service="medassist-api", version=app.version)

@@ -44,6 +44,22 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(schema["info"]["version"], "0.1.0")
         self.assertIn("get", schema["paths"]["/health"])
 
+    def test_openapi_defines_required_fields_for_system_responses(self):
+        schema = self.client.get("/openapi.json").json()
+
+        for path, fields in (
+            ("/", {"message"}),
+            ("/health", {"status", "service", "version"}),
+        ):
+            with self.subTest(path=path):
+                response_schema = schema["paths"][path]["get"]["responses"]["200"][
+                    "content"
+                ]["application/json"]["schema"]
+                model_name = response_schema["$ref"].rsplit("/", 1)[-1]
+                model = schema["components"]["schemas"][model_name]
+                self.assertEqual(set(model["required"]), fields)
+                self.assertEqual(set(model["properties"]), fields)
+
 
 if __name__ == "__main__":
     unittest.main()
