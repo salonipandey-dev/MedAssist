@@ -7,8 +7,9 @@ currently contains a small FastAPI backend and the project planning documents.
 
 ## Current status
 
-- Implemented: API welcome response, a liveness endpoint, generated API docs,
-  and HTTP contract tests.
+- Implemented: API welcome response, a liveness endpoint, typed response
+  schemas, optional frontend origins, generated API docs, HTTP contract tests,
+  and automated backend checks.
 - Planned: patient management, authentication, database storage, and triage
   assistance. These features are not implemented yet.
 - The prototype does not provide medical advice or clinical decision support.
@@ -69,6 +70,39 @@ Example response from `/health`:
 ```
 
 This is a liveness check. It does not check a database or any external service.
+The welcome and health responses have named schemas in `/docs` and
+`/openapi.json`, including their required fields.
+
+## Connect a local frontend
+
+Cross-origin browser access is disabled by default. To let a frontend read the
+API, set `MEDASSIST_CORS_ORIGINS` in the server terminal before starting Uvicorn.
+Use the frontend's exact origin: protocol, host, and port, without a trailing
+slash or path. Multiple origins are separated by commas.
+
+Windows PowerShell, from `backend`:
+
+```powershell
+$env:MEDASSIST_CORS_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+```
+
+macOS or Linux, from `backend` with the virtual environment activated:
+
+```bash
+MEDASSIST_CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173" python -m uvicorn app.main:app --reload
+```
+
+Only the configured origins and GET requests are permitted by the browser CORS
+policy. Credentialed browser requests are disabled. Invalid origins (including
+wildcards and URLs with paths) stop startup with a configuration error.
+Settings are read when the app is created, so restart the server after changes.
+`.env` files are not loaded automatically.
+
+To disable this setting in PowerShell, run
+`Remove-Item Env:MEDASSIST_CORS_ORIGINS` and restart the server. In a Unix shell,
+use `unset MEDASSIST_CORS_ORIGINS` if you previously exported it. CORS does not
+replace the authentication and access controls planned for patient workflows.
 
 ## Run the tests
 
@@ -91,15 +125,26 @@ python -m unittest discover -s tests -v
 ```
 
 The tests cover the existing welcome response, the health response, rejection of
-POST requests to the health route, and the published OpenAPI schema.
+POST requests to the health route, required OpenAPI fields, CORS defaults,
+allowed and unlisted origins, preflight requests, and invalid settings.
+
+The [Backend tests workflow](.github/workflows/backend-tests.yml) runs the suite
+and checks installed dependency compatibility on Ubuntu and Windows with Python
+3.10 and 3.14. It runs for backend or workflow changes pushed to `main`, for
+matching pull requests, and on manual dispatch from the Actions tab.
 
 ## Repository layout
 
-- `backend/app/main.py`: FastAPI application and system routes.
+- `backend/app/main.py`: application factory, system routes, and Uvicorn app.
+- `backend/app/config.py`: environment configuration for frontend origins.
+- `backend/app/schemas.py`: public system response models.
 - `backend/requirements.txt`: pinned runtime dependencies.
 - `backend/requirements-dev.txt`: runtime dependencies plus test client support.
 - `backend/tests/`: HTTP contract tests.
 - `docs/`: project synopsis, presentation, and evaluation report.
+- `.github/workflows/backend-tests.yml`: automated backend checks.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow.
 
 Virtual environments, Python caches, and local environment files are ignored by
 Git. Keep credentials and real patient information out of the repository.
