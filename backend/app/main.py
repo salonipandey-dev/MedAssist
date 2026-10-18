@@ -1,6 +1,6 @@
 """MedAssist API entry point."""
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_cors_origins
@@ -31,8 +31,9 @@ def create_app() -> FastAPI:
         return WelcomeResponse(message="MedAssist backend is running")
 
     @application.get("/health", tags=["System"], summary="Check API liveness")
-    def health() -> HealthResponse:
+    def health(response: Response) -> HealthResponse:
         """Report liveness only; no database or external services are checked."""
+        response.headers["Cache-Control"] = "no-store"
         return HealthResponse(
             status="ok", service="medassist-api", version=application.version
         )

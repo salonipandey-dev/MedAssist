@@ -70,6 +70,8 @@ Example response from `/health`:
 ```
 
 This is a liveness check. It does not check a database or any external service.
+Successful health responses send `Cache-Control: no-store` so browsers and
+intermediaries do not store a stale liveness result.
 The welcome and health responses have named schemas in `/docs` and
 `/openapi.json`, including their required fields.
 
@@ -139,8 +141,9 @@ python -m pip install -r requirements-dev.txt
 python -m unittest discover -s tests -v
 ```
 
-The tests cover the existing welcome response, the health response, rejection of
-POST requests to the health route, required OpenAPI fields, CORS defaults,
+The tests cover the existing welcome response, the health response and its
+cache policy, rejection of POST requests to the health route, required OpenAPI
+fields, CORS defaults,
 allowed and unlisted origins, preflight requests, invalid settings, request ID
 generation, and browser access to response IDs.
 
