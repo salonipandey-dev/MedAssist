@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_cors_origins
+from app.middleware import RequestIDMiddleware
 from app.schemas import HealthResponse, WelcomeResponse
 
 
@@ -21,7 +22,9 @@ def create_app() -> FastAPI:
             allow_origins=origins,
             allow_credentials=False,
             allow_methods=["GET"],
+            expose_headers=["X-Request-ID"],
         )
+    application.add_middleware(RequestIDMiddleware)
 
     @application.get("/", tags=["System"], summary="Check the API welcome message")
     def home() -> WelcomeResponse:

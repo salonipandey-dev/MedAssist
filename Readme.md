@@ -8,8 +8,8 @@ currently contains a small FastAPI backend and the project planning documents.
 ## Current status
 
 - Implemented: API welcome response, a liveness endpoint, typed response
-  schemas, optional frontend origins, generated API docs, HTTP contract tests,
-  and automated backend checks.
+  schemas, request IDs, optional frontend origins, generated API docs, HTTP
+  contract tests, and automated backend checks.
 - Planned: patient management, authentication, database storage, and triage
   assistance. These features are not implemented yet.
 - The prototype does not provide medical advice or clinical decision support.
@@ -73,6 +73,21 @@ This is a liveness check. It does not check a database or any external service.
 The welcome and health responses have named schemas in `/docs` and
 `/openapi.json`, including their required fields.
 
+## Trace a request
+
+Successful responses and handled client errors (such as 404 and 405) include an
+`X-Request-ID` response header. The API generates a new UUID for each HTTP request;
+caller-supplied IDs are replaced. Include this ID when reporting an API problem.
+Routes can access the same value through `request.state.request_id`. Request
+tracing does not record request bodies or patient information.
+
+```bash
+curl -i http://127.0.0.1:8000/health
+```
+
+An allowed frontend can read the header with
+`response.headers.get("X-Request-ID")`; it is exposed by the CORS configuration.
+
 ## Connect a local frontend
 
 Cross-origin browser access is disabled by default. To let a frontend read the
@@ -126,7 +141,8 @@ python -m unittest discover -s tests -v
 
 The tests cover the existing welcome response, the health response, rejection of
 POST requests to the health route, required OpenAPI fields, CORS defaults,
-allowed and unlisted origins, preflight requests, and invalid settings.
+allowed and unlisted origins, preflight requests, invalid settings, request ID
+generation, and browser access to response IDs.
 
 The [Backend tests workflow](.github/workflows/backend-tests.yml) runs the suite
 and checks installed dependency compatibility on Ubuntu and Windows with Python
@@ -137,6 +153,7 @@ matching pull requests, and on manual dispatch from the Actions tab.
 
 - `backend/app/main.py`: application factory, system routes, and Uvicorn app.
 - `backend/app/config.py`: environment configuration for frontend origins.
+- `backend/app/middleware.py`: server-generated HTTP request IDs.
 - `backend/app/schemas.py`: public system response models.
 - `backend/requirements.txt`: pinned runtime dependencies.
 - `backend/requirements-dev.txt`: runtime dependencies plus test client support.
