@@ -1,0 +1,26 @@
+# Start the backend first; change the port here if needed.
+# Run individual requests with an HTTP client that supports .http files.
+@baseUrl = http://127.0.0.1:8000
+
+### Welcome message: 200 with the backend welcome message
+GET {{baseUrl}}/
+Accept: application/json
+
+### Liveness: 200 with status, service, version, and Cache-Control: no-store
+GET {{baseUrl}}/health
+Accept: application/json
+
+### Headers-only liveness: 200 with no body and a new X-Request-ID
+HEAD {{baseUrl}}/health
+
+### API contract: 200 with the generated OpenAPI schema
+GET {{baseUrl}}/openapi.json
+Accept: application/json
+
+### Unknown route: 404 with a detail field and X-Request-ID
+GET {{baseUrl}}/missing
+Accept: application/json
+
+### Unsupported health write: 405 with a detail field and X-Request-ID
+POST {{baseUrl}}/health
+Accept: application/json

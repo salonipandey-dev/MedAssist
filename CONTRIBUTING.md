@@ -45,5 +45,11 @@ response schemas. Use `create_app()` when tests need an independent application
 instance; settings are read for each instance. See the README's
 [frontend configuration](Readme.md#connect-a-local-frontend) for browser access.
 
+Use [requests.http](backend/requests.http) with a compatible HTTP client to try
+welcome, health, schema, and error responses against the running server. Its
+`@baseUrl` defaults to `http://127.0.0.1:8000`; change it when using another port.
+Check the expected status in each request's title and inspect `X-Request-ID` in
+the response headers when investigating a problem.
+
 Use synthetic examples for project work. Authentication and database storage
 remain future work; real patient data should not be used in this prototype.

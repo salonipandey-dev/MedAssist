@@ -49,6 +49,12 @@ python -m uvicorn app.main:app --reload
 Keep the server terminal open. Visit <http://127.0.0.1:8000/docs> to try the API.
 Use `Ctrl+C` to stop the development server. `--reload` is for local development.
 
+The [sample API requests](backend/requests.http) include welcome, GET/HEAD health,
+OpenAPI, and error examples with expected status codes. Open the file in an HTTP
+client that supports `.http` files, such as VS Code with the REST Client
+extension, and run each request while the server is running. Edit `@baseUrl` if
+you use a different port. These examples do not require a database or login.
+
 ## Available endpoints
 
 | Method | Path | Purpose |
@@ -164,6 +170,7 @@ matching pull requests, and on manual dispatch from the Actions tab.
 - `backend/app/schemas.py`: public system response models.
 - `backend/requirements.txt`: pinned runtime dependencies.
 - `backend/requirements-dev.txt`: runtime dependencies plus test client support.
+- `backend/requests.http`: runnable local API examples and expected responses.
 - `backend/tests/`: HTTP contract tests.
 - `docs/`: project synopsis, presentation, and evaluation report.
 - `.github/workflows/backend-tests.yml`: automated backend checks.
