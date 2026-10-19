@@ -40,17 +40,34 @@ class CorsTests(unittest.TestCase):
         response = client.get("/health", headers={"Origin": "https://unlisted.example"})
         self.assertNotIn("access-control-allow-origin", response.headers)
 
-    def test_preflight_allows_get_from_a_configured_origin(self):
-        response = self.make_client("http://localhost:5173").options(
-            "/health",
-            headers={
-                "Origin": "http://localhost:5173",
-                "Access-Control-Request-Method": "GET",
-            },
+    def test_preflight_allows_get_and_head_from_a_configured_origin(self):
+        client = self.make_client("http://localhost:5173")
+        for method in ("GET", "HEAD"):
+            with self.subTest(method=method):
+                response = client.options(
+                    "/health",
+                    headers={
+                        "Origin": "http://localhost:5173",
+                        "Access-Control-Request-Method": method,
+                    },
+                )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.headers["access-control-allow-methods"], "GET, HEAD"
+                )
+                self.assertEqual(
+                    response.headers["access-control-allow-origin"], "http://localhost:5173"
+                )
+
+    def test_allowed_frontend_can_check_health_without_a_response_body(self):
+        response = self.make_client("http://localhost:5173").head(
+            "/health", headers={"Origin": "http://localhost:5173"}
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers["access-control-allow-methods"], "GET")
+        self.assertEqual(response.content, b"")
+        self.assertEqual(response.headers["cache-control"], "no-store")
         self.assertEqual(
             response.headers["access-control-allow-origin"], "http://localhost:5173"
         )

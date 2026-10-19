@@ -35,6 +35,17 @@ class ApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+    def test_head_health_returns_get_headers_without_a_body(self):
+        health = self.client.get("/health")
+        response = self.client.head("/health")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"")
+        for header in ("content-type", "content-length", "cache-control"):
+            with self.subTest(header=header):
+                self.assertEqual(response.headers[header], health.headers[header])
+        self.assertEqual(response.headers["cache-control"], "no-store")
+
     def test_health_cannot_be_stored_as_a_cached_liveness_result(self):
         for headers in (
             {},

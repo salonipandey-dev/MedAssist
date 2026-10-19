@@ -21,7 +21,7 @@ def create_app() -> FastAPI:
             CORSMiddleware,
             allow_origins=origins,
             allow_credentials=False,
-            allow_methods=["GET"],
+            allow_methods=["GET", "HEAD"],
             expose_headers=["X-Request-ID"],
         )
     application.add_middleware(RequestIDMiddleware)
@@ -30,6 +30,7 @@ def create_app() -> FastAPI:
     def home() -> WelcomeResponse:
         return WelcomeResponse(message="MedAssist backend is running")
 
+    @application.head("/health", include_in_schema=False)
     @application.get("/health", tags=["System"], summary="Check API liveness")
     def health(response: Response) -> HealthResponse:
         """Report liveness only; no database or external services are checked."""

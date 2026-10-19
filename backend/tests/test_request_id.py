@@ -32,6 +32,7 @@ class RequestIDTests(unittest.TestCase):
         for method, path, status in (
             ("GET", "/", 200),
             ("GET", "/health", 200),
+            ("HEAD", "/health", 200),
             ("GET", "/missing", 404),
             ("POST", "/health", 405),
         ):

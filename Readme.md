@@ -7,7 +7,7 @@ currently contains a small FastAPI backend and the project planning documents.
 
 ## Current status
 
-- Implemented: API welcome response, a liveness endpoint, typed response
+- Implemented: API welcome response, GET/HEAD liveness checks, typed response
   schemas, request IDs, optional frontend origins, generated API docs, HTTP
   contract tests, and automated backend checks.
 - Planned: patient management, authentication, database storage, and triage
@@ -55,6 +55,7 @@ Use `Ctrl+C` to stop the development server. `--reload` is for local development
 | --- | --- | --- |
 | GET | `/` | Return the existing backend welcome message |
 | GET | `/health` | Check that the API is responding |
+| HEAD | `/health` | Check liveness headers without downloading a response body |
 | GET | `/docs` | Open interactive Swagger documentation |
 | GET | `/redoc` | Open ReDoc documentation |
 | GET | `/openapi.json` | Retrieve the OpenAPI schema |
@@ -72,6 +73,9 @@ Example response from `/health`:
 This is a liveness check. It does not check a database or any external service.
 Successful health responses send `Cache-Control: no-store` so browsers and
 intermediaries do not store a stale liveness result.
+Monitoring tools can use `HEAD /health` for the same status and headers without
+a response body. For example, run `curl -I http://127.0.0.1:8000/health` (use
+`curl.exe -I` in Windows PowerShell). HEAD requests also receive an `X-Request-ID`.
 The welcome and health responses have named schemas in `/docs` and
 `/openapi.json`, including their required fields.
 
@@ -110,7 +114,7 @@ macOS or Linux, from `backend` with the virtual environment activated:
 MEDASSIST_CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173" python -m uvicorn app.main:app --reload
 ```
 
-Only the configured origins and GET requests are permitted by the browser CORS
+Only the configured origins and GET/HEAD requests are permitted by the browser CORS
 policy. Credentialed browser requests are disabled. Invalid origins (including
 wildcards and URLs with paths) stop startup with a configuration error.
 Settings are read when the app is created, so restart the server after changes.
@@ -141,7 +145,7 @@ python -m pip install -r requirements-dev.txt
 python -m unittest discover -s tests -v
 ```
 
-The tests cover the existing welcome response, the health response and its
+The tests cover the existing welcome response, GET/HEAD health responses and their
 cache policy, rejection of POST requests to the health route, required OpenAPI
 fields, CORS defaults,
 allowed and unlisted origins, preflight requests, invalid settings, request ID
