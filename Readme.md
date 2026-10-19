@@ -55,6 +55,7 @@ Use `Ctrl+C` to stop the development server. `--reload` is for local development
 | --- | --- | --- |
 | GET | `/` | Return the existing backend welcome message |
 | GET | `/health` | Check that the API is responding |
+| HEAD | `/health` | Check liveness using response headers only |
 | GET | `/docs` | Open interactive Swagger documentation |
 | GET | `/redoc` | Open ReDoc documentation |
 | GET | `/openapi.json` | Retrieve the OpenAPI schema |
@@ -72,6 +73,8 @@ Example response from `/health`:
 This is a liveness check. It does not check a database or any external service.
 Successful health responses send `Cache-Control: no-store` so browsers and
 intermediaries do not store a stale liveness result.
+Uptime monitors can use `HEAD /health` for the same status and headers without
+downloading a response body, for example `curl -I http://127.0.0.1:8000/health`.
 The welcome and health responses have named schemas in `/docs` and
 `/openapi.json`, including their required fields.
 
@@ -110,8 +113,8 @@ macOS or Linux, from `backend` with the virtual environment activated:
 MEDASSIST_CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173" python -m uvicorn app.main:app --reload
 ```
 
-Only the configured origins and GET requests are permitted by the browser CORS
-policy. Credentialed browser requests are disabled. Invalid origins (including
+The browser CORS policy permits GET and HEAD requests from configured origins.
+Credentialed browser requests are disabled. Invalid origins (including
 wildcards and URLs with paths) stop startup with a configuration error.
 Settings are read when the app is created, so restart the server after changes.
 `.env` files are not loaded automatically.
@@ -142,10 +145,10 @@ python -m unittest discover -s tests -v
 ```
 
 The tests cover the existing welcome response, the health response and its
-cache policy, rejection of POST requests to the health route, required OpenAPI
-fields, CORS defaults,
-allowed and unlisted origins, preflight requests, invalid settings, request ID
-generation, and browser access to response IDs.
+cache policy, body-free HEAD liveness checks, rejection of POST requests to the
+health route, required OpenAPI fields, CORS defaults, allowed and unlisted
+origins, preflight requests, invalid settings, request ID generation, and
+browser access to response IDs.
 
 The [Backend tests workflow](.github/workflows/backend-tests.yml) runs the suite
 and checks installed dependency compatibility on Ubuntu and Windows with Python
