@@ -57,9 +57,20 @@ class CorsTests(unittest.TestCase):
                     response.headers["access-control-allow-methods"], "GET, HEAD"
                 )
                 self.assertEqual(
-                    response.headers["access-control-allow-origin"],
-                    "http://localhost:5173",
+                    response.headers["access-control-allow-origin"], "http://localhost:5173"
                 )
+
+    def test_allowed_frontend_can_check_health_without_a_response_body(self):
+        response = self.make_client("http://localhost:5173").head(
+            "/health", headers={"Origin": "http://localhost:5173"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"")
+        self.assertEqual(response.headers["cache-control"], "no-store")
+        self.assertEqual(
+            response.headers["access-control-allow-origin"], "http://localhost:5173"
+        )
 
     def test_preflight_rejects_unlisted_origins_and_write_methods(self):
         client = self.make_client("http://localhost:5173")

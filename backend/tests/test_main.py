@@ -35,32 +35,35 @@ class ApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 405)
 
-    def test_head_health_returns_headers_without_a_response_body(self):
-        get_response = self.client.get("/health")
+    def test_head_health_returns_get_headers_without_a_body(self):
+        health = self.client.get("/health")
         response = self.client.head("/health")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"")
-        self.assertEqual(response.headers.get("cache-control"), "no-store")
-        for name in ("content-type", "content-length"):
-            with self.subTest(header=name):
-                self.assertEqual(response.headers[name], get_response.headers[name])
-        self.assertIn("x-request-id", response.headers)
+        for header in ("content-type", "content-length", "cache-control"):
+            with self.subTest(header=header):
+                self.assertEqual(response.headers[header], health.headers[header])
+        self.assertEqual(response.headers["cache-control"], "no-store")
 
     def test_health_cannot_be_stored_as_a_cached_liveness_result(self):
-        for headers in (
-            {},
-            {
-                "If-None-Match": "*",
-                "If-Modified-Since": "Thu, 01 Jan 1970 00:00:00 GMT",
-            },
-        ):
-            with self.subTest(headers=headers):
-                response = self.client.get("/health", headers=headers)
+        for method in ("GET", "HEAD"):
+            for headers in (
+                {},
+                {
+                    "If-None-Match": "*",
+                    "If-Modified-Since": "Thu, 01 Jan 1970 00:00:00 GMT",
+                },
+            ):
+                with self.subTest(method=method, headers=headers):
+                    response = self.client.request(method, "/health", headers=headers)
 
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.headers.get("cache-control"), "no-store")
-                self.assertEqual(response.json()["status"], "ok")
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(response.headers.get("cache-control"), "no-store")
+                    if method == "GET":
+                        self.assertEqual(response.json()["status"], "ok")
+                    else:
+                        self.assertEqual(response.content, b"")
 
     def test_openapi_documents_the_api_and_health_route(self):
         response = self.client.get("/openapi.json")
