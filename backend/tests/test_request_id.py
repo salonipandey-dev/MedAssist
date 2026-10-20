@@ -11,11 +11,13 @@ from app.main import create_app
 
 
 class RequestIDTests(unittest.TestCase):
-    def make_client(self, origins="", application=None):
+    def make_client(self, origins="", application=None, raise_server_exceptions=True):
         if application is None:
             with patch.dict("os.environ", {"MEDASSIST_CORS_ORIGINS": origins}):
                 application = create_app()
-        client = TestClient(application)
+        client = TestClient(
+            application, raise_server_exceptions=raise_server_exceptions
+        )
         client.__enter__()
         self.addCleanup(client.__exit__, None, None, None)
         return client
@@ -47,6 +49,44 @@ class RequestIDTests(unittest.TestCase):
         second = self.assert_request_id(client.get("/health"))
 
         self.assertNotEqual(first, second)
+
+    def test_unhandled_server_errors_keep_the_route_request_id(self):
+        with patch.dict("os.environ", {"MEDASSIST_CORS_ORIGINS": ""}):
+            application = create_app()
+        route_request_ids = []
+
+        @application.get("/unexpected-error")
+        def unexpected_error(request: Request):
+            route_request_ids.append(request.state.request_id)
+            raise RuntimeError("Internal failure details must stay private")
+
+        client = self.make_client(
+            application=application, raise_server_exceptions=False
+        )
+        response_ids = []
+        for _ in range(2):
+            response = client.get(
+                "/unexpected-error", headers={"X-Request-ID": "caller-chosen-id"}
+            )
+
+            self.assertEqual(response.status_code, 500)
+            self.assertEqual(response.text, "Internal Server Error")
+            response_ids.append(self.assert_request_id(response))
+            self.assertEqual(response_ids[-1], route_request_ids[-1])
+
+        self.assertNotEqual(response_ids[0], response_ids[1])
+
+    def test_unhandled_errors_still_propagate_for_debugging(self):
+        with patch.dict("os.environ", {"MEDASSIST_CORS_ORIGINS": ""}):
+            application = create_app()
+
+        @application.get("/unexpected-error")
+        def unexpected_error():
+            raise RuntimeError("Unexpected route failure")
+
+        client = self.make_client(application=application)
+        with self.assertRaisesRegex(RuntimeError, "Unexpected route failure"):
+            client.get("/unexpected-error")
 
     def test_caller_cannot_choose_the_server_request_id(self):
         supplied_id = "caller-controlled-value"

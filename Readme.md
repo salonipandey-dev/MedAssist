@@ -93,6 +93,11 @@ caller-supplied IDs are replaced. Include this ID when reporting an API problem.
 Routes can access the same value through `request.state.request_id`. Request
 tracing does not record request bodies or patient information.
 
+Unexpected route failures before a response starts return a generic `500 Internal
+Server Error` with the same request ID. Exception details stay out of the response;
+the exception still propagates to the server for logging and debugging. Responses
+that have already started cannot be replaced by this error handler.
+
 ```bash
 curl -i http://127.0.0.1:8000/health
 ```
@@ -155,7 +160,7 @@ The tests cover the existing welcome response, GET/HEAD health responses and the
 cache policy, rejection of POST requests to the health route, required OpenAPI
 fields, CORS defaults,
 allowed and unlisted origins, preflight requests, invalid settings, request ID
-generation, and browser access to response IDs.
+generation, unexpected server failures, and browser access to response IDs.
 
 The [Backend tests workflow](.github/workflows/backend-tests.yml) runs the suite
 and checks installed dependency compatibility on Ubuntu and Windows with Python

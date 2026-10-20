@@ -1,7 +1,8 @@
 """MedAssist API entry point."""
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 
 from app.config import get_cors_origins
 from app.middleware import RequestIDMiddleware
@@ -25,6 +26,15 @@ def create_app() -> FastAPI:
             expose_headers=["X-Request-ID"],
         )
     application.add_middleware(RequestIDMiddleware)
+
+    @application.exception_handler(Exception)
+    async def server_error(request: Request, _exc: Exception) -> PlainTextResponse:
+        """Keep unexpected failures traceable without exposing exception details."""
+        return PlainTextResponse(
+            "Internal Server Error",
+            status_code=500,
+            headers={"X-Request-ID": request.state.request_id},
+        )
 
     @application.get("/", tags=["System"], summary="Check the API welcome message")
     def home() -> WelcomeResponse:
