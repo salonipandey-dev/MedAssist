@@ -1,7 +1,55 @@
-from fastapi import FastAPI
+"""MedAssist API entry point."""
 
-app = FastAPI()
+from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 
-@app.get("/")
-def home():
-    return {"message": "MedAssist backend is running"}
+from app.config import get_cors_origins
+from app.middleware import RequestIDMiddleware
+from app.schemas import HealthResponse, WelcomeResponse
+
+
+def create_app() -> FastAPI:
+    """Build an application with settings read when the instance is created."""
+    origins = get_cors_origins()
+    application = FastAPI(
+        title="MedAssist API",
+        description="Backend foundation for the MedAssist student project.",
+        version="0.1.0",
+    )
+    if origins:
+        application.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_credentials=False,
+            allow_methods=["GET", "HEAD"],
+            expose_headers=["X-Request-ID"],
+        )
+    application.add_middleware(RequestIDMiddleware)
+
+    @application.exception_handler(Exception)
+    async def server_error(request: Request, _exc: Exception) -> PlainTextResponse:
+        """Keep unexpected failures traceable without exposing exception details."""
+        return PlainTextResponse(
+            "Internal Server Error",
+            status_code=500,
+            headers={"X-Request-ID": request.state.request_id},
+        )
+
+    @application.get("/", tags=["System"], summary="Check the API welcome message")
+    def home() -> WelcomeResponse:
+        return WelcomeResponse(message="MedAssist backend is running")
+
+    @application.head("/health", include_in_schema=False)
+    @application.get("/health", tags=["System"], summary="Check API liveness")
+    def health(response: Response) -> HealthResponse:
+        """Report liveness only; no database or external services are checked."""
+        response.headers["Cache-Control"] = "no-store"
+        return HealthResponse(
+            status="ok", service="medassist-api", version=application.version
+        )
+
+    return application
+
+
+app = create_app()
