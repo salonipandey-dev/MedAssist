@@ -78,7 +78,8 @@ Example response from `/health`:
 
 This is a liveness check. It does not check a database or any external service.
 Successful health responses send `Cache-Control: no-store` so browsers and
-intermediaries do not store a stale liveness result.
+intermediaries do not store a stale liveness result. Conditional cache headers
+also receive a fresh `200 OK` liveness response instead of `304 Not Modified`.
 Monitoring tools can use `HEAD /health` for the same status and headers without
 a response body. For example, run `curl -I http://127.0.0.1:8000/health` (use
 `curl.exe -I` in Windows PowerShell). HEAD requests also receive an `X-Request-ID`.

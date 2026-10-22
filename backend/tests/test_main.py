@@ -47,19 +47,23 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.headers["cache-control"], "no-store")
 
     def test_health_cannot_be_stored_as_a_cached_liveness_result(self):
-        for headers in (
-            {},
-            {
-                "If-None-Match": "*",
-                "If-Modified-Since": "Thu, 01 Jan 1970 00:00:00 GMT",
-            },
-        ):
-            with self.subTest(headers=headers):
-                response = self.client.get("/health", headers=headers)
+        for method in ("GET", "HEAD"):
+            for headers in (
+                {},
+                {
+                    "If-None-Match": "*",
+                    "If-Modified-Since": "Thu, 01 Jan 1970 00:00:00 GMT",
+                },
+            ):
+                with self.subTest(method=method, headers=headers):
+                    response = self.client.request(method, "/health", headers=headers)
 
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.headers.get("cache-control"), "no-store")
-                self.assertEqual(response.json()["status"], "ok")
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(response.headers.get("cache-control"), "no-store")
+                    if method == "GET":
+                        self.assertEqual(response.json()["status"], "ok")
+                    else:
+                        self.assertEqual(response.content, b"")
 
     def test_openapi_documents_the_api_and_health_route(self):
         response = self.client.get("/openapi.json")
