@@ -10,9 +10,20 @@ currently contains a small FastAPI backend and the project planning documents.
 - Implemented: API welcome response, GET/HEAD liveness checks, typed response
   schemas, request IDs, optional frontend origins, generated API docs, HTTP
   contract tests, and automated backend checks.
-- Planned: patient management, authentication, database storage, and triage
-  assistance. These features are not implemented yet.
+- Frontend demo: fictional patient entries appear in a temporary in-memory table;
+  no registration data is sent to the API or saved between page reloads. The
+  triage form is intentionally unavailable until clinically validated.
+- Planned: persistent patient management, authentication, database storage, and
+  triage assistance. These features are not implemented yet.
 - The prototype does not provide medical advice or clinical decision support.
+
+## Try the frontend demo
+
+Open `frontend/index.html` in a browser. The included `frontend/js/app.js`
+script adds form validation and an in-memory table for **fictional sample
+entries only**. The demo has no API connection or persistent storage; reloading
+clears entries. Do not enter real patient or health information. Triage scoring
+is intentionally disabled because no validated decision support exists.
 
 ## Run locally
 
@@ -170,6 +181,8 @@ matching pull requests, and on manual dispatch from the Actions tab.
 
 ## Repository layout
 
+- `frontend/index.html`, `frontend/style.css`, and `frontend/js/app.js`:
+  static browser-only demonstration without data persistence or triage scoring.
 - `backend/app/main.py`: application factory, system routes, and Uvicorn app.
 - `backend/app/config.py`: environment configuration for frontend origins.
 - `backend/app/middleware.py`: server-generated HTTP request IDs.
