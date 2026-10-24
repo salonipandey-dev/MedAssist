@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>MedAssist | Healthcare Triage Platform</title>
+    <title>MedAssist | Fictional Healthcare UI Demo</title>
 
     <link rel="stylesheet" href="style.css">
 
@@ -33,22 +33,22 @@
                 Dashboard
             </a>
 
-            <a href="#patient">
+            <a href="#patient" class="nav-link">
                 <i class="fa-solid fa-user-plus"></i>
                 Patient
             </a>
 
-            <a href="#triage">
+            <a href="#triage" class="nav-link">
                 <i class="fa-solid fa-stethoscope"></i>
                 Triage
             </a>
 
-            <a href="#records">
+            <a href="#records" class="nav-link">
                 <i class="fa-solid fa-file-medical"></i>
                 Records
             </a>
 
-            <a href="#analytics">
+            <a href="#analytics" class="nav-link">
                 <i class="fa-solid fa-chart-line"></i>
                 Analytics
             </a>
@@ -73,7 +73,7 @@
 
             <div>
                 <h1>Healthcare Dashboard</h1>
-                <p>AI-Assisted Triage & Patient Management</p>
+                <p>Student UI prototype — fictional data only</p>
             </div>
 
             <div class="user-profile">
@@ -84,7 +84,7 @@
 
                 <div>
                     <strong>Saloni</strong>
-                    <p>Administrator</p>
+                    <p>Demo Owner — no login</p>
                 </div>
 
             </div>
@@ -114,8 +114,8 @@
                         No real medical assessment or patient storage is available.
                     </p>
 
-                    <a href="#triage" class="primary-btn">
-                        Start Triage
+                    <a href="#patient" class="primary-btn">
+                        Try Sample Registration
                     </a>
 
                 </div>
@@ -153,7 +153,7 @@
 
                     <div>
                         <p>Low Risk Cases</p>
-                        <h3 id="lowRiskCount">0</h3>
+                        <h3 id="lowRiskCount">N/A</h3>
                     </div>
 
                 </div>
@@ -167,7 +167,7 @@
 
                     <div>
                         <p>Moderate Risk</p>
-                        <h3 id="mediumRiskCount">0</h3>
+                        <h3 id="mediumRiskCount">N/A</h3>
                     </div>
 
                 </div>
@@ -181,7 +181,7 @@
 
                     <div>
                         <p>Emergency</p>
-                        <h3 id="highRiskCount">0</h3>
+                        <h3 id="highRiskCount">N/A</h3>
                     </div>
 
                 </div>
@@ -298,152 +298,11 @@
             </div>
 
 
-            <form id="triageForm">
-
-                <div class="form-group">
-
-                    <label>Patient Name</label>
-
-                    <input
-                        type="text"
-                        id="triagePatient"
-                        placeholder="Patient name"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Main Symptoms</label>
-
-                    <textarea
-                        id="symptoms"
-                        rows="5"
-                        placeholder="Example: fever, cough, chest pain, dizziness..."
-                        required
-                    ></textarea>
-
-                </div>
-
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-
-                        <label>Temperature °C</label>
-
-                        <input
-                            type="number"
-                            step="0.1"
-                            id="temperature"
-                            placeholder="37.0"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>Heart Rate</label>
-
-                        <input
-                            type="number"
-                            id="heartRate"
-                            placeholder="72 BPM"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>Oxygen Saturation</label>
-
-                        <input
-                            type="number"
-                            id="oxygen"
-                            placeholder="98%"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label>Pain Level</label>
-
-                        <select id="painLevel">
-
-                            <option value="0">No Pain</option>
-                            <option value="1">Mild</option>
-                            <option value="2">Moderate</option>
-                            <option value="3">Severe</option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                <button type="submit" class="primary-btn">
-
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-
-                    Analyse Patient
-
-                </button>
-
-            </form>
-
-
-            <!-- Result -->
-
-            <div id="triageResult" class="triage-result hidden">
-
-                <div class="result-header">
-
-                    <div>
-
-                        <span>
-                            TRIAGE RESULT
-                        </span>
-
-                        <h2 id="riskLevel">
-                            Moderate Priority
-                        </h2>
-
-                    </div>
-
-                    <div id="riskIndicator" class="risk-circle">
-                        !
-                    </div>
-
-                </div>
-
-
-                <div class="result-grid">
-
-                    <div>
-                        <p>Patient</p>
-                        <strong id="resultPatient"></strong>
-                    </div>
-
-                    <div>
-                        <p>Priority Score</p>
-                        <strong id="riskScore"></strong>
-                    </div>
-
-                    <div>
-                        <p>Recommended Action</p>
-                        <strong id="recommendedAction"></strong>
-                    </div>
-
-                </div>
-
-            </div>
+            <p id="triageAvailability" class="triage-unavailable" role="status">
+                Triage is not available in this nonclinical student prototype.
+                No symptoms, vital signs, or risk scores can be entered or assessed.
+                Do not use MedAssist for medical decisions.
+            </p>
 
         </section>
 
@@ -521,9 +380,7 @@
 
                     <p>Total Triage Assessments</p>
 
-                    <h2 id="totalAssessments">
-                        0
-                    </h2>
+                    <h2 id="totalAssessments">N/A</h2>
 
                 </div>
 
@@ -532,9 +389,7 @@
 
                     <p>Most Recent Risk Level</p>
 
-                    <h2 id="latestRisk">
-                        -
-                    </h2>
+                    <h2 id="latestRisk">N/A</h2>
 
                 </div>
 
