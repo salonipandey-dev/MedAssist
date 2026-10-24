@@ -50,6 +50,36 @@ class RequestIDTests(unittest.TestCase):
 
         self.assertNotEqual(first, second)
 
+    def test_request_ids_stay_unique_across_http_methods_and_errors(self):
+        """Each request gets its own server-generated ID, even across methods."""
+        client = self.make_client("http://localhost:5173")
+        seen_ids = set()
+        requests = (
+            ("GET", "/", {}, 200),
+            ("GET", "/health", {}, 200),
+            ("HEAD", "/health", {}, 200),
+            ("GET", "/missing", {}, 404),
+            ("POST", "/health", {}, 405),
+            (
+                "OPTIONS",
+                "/health",
+                {
+                    "Origin": "http://localhost:5173",
+                    "Access-Control-Request-Method": "GET",
+                },
+                200,
+            ),
+        )
+        for method, path, headers, expected_status in requests:
+            with self.subTest(method=method, path=path):
+                response = client.request(method, path, headers=headers)
+                self.assertEqual(response.status_code, expected_status)
+                request_id = self.assert_request_id(response)
+                self.assertNotIn(request_id, seen_ids)
+                seen_ids.add(request_id)
+
+        self.assertEqual(len(seen_ids), len(requests))
+
     def test_unhandled_server_errors_keep_the_route_request_id(self):
         with patch.dict("os.environ", {"MEDASSIST_CORS_ORIGINS": ""}):
             application = create_app()
