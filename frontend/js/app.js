@@ -3,11 +3,10 @@
 // Browser-only prototype. Never store or send real patient information.
 (() => {
     const patientForm = document.getElementById("patientForm");
-    const triageForm = document.getElementById("triageForm");
     const table = document.getElementById("patientTable");
     const count = document.getElementById("patientCount");
 
-    if (!patientForm || !triageForm || !table || !count) {
+    if (!patientForm || !table || !count) {
         return;
     }
 
@@ -48,15 +47,7 @@
         patientForm.reset();
     });
 
-    // No validated clinical logic exists. Do not generate fictitious risk scores.
-    const triageNotice = document.createElement("p");
-    triageNotice.setAttribute("role", "status");
-    triageNotice.textContent =
-        "Triage scoring is not implemented. Do not enter real health information or use this prototype for medical decisions.";
-    triageForm.replaceWith(triageNotice);
-    document.getElementById("triageResult")?.classList.add("hidden");
-    document.getElementById("totalAssessments").textContent = "N/A";
-    document.getElementById("latestRisk").textContent = "N/A";
+    // Triage is intentionally not implemented; its unavailable notice is static HTML.
 
     document.querySelectorAll(".nav-link").forEach((link) => {
         link.addEventListener("click", () => {
