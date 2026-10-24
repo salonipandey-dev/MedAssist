@@ -12,7 +12,8 @@ currently contains a small FastAPI backend and the project planning documents.
   contract tests, and automated backend checks.
 - Frontend demo: fictional patient entries appear in a temporary in-memory table;
   no registration data is sent to the API or saved between page reloads. The
-  triage section displays a static unavailable notice and exposes no health\n  input fields or risk scores, including when JavaScript is disabled.
+  triage section displays a static unavailable notice and exposes no health
+  input fields or risk scores, including when JavaScript is disabled.
 - Planned: persistent patient management, authentication, database storage, and
   triage assistance. These features are not implemented yet.
 - The prototype does not provide medical advice or clinical decision support.
@@ -23,7 +24,8 @@ Open `frontend/index.html` in a browser. The included `frontend/js/app.js`
 script adds form validation and an in-memory table for **fictional sample
 entries only**. The demo has no API connection or persistent storage; reloading
 clears entries. Do not enter real patient or health information. Triage scoring
-is not implemented; the page does not render health-input fields or risk\nresults. The risk statistics show N/A rather than misleading zero counts.
+is not implemented; the page does not render health-input fields or risk
+results. The risk statistics show N/A rather than misleading zero counts.
 
 ### Verify frontend nonclinical safeguards
 

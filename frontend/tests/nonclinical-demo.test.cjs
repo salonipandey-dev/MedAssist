@@ -58,6 +58,7 @@ function loadDemoWithoutTriage() {
         "patientName", "patientAge", "patientGender", "patientPhone",
     ];
     const elements = Object.fromEntries(ids.map((id) => [id, makeElement()]));
+    elements.patientCount.textContent = "0";
     const emptyRow = makeElement();
     emptyRow.id = "emptyRow";
     elements.patientTable.appendChild(emptyRow);
@@ -105,7 +106,7 @@ test("invalid sample ages are rejected without changing the table", () => {
     for (const age of ["-1", "121", "12.5", "abc"]) {
         submit("Fictional Sample", age);
     }
-    assert.equal(elements.patientCount.textContent, "");
+    assert.equal(elements.patientCount.textContent, "0");
     assert.equal(elements.patientTable.children.length, 1);
     assert.equal(elements.patientTable.children[0].id, "emptyRow");
 });
