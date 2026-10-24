@@ -10,7 +10,7 @@ const html = readFileSync(join(__dirname, "../index.html"), "utf8");
 const javascript = readFileSync(join(__dirname, "../js/app.js"), "utf8");
 
 test("triage cannot solicit health inputs if JavaScript is disabled", () => {
-    const triage = html.match(/<section id="triage"\b[\s\S]*?<\/section>/i)?.[0];
+    const triage = html.match(/<section id="triage"[^>]*>[\s\S]*?<\/section>/i)?.[0];
     assert.ok(triage, "Triage section should remain available as an explanation");
     assert.match(triage, /id="triageAvailability"/);
     assert.match(triage, /not available/i);
