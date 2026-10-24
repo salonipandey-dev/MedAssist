@@ -25,6 +25,20 @@ entries only**. The demo has no API connection or persistent storage; reloading
 clears entries. Do not enter real patient or health information. Triage scoring
 is intentionally disabled because no validated decision support exists.
 
+Use **Clear demo entries** in the Recent Patients section to discard every
+fictional entry and reset the patient counter without reloading the page.
+The clear button stays disabled when the table is empty.
+
+To check the frontend logic without installing any Node packages, run this from
+the repository root (Node.js 22 recommended):
+
+```bash
+node --test frontend/tests/app.test.cjs
+```
+
+The smoke tests cover literal text rendering, age validation, and clearing
+temporary demo entries. GitHub Actions runs them on frontend pull requests.
+
 ## Run locally
 
 Prerequisite: Python 3.10 or newer with `pip` and `venv` available. Clone the
