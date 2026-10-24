@@ -246,6 +246,26 @@ nav a.active {
 }
 
 
+.secondary-btn {
+    background: white;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+    border-radius: 9px;
+    padding: 10px 15px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.secondary-btn:hover:not(:disabled) {
+    background: #e0f2fe;
+}
+
+.secondary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* ---------------- STATS ---------------- */
 
 .stats-grid {

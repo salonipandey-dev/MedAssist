@@ -6,8 +6,9 @@
     const triageForm = document.getElementById("triageForm");
     const table = document.getElementById("patientTable");
     const count = document.getElementById("patientCount");
+    const clearButton = document.getElementById("clearDemoEntries");
 
-    if (!patientForm || !triageForm || !table || !count) {
+    if (!patientForm || !triageForm || !table || !count || !clearButton) {
         return;
     }
 
@@ -44,8 +45,29 @@
         table.appendChild(row);
         demoPatientCount += 1;
         count.textContent = String(demoPatientCount);
+        clearButton.disabled = false;
         status.textContent = "Sample entry added in this tab only. Nothing was saved or sent.";
         patientForm.reset();
+    });
+
+    clearButton.addEventListener("click", () => {
+        if (demoPatientCount === 0) return;
+
+        // Remove only temporary DOM entries. No patient data is persisted.
+        table.replaceChildren();
+        const emptyRow = document.createElement("tr");
+        emptyRow.id = "emptyRow";
+        const emptyCell = document.createElement("td");
+        emptyCell.colSpan = 4;
+        emptyCell.className = "empty-state";
+        emptyCell.textContent = "No fictional sample entries yet.";
+        emptyRow.appendChild(emptyCell);
+        table.appendChild(emptyRow);
+
+        demoPatientCount = 0;
+        count.textContent = "0";
+        clearButton.disabled = true;
+        status.textContent = "All fictional sample entries were cleared from this tab.";
     });
 
     // No validated clinical logic exists. Do not generate fictitious risk scores.
