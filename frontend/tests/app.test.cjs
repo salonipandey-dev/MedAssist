@@ -48,6 +48,8 @@ function setup() {
     ];
     const elements = Object.fromEntries(ids.map((id) => [id, makeElement(id)]));
     elements.patientCount.textContent = "0";
+    // Mirror the clear button's initially disabled HTML attribute.
+    elements.clearDemoEntries.disabled = true;
     const empty = makeElement("emptyRow");
     elements.patientTable.appendChild(empty);
 
