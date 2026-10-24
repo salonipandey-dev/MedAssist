@@ -212,24 +212,28 @@
                 <div class="form-grid">
 
                     <div class="form-group">
-                        <label>Patient Name</label>
+                        <label for="patientName">Patient Name</label>
 
                         <input
                             type="text"
                             id="patientName"
-                            placeholder="Enter full name"
+                            placeholder="e.g. Demo Patient A"
+                            maxlength="80"
                             required
                         >
                     </div>
 
 
                     <div class="form-group">
-                        <label>Age</label>
+                        <label for="patientAge">Age</label>
 
                         <input
                             type="number"
                             id="patientAge"
                             placeholder="Age"
+                            min="0"
+                            max="120"
+                            step="1"
                             required
                         >
                     </div>
@@ -237,7 +241,7 @@
 
                     <div class="form-group">
 
-                        <label>Gender</label>
+                        <label for="patientGender">Gender</label>
 
                         <select id="patientGender">
 
@@ -253,12 +257,13 @@
 
                     <div class="form-group">
 
-                        <label>Phone Number</label>
+                        <label for="patientPhone">Phone Number</label>
 
                         <input
                             type="tel"
                             id="patientPhone"
-                            placeholder="+91 XXXXX XXXXX"
+                            placeholder="Fictional number only"
+                            maxlength="30"
                         >
 
                     </div>
