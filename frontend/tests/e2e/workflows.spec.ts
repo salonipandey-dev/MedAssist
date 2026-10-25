@@ -307,3 +307,24 @@ for (const dark of [false, true])
       ).toEqual([]);
     }
   });
+
+test('dark validation errors remain readable and connected to their controls', async ({ page }) => {
+  for (const path of ['/app/patient/profile', '/app/doctor/reviews']) {
+    await page.goto(path);
+    await page.getByRole('button', { name: 'Switch to dark mode' }).click();
+    if (path.includes('profile')) {
+      await page.getByRole('button', { name: 'Edit profile' }).click();
+      await page.getByLabel('Fictional display alias').fill('');
+      await page.getByRole('button', { name: 'Save demo profile' }).click();
+    } else {
+      await page.getByRole('button', { name: 'Record sample review' }).click();
+    }
+    await expect(page.getByRole('alert')).toBeVisible();
+    const result = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .analyze();
+    expect(
+      result.violations.map((v) => ({ id: v.id, nodes: v.nodes.map((n) => n.target) })),
+    ).toEqual([]);
+  }
+});

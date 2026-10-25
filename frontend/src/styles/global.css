@@ -11,6 +11,7 @@
   --surface: #fff;
   --subtle: #f1f5f9;
   --text: #172033;
+  --error-text: #b63443;
   --muted: #5d6d82;
   --border: #e7edf3;
   --navy: #0b1630;
@@ -30,6 +31,7 @@
   --surface: #111d30;
   --subtle: #19273d;
   --text: #e7edf5;
+  --error-text: #fda4af;
   --muted: #a3b1c6;
   --border: #25334a;
   --navy: #e7edf5;
@@ -337,7 +339,7 @@ hr {
   color: var(--text);
 }
 .btn-danger {
-  color: #be3939;
+  color: var(--error-text);
   background: var(--surface);
   border-color: var(--border);
 }
@@ -712,11 +714,11 @@ hr {
   font-weight: 400;
 }
 .field-error {
-  color: #b63443;
+  color: var(--error-text);
   font-size: 11px;
 }
 .field input[aria-invalid='true'] {
-  border-color: #b63443;
+  border-color: var(--error-text);
 }
 .form-actions {
   display: flex;
@@ -1189,6 +1191,7 @@ hr {
 .workspace-admin .sidebar {
   background: #0b1630;
   --text: #e7edf5;
+  --error-text: #fda4af;
   --muted: #a3b1c6;
   --surface: #14213c;
   --bg: #111e37;

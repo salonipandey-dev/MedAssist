@@ -1,25 +1,34 @@
-name: Frontend nonclinical safeguards
+name: Frontend quality and nonclinical safeguards
 
 on:
   push:
     branches: [main]
     paths:
       - "frontend/**"
+      - "package.json"
       - ".github/workflows/frontend-safeguards.yml"
   pull_request:
     paths:
       - "frontend/**"
+      - "package.json"
       - ".github/workflows/frontend-safeguards.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: frontend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
-    name: No clinical inputs or misleading risk results
+    name: Build, workflows, accessibility and safety
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -29,5 +38,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Run static and sample-workflow regression tests
-        run: node --test frontend/tests/nonclinical-demo.test.cjs
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Check source formatting
+        run: npm run format:check
+      - name: Check TypeScript and build production frontend
+        run: npm run build
+      - name: Run original safeguards, modern boundaries and service tests
+        run: npm test
+      - name: Install Chromium and required browser libraries
+        run: npx playwright install --with-deps chromium
+      - name: Verify compiled workflows, responsive routes and accessible themes
+        run: npm run test:e2e
+      - name: Upload browser diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-browser-diagnostics
+          path: frontend/test-results/
+          retention-days: 7

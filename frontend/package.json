@@ -11,10 +11,11 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --test tests/*.test.cjs && vitest run",
+    "test": "node --test tests/nonclinical-demo.test.cjs tests/modern-safeguards.test.cjs && vitest run",
     "test:e2e": "playwright test",
-    "format": "prettier --write src vite.config.ts playwright.config.ts tests/e2e components.json",
-    "format:check": "prettier --check src vite.config.ts playwright.config.ts tests/e2e components.json"
+    "format": "prettier --write src vite.config.ts playwright.config.ts tests/e2e components.json scripts",
+    "format:check": "prettier --check src vite.config.ts playwright.config.ts tests/e2e components.json scripts",
+    "screenshots": "node scripts/capture-screenshots.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",

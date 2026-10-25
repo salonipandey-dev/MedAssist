@@ -53,3 +53,24 @@ the response headers when investigating a problem.
 
 Use synthetic examples for project work. Authentication and database storage
 remain future work; real patient data should not be used in this prototype.
+
+## Work on the React frontend
+
+Run `npm ci` in `frontend`, then `npm run dev`. Keep the original demo at
+`frontend/public/legacy/` intact unless deliberately fixing its safeguards.
+
+Before pushing frontend work, run `npm run format:check`, `npm run build`,
+`npm test`, and `npm run test:e2e` from `frontend`. Install the browser once with
+`npx playwright install chromium` (use `--with-deps` on a minimal Linux host).
+The browser suite serves the compiled build, so rebuild after source changes.
+
+Keep mock workflow rules in `src/data/mock/service.ts`, records in `seed.ts`,
+and chart aggregates in `analytics.ts`. Use shared typed records across views.
+Only `src/services/api/system.ts` may contact the implemented system API.
+Do not add a real health-input control, upload picker, credentials or prediction
+until the required backend and appropriate verification exist. Do not use browser
+storage for sample records or quietly redirect mock actions to real services.
+
+See [the frontend guide](docs/FRONTEND_GUIDE.md) for route architecture,
+service boundaries and the backend integration sequence. Screenshots can be
+regenerated after building with `npm run screenshots`; use fictional records only.

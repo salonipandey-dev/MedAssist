@@ -3,41 +3,82 @@
 **An AI-Assisted Healthcare Triage and Patient Management Platform**
 
 MedAssist is a B.Tech CSE student project by Saloni Pandey. This repository
-currently contains a small FastAPI backend and the project planning documents.
+contains a responsive React/TypeScript product frontend, a small FastAPI system API,
+and the original academic planning documents. All product workflows use fictional
+demonstration data; this is not a clinically deployed healthcare service.
 
 ## Current status
 
 - Implemented: API welcome response, GET/HEAD liveness checks, typed response
   schemas, request IDs, optional frontend origins, generated API docs, HTTP
   contract tests, and automated backend checks.
-- Frontend demo: fictional patient entries appear in a temporary in-memory table;
-  no registration data is sent to the API or saved between page reloads. The
-  triage section displays a static unavailable notice and exposes no health
-  input fields or risk scores, including when JavaScript is disabled.
+- Frontend: public product website and distinct patient, doctor and administrator
+  workspaces, with light/dark themes, case/review workflows, fictional appointments,
+  safe document previews, searchable tables and derived sample analytics. Changes
+  stay in memory and reset on reload. No real clinical input or scoring is available.
+- Preserved: original HTML/CSS/JavaScript demo at `frontend/public/legacy/`,
+  with all original nonclinical safeguards retained.
 - Planned: persistent patient management, authentication, database storage, and
   triage assistance. These features are not implemented yet.
 - The prototype does not provide medical advice or clinical decision support.
 
-## Try the frontend demo
+## Explore the product frontend
 
-Open `frontend/index.html` in a browser. The included `frontend/js/app.js`
-script adds form validation and an in-memory table for **fictional sample
-entries only**. The demo has no API connection or persistent storage; reloading
-clears entries. Do not enter real patient or health information. Triage scoring
-is not implemented; the page does not render health-input fields or risk
-results. The risk statistics show N/A rather than misleading zero counts.
+![MedAssist public product experience](docs/screenshots/home.png)
 
-### Verify frontend nonclinical safeguards
+Requires Node.js **22.12 or newer**. From the repository root:
 
-With Node.js 22, run from the repository root:
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Open **http://127.0.0.1:5173** and choose **Explore Demo**. No backend or account is
+needed for the fictional product demonstration. Do not enter real health information.
+
+- **Patient:** profile preferences, six-step fixed sample assessment, case tracking,
+  fictional appointment requests, document previews and notifications.
+- **Doctor:** assigned-case queue, split-panel independent review, patient context
+  and fictional appointment schedule.
+- **Administrator:** interactive sample analytics, user management, chronological
+  sample events and optional system-liveness check.
+
+The header switches fictional perspectives. Reloading or Settings → Reset demo data
+restores the original dataset. Role switching is not authentication. AI classification,
+real patient storage and real file uploads remain unavailable.
+
+For all routes, architecture, capabilities, optional API wiring and backend next steps,
+read the [frontend guide](docs/FRONTEND_GUIDE.md). The
+[audit](docs/FRONTEND_AUDIT.md) records the original implementation boundary.
+
+### Build and verify the frontend
+
+Run from `frontend`:
+
+```bash
+npm run typecheck
+npm run build
+npm test
+npx playwright install chromium
+npm run test:e2e
+npm run format:check
+```
+
+Use `npm run preview` to inspect the production build at **http://127.0.0.1:4173**.
+The browser suite runs against the compiled build. On a minimal Linux host, install
+browser system libraries with `npx playwright install --with-deps chromium`.
+
+The original static demo is still available at `/legacy/index.html` through Vite,
+or by opening `frontend/public/legacy/index.html` directly. Its original safeguards
+can be verified independently from the repository root:
 
 ```bash
 node --test frontend/tests/nonclinical-demo.test.cjs
 ```
 
-These tests check the JavaScript-disabled HTML, unavailable risk metrics,
-no clinical forms, and safe sample registration without a triage form.
-GitHub Actions repeats this check when frontend files change.
+See [recorded verification results](docs/VERIFICATION.md) and
+[additional screenshots](docs/screenshots/README.md).
 
 ## Run locally
 
@@ -195,8 +236,11 @@ matching pull requests, and on manual dispatch from the Actions tab.
 
 ## Repository layout
 
-- `frontend/index.html`, `frontend/style.css`, and `frontend/js/app.js`:
-  static browser-only demonstration without data persistence or triage scoring.
+- `frontend/src/`: typed React product frontend, role-specific features and
+  isolated synthetic-data services.
+- `frontend/public/legacy/`: original static demo, preserved with its safeguards.
+- `frontend/tests/`: nonclinical boundary checks and compiled-browser workflows.
+- `docs/FRONTEND_GUIDE.md`: frontend setup, architecture, feature matrix and integration plan.
 - `backend/app/main.py`: application factory, system routes, and Uvicorn app.
 - `backend/app/config.py`: environment configuration for frontend origins.
 - `backend/app/middleware.py`: server-generated HTTP request IDs.
