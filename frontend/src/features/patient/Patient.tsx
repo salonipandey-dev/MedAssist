@@ -45,6 +45,7 @@ export function PatientOverview() {
     .filter((a) => ['Requested', 'Confirmed'].includes(a.status))
     .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const next = appointments[0];
+  const nextDoctor = state.users.find((user) => user.id === next?.doctorId);
   const reports = state.reports.filter((r) => r.patientId === PATIENT_ID);
   const events = state.events
     .filter((e) => cases.some((c) => e.description.includes(c.id)))
@@ -191,10 +192,12 @@ export function PatientOverview() {
                   <p>{next.time} IST · Fictional availability</p>
                 </div>
                 <div className="appointment-doctor">
-                  <Avatar name="Avery Morgan" size="sm" />
+                  <Avatar name={nextDoctor?.name ?? 'Not assigned'} size="sm" />
                   <div>
-                    <strong>Dr. Avery Morgan</strong>
-                    <small>General practice · Fictional professional</small>
+                    <strong>{nextDoctor?.name ?? 'Professional not assigned'}</strong>
+                    <small>
+                      {nextDoctor?.specialty ?? 'Sample workspace'} · Fictional professional
+                    </small>
                   </div>
                 </div>
                 <Button variant="secondary" className="full-width" asChild>
