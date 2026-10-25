@@ -31,7 +31,7 @@ export function createSeed(): DemoState {
   const cases: DemoState['cases'] = Array.from({length:36},(_,i)=>({
     id: `MA-${String(2401+i)}`, patientId: `p-${pad(i%12+1)}`, doctorId: i%4===0 ? undefined : `d-${pad(i%4+1)}`,
     title: ['Sample intake','Document follow-up','Record review'][Math.floor(i/12)],
-    submitted: iso(8+Math.floor(i/12), 3+(i%12)*2), status: statuses[(i+Math.floor(i/12))%4],
+    submitted: iso(i<8?8:i<20?9:10, 3+(i%12)*2), status: statuses[(i+Math.floor(i/12))%4],
     assessmentId: 'sample-a', reportIds: i%3===0 ? [`R-${2401+i}`] : [],
   }));
   // Keep assignment semantics consistent with workflow status.
