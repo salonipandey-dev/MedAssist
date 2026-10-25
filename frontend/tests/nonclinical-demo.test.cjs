@@ -6,8 +6,8 @@ const { join } = require("node:path");
 const { test } = require("node:test");
 const vm = require("node:vm");
 
-const html = readFileSync(join(__dirname, "../index.html"), "utf8");
-const javascript = readFileSync(join(__dirname, "../js/app.js"), "utf8");
+const html = readFileSync(join(__dirname, "../public/legacy/index.html"), "utf8");
+const javascript = readFileSync(join(__dirname, "../public/legacy/js/app.js"), "utf8");
 
 test("triage cannot solicit health inputs if JavaScript is disabled", () => {
     const triage = html.match(/<section id="triage"[^>]*>[\s\S]*?<\/section>/i)?.[0];
