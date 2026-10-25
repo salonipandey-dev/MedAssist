@@ -21,3 +21,11 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+
+# React frontend build and test output
+node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
+*.tsbuildinfo
