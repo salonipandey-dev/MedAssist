@@ -1,16 +1,323 @@
+import { ArrowLeft, ArrowRight, Check, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, Clock3, FileText, Stethoscope } from 'lucide-react';
 import { useDemo } from '../../app/Provider';
-import { Avatar, Badge, Button, DialogPanel, EmptyState, Notice, PageHeading, Panel, Status } from '../../components/ui';
-import { DataTable } from '../../components/ui/DataTable';
+import {
+  Avatar,
+  Badge,
+  Button,
+  DialogPanel,
+  EmptyState,
+  Notice,
+  PageHeading,
+  Panel,
+  Status,
+} from '../../components/ui';
 import { AIConcept } from '../../components/ui/AIConcept';
-import { roleCases } from '../../data/mock/service';
+import { DataTable } from '../../components/ui/DataTable';
 import { SAMPLE_ASSESSMENT } from '../../data/mock/seed';
+import { roleCases } from '../../data/mock/service';
+import type { CaseRecord, DemoReport, Role } from '../../types';
 import { formatDate } from '../../utils/format';
 import { ReportPreview } from '../reports/Reports';
-import type { CaseRecord, DemoReport, Role } from '../../types';
-export function CaseContent({record}:{record:CaseRecord}){const {state}=useDemo();const [report,setReport]=useState<DemoReport|null>(null);const patient=state.users.find(u=>u.id===record.patientId)!;const doctor=state.users.find(u=>u.id===record.doctorId);const reviews=state.reviews.filter(r=>r.caseId===record.id);const events=state.events.filter(e=>e.description.includes(record.id)).sort((a,b)=>a.time.localeCompare(b.time));return <div className="stack"><div className="case-id-row"><span className="mono">{record.id}</span><Status status={record.status}/></div><div className="case-patient"><Avatar name={patient.name}/><div><h3>{patient.name}</h3><p>Fictional patient · {patient.id}</p></div><Badge>Sample Data</Badge></div><dl className="detail-grid"><div><dt>Submission date</dt><dd>{formatDate(record.submitted)}</dd></div><div><dt>Assigned professional</dt><dd>{doctor?.name??'Not yet assigned'}</dd></div><div><dt>Professional review</dt><dd>{reviews.length?`${reviews.length} sample record${reviews.length>1?'s':''}`:'Awaiting review'}</dd></div><div><dt>AI assistance</dt><dd>Not yet available</dd></div></dl><Notice>Case status describes workflow progress. It is separate from medical urgency. No medical classification is available.</Notice><section className="case-section"><h3>Submitted sample information</h3><p className="text-small muted mt-4">{SAMPLE_ASSESSMENT.symptom}</p><dl className="detail-grid mt-4"><div><dt>Duration</dt><dd>{SAMPLE_ASSESSMENT.duration}</dd></div><div><dt>Self-described severity</dt><dd>{SAMPLE_ASSESSMENT.severity}</dd></div></dl></section><section className="case-section"><h3>Attached report references</h3>{record.reportIds.length?record.reportIds.map(id=>{const r=state.reports.find(r=>r.id===id)!;return <button className="report-reference" key={id} onClick={()=>setReport(r)}><FileText size={18}/><span>{r.name}<small>{r.id} · Safe sample preview</small></span><ArrowRight size={15}/></button>}):<p className="text-small muted mt-4">No sample documents attached to this case.</p>}</section><section className="case-section"><h3>Case chronology</h3><ol className="case-timeline">{events.map(event=><li key={event.id}><span className="timeline-icon"><Check size={12}/></span><div><strong>{event.description}</strong><p>{formatDate(event.time)} · {event.actor}</p></div></li>)}</ol></section><section className="case-section"><h3>Independent professional reviews</h3>{reviews.length?reviews.map(r=><div className="review-record" key={r.id}><div className="flex-between"><Badge tone="indigo">{r.id}</Badge><span className="muted text-small">{formatDate(r.created)}</span></div><p>{r.note}</p><small>{r.assessment}</small></div>):<p className="text-small muted mt-4">No professional review recorded for this fictional case.</p>}</section><ReportPreview report={report} onClose={()=>setReport(null)}/></div>;}
-export function CaseDrawer({record,onClose,role='patient'}:{record:CaseRecord|null;onClose:()=>void;role?:Role}){return <DialogPanel open={!!record} onOpenChange={open=>!open&&onClose()} drawer title={record?.title??'Case details'} description="Fictional case record · Memory-only demonstration">{record&&<><CaseContent record={record}/>{role==='doctor'&&record.status!=='Closed'&&<div className="form-actions"><Button asChild><Link to={`/app/doctor/reviews/${record.id}`} onClick={onClose}>Open review workspace <ArrowRight size={15}/></Link></Button></div>}</>}</DialogPanel>;}
-export function CaseList({role,onlyPending=false}:{role:Role;onlyPending?:boolean}){const {state}=useDemo();const [selected,setSelected]=useState<string|null>(null);const records=roleCases(state,role).filter(c=>!onlyPending||c.status==='Assigned');return <><PageHeading eyebrow={role==='patient'?'YOUR CONNECTED RECORDS':'CASE COORDINATION'} title={onlyPending?'Cases awaiting review':role==='patient'?'My cases':role==='doctor'?'Assigned cases':'Case management'} description="A clear view of each case, its context and its workflow progress." action={role==='patient'?<Button asChild><Link to="/app/patient/assessments">Explore sample assessment <ArrowRight size={15}/></Link></Button>:<Badge tone="teal">Sample Data</Badge>}/><Panel title="Case queue" description={`${records.length} fictional cases · Workflow statuses, not urgency classifications`}><DataTable rows={records} getId={r=>r.id} label="cases" getSearch={r=>`${r.id} ${r.title} ${state.users.find(u=>u.id===r.patientId)?.name}`} getStatus={r=>r.status} filterOptions={['Submitted','Assigned','Reviewed','Closed']} columns={[{key:'id',label:'Case',sortValue:r=>r.id,render:r=><div><strong className="mono">{r.id}</strong><p className="text-small muted" style={{fontSize:10,marginTop:5}}>{r.title}</p></div>},{key:'patient',label:'Patient',sortValue:r=>state.users.find(u=>u.id===r.patientId)?.name??'',render:r=><div className="table-person"><Avatar name={state.users.find(u=>u.id===r.patientId)!.name} size="sm"/><span className="text-small">{state.users.find(u=>u.id===r.patientId)!.name}</span></div>},{key:'date',label:'Submitted',sortValue:r=>r.submitted,render:r=>formatDate(r.submitted)},{key:'status',label:'Workflow status',sortValue:r=>r.status,render:r=><Status status={r.status}/>},{key:'action',label:'Details',render:r=><Button variant="ghost" size="sm" onClick={()=>setSelected(r.id)}>View case <ArrowRight size={13}/></Button>}]}/></Panel><div className="mt-6"><Notice>All cases are fictional. Doctor reviews are independent records; the model has no prediction or clinical output to display.</Notice></div><CaseDrawer role={role} record={state.cases.find(c=>c.id===selected)??null} onClose={()=>setSelected(null)}/></>;}
-export function CaseDetailPage({role}:{role:Role}){const {caseId}=useParams();const {state}=useDemo();const record=roleCases(state,role).find(c=>c.id===caseId);return record?<><Link className="text-link mb-4" to={`/app/${role}/cases`}><ArrowLeft size={14}/>Back to cases</Link><PageHeading title={record.title} description="Fictional case detail · No clinical decision support"/><div className="grid-2"><Panel><div className="padded"><CaseContent record={record}/></div></Panel><AIConcept/></div></>:<EmptyState title="Sample case not found" description="Choose a case from this demonstration workspace." action={<Button asChild><Link to={`/app/${role}/cases`}>Open case list</Link></Button>}/>;}
+export function CaseContent({ record }: { record: CaseRecord }) {
+  const { state } = useDemo();
+  const [report, setReport] = useState<DemoReport | null>(null);
+  const patient = state.users.find((u) => u.id === record.patientId)!;
+  const doctor = state.users.find((u) => u.id === record.doctorId);
+  const reviews = state.reviews.filter((r) => r.caseId === record.id);
+  const events = state.events
+    .filter((e) => e.description.includes(record.id))
+    .sort((a, b) => a.time.localeCompare(b.time));
+  return (
+    <div className="stack">
+      <div className="case-id-row">
+        <span className="mono">{record.id}</span>
+        <Status status={record.status} />
+      </div>
+      <div className="case-patient">
+        <Avatar name={patient.name} />
+        <div>
+          <h3>{patient.name}</h3>
+          <p>Fictional patient · {patient.id}</p>
+        </div>
+        <Badge>Sample Data</Badge>
+      </div>
+      <dl className="detail-grid">
+        <div>
+          <dt>Submission date</dt>
+          <dd>{formatDate(record.submitted)}</dd>
+        </div>
+        <div>
+          <dt>Assigned professional</dt>
+          <dd>{doctor?.name ?? 'Not yet assigned'}</dd>
+        </div>
+        <div>
+          <dt>Professional review</dt>
+          <dd>
+            {reviews.length
+              ? `${reviews.length} sample record${reviews.length > 1 ? 's' : ''}`
+              : 'Awaiting review'}
+          </dd>
+        </div>
+        <div>
+          <dt>AI assistance</dt>
+          <dd>Not yet available</dd>
+        </div>
+      </dl>
+      <Notice>
+        Case status describes workflow progress. It is separate from medical urgency. No medical
+        classification is available.
+      </Notice>
+      <section className="case-section">
+        <h3>Submitted sample information</h3>
+        <p className="text-small muted mt-4">{SAMPLE_ASSESSMENT.symptom}</p>
+        <dl className="detail-grid mt-4">
+          <div>
+            <dt>Duration</dt>
+            <dd>{SAMPLE_ASSESSMENT.duration}</dd>
+          </div>
+          <div>
+            <dt>Self-described severity</dt>
+            <dd>{SAMPLE_ASSESSMENT.severity}</dd>
+          </div>
+        </dl>
+      </section>
+      <section className="case-section">
+        <h3>Attached report references</h3>
+        {record.reportIds.length ? (
+          record.reportIds.map((id) => {
+            const r = state.reports.find((r) => r.id === id)!;
+            return (
+              <button className="report-reference" key={id} onClick={() => setReport(r)}>
+                <FileText size={18} />
+                <span>
+                  {r.name}
+                  <small>{r.id} · Safe sample preview</small>
+                </span>
+                <ArrowRight size={15} />
+              </button>
+            );
+          })
+        ) : (
+          <p className="text-small muted mt-4">No sample documents attached to this case.</p>
+        )}
+      </section>
+      <section className="case-section">
+        <h3>Case chronology</h3>
+        <ol className="case-timeline">
+          {events.map((event) => (
+            <li key={event.id}>
+              <span className="timeline-icon">
+                <Check size={12} />
+              </span>
+              <div>
+                <strong>{event.description}</strong>
+                <p>
+                  {formatDate(event.time)} · {event.actor}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section className="case-section">
+        <h3>Independent professional reviews</h3>
+        {reviews.length ? (
+          reviews.map((r) => (
+            <div className="review-record" key={r.id}>
+              <div className="flex-between">
+                <Badge tone="indigo">{r.id}</Badge>
+                <span className="muted text-small">{formatDate(r.created)}</span>
+              </div>
+              <p>{r.note}</p>
+              <small>{r.assessment}</small>
+            </div>
+          ))
+        ) : (
+          <p className="text-small muted mt-4">
+            No professional review recorded for this fictional case.
+          </p>
+        )}
+      </section>
+      <ReportPreview report={report} onClose={() => setReport(null)} />
+    </div>
+  );
+}
+export function CaseDrawer({
+  record,
+  onClose,
+  role = 'patient',
+}: {
+  record: CaseRecord | null;
+  onClose: () => void;
+  role?: Role;
+}) {
+  return (
+    <DialogPanel
+      open={!!record}
+      onOpenChange={(open) => !open && onClose()}
+      drawer
+      title={record?.title ?? 'Case details'}
+      description="Fictional case record · Memory-only demonstration"
+    >
+      {record && (
+        <>
+          <CaseContent record={record} />
+          {role === 'doctor' && record.status !== 'Closed' && (
+            <div className="form-actions">
+              <Button asChild>
+                <Link to={`/app/doctor/reviews/${record.id}`} onClick={onClose}>
+                  Open review workspace <ArrowRight size={15} />
+                </Link>
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+    </DialogPanel>
+  );
+}
+export function CaseList({ role, onlyPending = false }: { role: Role; onlyPending?: boolean }) {
+  const { state } = useDemo();
+  const [selected, setSelected] = useState<string | null>(null);
+  const records = roleCases(state, role).filter((c) => !onlyPending || c.status === 'Assigned');
+  return (
+    <>
+      <PageHeading
+        eyebrow={role === 'patient' ? 'YOUR CONNECTED RECORDS' : 'CASE COORDINATION'}
+        title={
+          onlyPending
+            ? 'Cases awaiting review'
+            : role === 'patient'
+              ? 'My cases'
+              : role === 'doctor'
+                ? 'Assigned cases'
+                : 'Case management'
+        }
+        description="A clear view of each case, its context and its workflow progress."
+        action={
+          role === 'patient' ? (
+            <Button asChild>
+              <Link to="/app/patient/assessments">
+                Explore sample assessment <ArrowRight size={15} />
+              </Link>
+            </Button>
+          ) : (
+            <Badge tone="teal">Sample Data</Badge>
+          )
+        }
+      />
+      <Panel
+        title="Case queue"
+        description={`${records.length} fictional cases · Workflow statuses, not urgency classifications`}
+      >
+        <DataTable
+          rows={records}
+          getId={(r) => r.id}
+          label="cases"
+          getSearch={(r) =>
+            `${r.id} ${r.title} ${state.users.find((u) => u.id === r.patientId)?.name}`
+          }
+          getStatus={(r) => r.status}
+          filterOptions={['Submitted', 'Assigned', 'Reviewed', 'Closed']}
+          columns={[
+            {
+              key: 'id',
+              label: 'Case',
+              sortValue: (r) => r.id,
+              render: (r) => (
+                <div>
+                  <strong className="mono">{r.id}</strong>
+                  <p className="text-small muted" style={{ fontSize: 10, marginTop: 5 }}>
+                    {r.title}
+                  </p>
+                </div>
+              ),
+            },
+            {
+              key: 'patient',
+              label: 'Patient',
+              sortValue: (r) => state.users.find((u) => u.id === r.patientId)?.name ?? '',
+              render: (r) => (
+                <div className="table-person">
+                  <Avatar name={state.users.find((u) => u.id === r.patientId)!.name} size="sm" />
+                  <span className="text-small">
+                    {state.users.find((u) => u.id === r.patientId)!.name}
+                  </span>
+                </div>
+              ),
+            },
+            {
+              key: 'date',
+              label: 'Submitted',
+              sortValue: (r) => r.submitted,
+              render: (r) => formatDate(r.submitted),
+            },
+            {
+              key: 'status',
+              label: 'Workflow status',
+              sortValue: (r) => r.status,
+              render: (r) => <Status status={r.status} />,
+            },
+            {
+              key: 'action',
+              label: 'Details',
+              render: (r) => (
+                <Button variant="ghost" size="sm" onClick={() => setSelected(r.id)}>
+                  View case <ArrowRight size={13} />
+                </Button>
+              ),
+            },
+          ]}
+        />
+      </Panel>
+      <div className="mt-6">
+        <Notice>
+          All cases are fictional. Doctor reviews are independent records; the model has no
+          prediction or clinical output to display.
+        </Notice>
+      </div>
+      <CaseDrawer
+        role={role}
+        record={state.cases.find((c) => c.id === selected) ?? null}
+        onClose={() => setSelected(null)}
+      />
+    </>
+  );
+}
+export function CaseDetailPage({ role }: { role: Role }) {
+  const { caseId } = useParams();
+  const { state } = useDemo();
+  const record = roleCases(state, role).find((c) => c.id === caseId);
+  return record ? (
+    <>
+      <Link className="text-link mb-4" to={`/app/${role}/cases`}>
+        <ArrowLeft size={14} />
+        Back to cases
+      </Link>
+      <PageHeading
+        title={record.title}
+        description="Fictional case detail · No clinical decision support"
+      />
+      <div className="grid-2">
+        <Panel>
+          <div className="padded">
+            <CaseContent record={record} />
+          </div>
+        </Panel>
+        <AIConcept />
+      </div>
+    </>
+  ) : (
+    <EmptyState
+      title="Sample case not found"
+      description="Choose a case from this demonstration workspace."
+      action={
+        <Button asChild>
+          <Link to={`/app/${role}/cases`}>Open case list</Link>
+        </Button>
+      }
+    />
+  );
+}

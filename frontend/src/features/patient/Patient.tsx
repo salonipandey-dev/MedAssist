@@ -1,16 +1,447 @@
+import {
+  ArrowRight,
+  Bell,
+  CalendarDays,
+  CheckCheck,
+  ChevronRight,
+  ClipboardList,
+  Clock3,
+  FileText,
+  Plus,
+  ShieldCheck,
+  Stethoscope,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Bell, CalendarDays, Check, CheckCheck, ChevronRight, ClipboardList, Clock3, FileText, HeartPulse, Plus, ShieldCheck, Stethoscope } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDemo } from '../../app/Provider';
-import { Avatar, Badge, Button, EmptyState, Notice, PageHeading, Panel, Stat, Status, TextLink } from '../../components/ui';
-import { CaseDrawer } from '../cases/Cases';
-import { ReportPreview } from '../reports/Reports';
-import { roleAppointments, roleCases } from '../../data/mock/service';
+import {
+  Avatar,
+  Badge,
+  Button,
+  EmptyState,
+  Notice,
+  PageHeading,
+  Panel,
+  Stat,
+  Status,
+  TextLink,
+} from '../../components/ui';
 import { PATIENT_ID } from '../../data/mock/seed';
-import { formatDate } from '../../utils/format';
+import { roleAppointments, roleCases } from '../../data/mock/service';
 import { CareIllustration } from '../../pages/public/ProductPreview';
 import type { DemoReport, Role } from '../../types';
-export function PatientOverview(){const {state}=useDemo();const [selected,setSelected]=useState<string|null>(null);const [report,setReport]=useState<DemoReport|null>(null);const cases=roleCases(state,'patient');const appointments=roleAppointments(state,'patient').filter(a=>['Requested','Confirmed'].includes(a.status)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));const next=appointments[0];const reports=state.reports.filter(r=>r.patientId===PATIENT_ID);const events=state.events.filter(e=>cases.some(c=>e.description.includes(c.id))).slice(0,4);const pending=cases.filter(c=>['Submitted','Assigned'].includes(c.status)).length;const completion=Math.round(([!!state.profile.alias,!!state.profile.language,state.profile.reminders].filter(Boolean).length/3)*100);return <><PageHeading eyebrow="SUNDAY, 25 OCTOBER 2026 · DEMO CLOCK" title={`Welcome back, ${state.profile.alias.split(' ')[0]}.`} description="A little clarity for your health journey. Everything you need, in one place." action={<Button asChild><Link to="/app/patient/assessments"><Plus size={15}/>Explore sample assessment</Link></Button>}/><div className="patient-welcome"><div><Badge>YOUR CARE, CONNECTED</Badge><h2>A clearer picture.<br/>A more considered experience.</h2><p>Follow your sample cases, keep appointments in view,<br className="desktop-only"/>and know what happens next.</p><Link to="/app/patient/cases">Explore your cases <ArrowRight size={14}/></Link></div><CareIllustration/><div className="welcome-note"><ShieldCheck size={12}/>Fictional patient workspace</div></div><div className="stat-grid"><Stat label="My cases" value={cases.length} detail="Connected sample records" icon={<ClipboardList/>}/><Stat label="Awaiting review" value={pending} detail="Workflow status only" icon={<Clock3/>} tone="amber"/><Stat label="Appointments" value={appointments.length} detail="Upcoming sample requests" icon={<CalendarDays/>} tone="indigo"/><Stat label="Medical reports" value={reports.length} detail="Safe built-in previews" icon={<FileText/>}/></div><div className="patient-main-grid"><div className="stack"><Panel title="Recent cases" description="A clear view of your sample case progress" action={<TextLink to="/app/patient/cases">View all</TextLink>}><div className="patient-case-list">{cases.slice(0,3).map(c=><button key={c.id} className="patient-case-row" onClick={()=>setSelected(c.id)}><span className="case-symbol"><ClipboardList size={19}/></span><span className="patient-case-title"><strong>{c.title}</strong><small>{c.id} <span>·</span> {formatDate(c.submitted)}</small></span><Status status={c.status}/><ChevronRight size={15}/></button>)}</div><div className="panel-footnote"><span className="status-dot"/>Case progress describes workflow, not medical urgency.</div></Panel><Panel title="Recent activity" description="The latest updates in your fictional workspace" action={<TextLink to="/app/patient/history">View history</TextLink>}><ul className="timeline">{events.map((event,i)=><li key={event.id}><span className="timeline-icon">{event.action==='Review'?<Stethoscope size={12}/>:<ClipboardList size={12}/>}</span><div><strong>{event.description}</strong><p>{event.actor}</p></div><time>{formatDate(event.time,{day:'numeric',month:'short',timeZone:'UTC'})}</time></li>)}</ul></Panel></div><div className="stack"><Panel title="Next appointment" action={<CalendarDays size={16} className="muted"/>}>{next?<div className="next-appointment"><div className="appointment-day"><strong>{formatDate(next.date,{day:'2-digit',timeZone:'UTC'})}</strong><span>{formatDate(next.date,{month:'short',timeZone:'UTC'})}</span></div><div><Badge tone={next.status==='Confirmed'?'teal':'amber'}>{next.status}</Badge><h3>{next.kind}</h3><p>{next.time} IST · Fictional availability</p></div><div className="appointment-doctor"><Avatar name="Avery Morgan" size="sm"/><div><strong>Dr. Avery Morgan</strong><small>General practice · Fictional professional</small></div></div><Button variant="secondary" className="full-width" asChild><Link to="/app/patient/appointments">View appointments <ArrowRight size={13}/></Link></Button></div>:<EmptyState title="A little space in your schedule" description="Explore fictional slots to try a sample appointment request." action={<Button asChild size="sm"><Link to="/app/patient/appointments">Explore slots</Link></Button>}/>}</Panel><Panel title="Your demo profile" action={<Badge tone="teal">{completion}%</Badge>}><div className="profile-completion"><div className="progress-track"><span style={{width:`${completion}%`}}/></div><p>{[!!state.profile.alias,!!state.profile.language,state.profile.reminders].filter(Boolean).length} of 3 interface preferences set. Real patient details are not collected.</p><TextLink to="/app/patient/profile">Review your preferences</TextLink></div></Panel><Panel title="Your documents" action={<FileText size={16} className="muted"/>}>{reports.slice(0,2).map(r=><button className="document-shortcut" key={r.id} onClick={()=>setReport(r)}><span className="file-icon"><FileText size={17}/></span><span><strong>{r.name}</strong><small>{r.type} metadata · Safe preview</small></span><ChevronRight size={14}/></button>)}<div className="padded" style={{paddingTop:14,paddingBottom:18}}><TextLink to="/app/patient/reports">Open document library</TextLink></div></Panel></div></div><div className="next-actions"><div><span className="action-icon"><ClipboardList size={20}/></span><div><h3>Understand the first step.</h3><p>Walk through a predefined assessment sample.</p></div><Link to="/app/patient/assessments" aria-label="Explore a predefined sample assessment"><ArrowRight size={20}/></Link></div><div><span className="action-icon indigo"><ShieldCheck size={20}/></span><div><h3>Designed with clear boundaries.</h3><p>Read what this prototype can and cannot do.</p></div><Link to="/security" aria-label="Read prototype privacy and safety boundaries"><ArrowRight size={20}/></Link></div></div><CaseDrawer record={state.cases.find(c=>c.id===selected)??null} onClose={()=>setSelected(null)}/><ReportPreview report={report} onClose={()=>setReport(null)}/></>;}
-export function PatientHistory(){const {state}=useDemo();const cases=roleCases(state,'patient');const reviews=state.reviews.filter(r=>cases.some(c=>c.id===r.caseId));return <><PageHeading eyebrow="YOUR CONNECTED STORY" title="Health history" description="Fixed fictional context and sample case history, thoughtfully organized."/><div className="grid-2"><Panel title="Fictional patient context" description="Predefined demonstration only"><div className="padded" style={{paddingTop:0}}><dl className="detail-grid"><div><dt>Patient</dt><dd>Mira Chen · Fictional adult</dd></div><div><dt>Medical conditions</dt><dd>Not specified in sample</dd></div><div><dt>Medications</dt><dd>Not collected</dd></div><div><dt>Allergies</dt><dd>Not collected</dd></div></dl><div className="mt-6"><Notice>No absence of an illness or allergy is implied. This is illustrative sample context, not a medical record.</Notice></div></div></Panel><Panel title="Sample record summary"><div className="padded" style={{paddingTop:0}}><div className="history-counts"><div><strong>{cases.length}</strong><span>Sample cases</span></div><div><strong>{reviews.length}</strong><span>Review records</span></div></div><p className="muted text-small mt-6">Professional reviews are kept separately from future AI predictions. No diagnosis or treatment history is available.</p></div></Panel></div><div className="mt-6"><ActivityView role="patient" embedded/></div></>;}
-export function ActivityView({role,embedded=false}:{role:Role;embedded?:boolean}){const {state,dispatch}=useDemo();const cases=roleCases(state,role);const events=state.events.filter(e=>role==='admin'||cases.some(c=>e.description.includes(c.id)));const [filter,setFilter]=useState('All');const [unread,setUnread]=useState(false);const filtered=events.filter(e=>(filter==='All'||e.action===filter)&&(!unread||!state.readNotifications.includes(e.id)));return <>{!embedded&&<PageHeading eyebrow="YOUR WORKSPACE, IN MOTION" title={role==='patient'?'Notifications':'Activity'} description="Sample workflow updates held in page memory. No real alerts are sent."/>}<Panel title={embedded?'Sample history timeline':'Workspace updates'} description="Fictional events · Not a production audit system" action={role==='patient'&&<Button variant="ghost" size="sm" onClick={()=>{events.forEach(e=>dispatch({type:'readNotification',id:e.id}));toast.success('Sample notifications marked as read.');}}><CheckCheck size={14}/>Mark all read</Button>}><div className="toolbar"><label className="field"><span className="sr-only">Filter activity type</span><select value={filter} onChange={e=>setFilter(e.target.value)}><option value="All">All activity</option><option>Case</option><option>Review</option></select></label>{role==='patient'&&<label className="switch"><input type="checkbox" checked={unread} onChange={e=>setUnread(e.target.checked)}/>Unread only</label>}</div>{filtered.length?<ul className="notification-list">{filtered.slice(0,30).map(e=><li key={e.id} className={state.readNotifications.includes(e.id)?'is-read':''}><span className="notification-symbol">{e.action==='Review'?<Stethoscope size={18}/>:<Bell size={18}/>}</span><div><strong>{e.description}</strong><p>{formatDate(e.time)} · {e.actor}</p></div>{role==='patient'&&!state.readNotifications.includes(e.id)&&<Button variant="ghost" size="sm" onClick={()=>dispatch({type:'readNotification',id:e.id})}>Mark read</Button>}</li>)}</ul>:<EmptyState title="You’re all caught up" description="No sample notifications match this view."/>}</Panel></>;}
+import { formatDate } from '../../utils/format';
+import { CaseDrawer } from '../cases/Cases';
+import { ReportPreview } from '../reports/Reports';
+export function PatientOverview() {
+  const { state } = useDemo();
+  const [selected, setSelected] = useState<string | null>(null);
+  const [report, setReport] = useState<DemoReport | null>(null);
+  const cases = [...roleCases(state, 'patient')].sort((a, b) =>
+    b.submitted.localeCompare(a.submitted),
+  );
+  const appointments = roleAppointments(state, 'patient')
+    .filter((a) => ['Requested', 'Confirmed'].includes(a.status))
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const next = appointments[0];
+  const reports = state.reports.filter((r) => r.patientId === PATIENT_ID);
+  const events = state.events
+    .filter((e) => cases.some((c) => e.description.includes(c.id)))
+    .slice(0, 4);
+  const pending = cases.filter((c) => ['Submitted', 'Assigned'].includes(c.status)).length;
+  const completion = Math.round(
+    ([!!state.profile.alias, !!state.profile.language, state.profile.reminders].filter(Boolean)
+      .length /
+      3) *
+      100,
+  );
+  return (
+    <>
+      <PageHeading
+        eyebrow="SUNDAY, 25 OCTOBER 2026 · DEMO CLOCK"
+        title={`Welcome back, ${state.profile.alias.split(' ')[0]}.`}
+        description="A little clarity for your health journey. Everything you need, in one place."
+        action={
+          <Button asChild>
+            <Link to="/app/patient/assessments">
+              <Plus size={15} />
+              Explore sample assessment
+            </Link>
+          </Button>
+        }
+      />
+      <div className="patient-welcome">
+        <div>
+          <Badge>YOUR CARE, CONNECTED</Badge>
+          <h2>
+            A clearer picture.
+            <br />A more considered experience.
+          </h2>
+          <p>
+            Follow your sample cases, keep appointments in view,
+            <br className="desktop-only" />
+            and know what happens next.
+          </p>
+          <Link to="/app/patient/cases">
+            Explore your cases <ArrowRight size={14} />
+          </Link>
+        </div>
+        <CareIllustration />
+        <div className="welcome-note">
+          <ShieldCheck size={12} />
+          Fictional patient workspace
+        </div>
+      </div>
+      <div className="stat-grid">
+        <Stat
+          label="My cases"
+          value={cases.length}
+          detail="Connected sample records"
+          icon={<ClipboardList />}
+        />
+        <Stat
+          label="Awaiting review"
+          value={pending}
+          detail="Workflow status only"
+          icon={<Clock3 />}
+          tone="amber"
+        />
+        <Stat
+          label="Appointments"
+          value={appointments.length}
+          detail="Upcoming sample requests"
+          icon={<CalendarDays />}
+          tone="indigo"
+        />
+        <Stat
+          label="Medical reports"
+          value={reports.length}
+          detail="Safe built-in previews"
+          icon={<FileText />}
+        />
+      </div>
+      <div className="patient-main-grid">
+        <div className="stack">
+          <Panel
+            title="Recent cases"
+            description="A clear view of your sample case progress"
+            action={<TextLink to="/app/patient/cases">View all</TextLink>}
+          >
+            <div className="patient-case-list">
+              {cases.slice(0, 3).map((c) => (
+                <button key={c.id} className="patient-case-row" onClick={() => setSelected(c.id)}>
+                  <span className="case-symbol">
+                    <ClipboardList size={19} />
+                  </span>
+                  <span className="patient-case-title">
+                    <strong>{c.title}</strong>
+                    <small>
+                      {c.id} <span>·</span> {formatDate(c.submitted)}
+                    </small>
+                  </span>
+                  <Status status={c.status} />
+                  <ChevronRight size={15} />
+                </button>
+              ))}
+            </div>
+            <div className="panel-footnote">
+              <span className="status-dot" />
+              Case progress describes workflow, not medical urgency.
+            </div>
+          </Panel>
+          <Panel
+            title="Recent activity"
+            description="The latest updates in your fictional workspace"
+            action={<TextLink to="/app/patient/history">View history</TextLink>}
+          >
+            <ul className="timeline">
+              {events.map((event) => (
+                <li key={event.id}>
+                  <span className="timeline-icon">
+                    {event.action === 'Review' ? (
+                      <Stethoscope size={12} />
+                    ) : (
+                      <ClipboardList size={12} />
+                    )}
+                  </span>
+                  <div>
+                    <strong>{event.description}</strong>
+                    <p>{event.actor}</p>
+                  </div>
+                  <time>
+                    {formatDate(event.time, { day: 'numeric', month: 'short', timeZone: 'UTC' })}
+                  </time>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        </div>
+        <div className="stack">
+          <Panel title="Next appointment" action={<CalendarDays size={16} className="muted" />}>
+            {next ? (
+              <div className="next-appointment">
+                <div className="appointment-day">
+                  <strong>{formatDate(next.date, { day: '2-digit', timeZone: 'UTC' })}</strong>
+                  <span>{formatDate(next.date, { month: 'short', timeZone: 'UTC' })}</span>
+                </div>
+                <div>
+                  <Badge tone={next.status === 'Confirmed' ? 'teal' : 'amber'}>{next.status}</Badge>
+                  <h3>{next.kind}</h3>
+                  <p>{next.time} IST · Fictional availability</p>
+                </div>
+                <div className="appointment-doctor">
+                  <Avatar name="Avery Morgan" size="sm" />
+                  <div>
+                    <strong>Dr. Avery Morgan</strong>
+                    <small>General practice · Fictional professional</small>
+                  </div>
+                </div>
+                <Button variant="secondary" className="full-width" asChild>
+                  <Link to="/app/patient/appointments">
+                    View appointments <ArrowRight size={13} />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <EmptyState
+                title="A little space in your schedule"
+                description="Explore fictional slots to try a sample appointment request."
+                action={
+                  <Button asChild size="sm">
+                    <Link to="/app/patient/appointments">Explore slots</Link>
+                  </Button>
+                }
+              />
+            )}
+          </Panel>
+          <Panel title="Your demo profile" action={<Badge tone="teal">{completion}%</Badge>}>
+            <div className="profile-completion">
+              <div className="progress-track">
+                <span style={{ width: `${completion}%` }} />
+              </div>
+              <p>
+                {
+                  [!!state.profile.alias, !!state.profile.language, state.profile.reminders].filter(
+                    Boolean,
+                  ).length
+                }{' '}
+                of 3 interface preferences set. Real patient details are not collected.
+              </p>
+              <TextLink to="/app/patient/profile">Review your preferences</TextLink>
+            </div>
+          </Panel>
+          <Panel title="Your documents" action={<FileText size={16} className="muted" />}>
+            {reports.slice(0, 2).map((r) => (
+              <button className="document-shortcut" key={r.id} onClick={() => setReport(r)}>
+                <span className="file-icon">
+                  <FileText size={17} />
+                </span>
+                <span>
+                  <strong>{r.name}</strong>
+                  <small>{r.type} metadata · Safe preview</small>
+                </span>
+                <ChevronRight size={14} />
+              </button>
+            ))}
+            <div className="padded" style={{ paddingTop: 14, paddingBottom: 18 }}>
+              <TextLink to="/app/patient/reports">Open document library</TextLink>
+            </div>
+          </Panel>
+        </div>
+      </div>
+      <div className="next-actions">
+        <div>
+          <span className="action-icon">
+            <ClipboardList size={20} />
+          </span>
+          <div>
+            <h3>Understand the first step.</h3>
+            <p>Walk through a predefined assessment sample.</p>
+          </div>
+          <Link to="/app/patient/assessments" aria-label="Explore a predefined sample assessment">
+            <ArrowRight size={20} />
+          </Link>
+        </div>
+        <div>
+          <span className="action-icon indigo">
+            <ShieldCheck size={20} />
+          </span>
+          <div>
+            <h3>Designed with clear boundaries.</h3>
+            <p>Read what this prototype can and cannot do.</p>
+          </div>
+          <Link to="/security" aria-label="Read prototype privacy and safety boundaries">
+            <ArrowRight size={20} />
+          </Link>
+        </div>
+      </div>
+      <CaseDrawer
+        record={state.cases.find((c) => c.id === selected) ?? null}
+        onClose={() => setSelected(null)}
+      />
+      <ReportPreview report={report} onClose={() => setReport(null)} />
+    </>
+  );
+}
+export function PatientHistory() {
+  const { state } = useDemo();
+  const cases = roleCases(state, 'patient');
+  const reviews = state.reviews.filter((r) => cases.some((c) => c.id === r.caseId));
+  return (
+    <>
+      <PageHeading
+        eyebrow="YOUR CONNECTED STORY"
+        title="Health history"
+        description="Fixed fictional context and sample case history, thoughtfully organized."
+      />
+      <div className="grid-2">
+        <Panel title="Fictional patient context" description="Predefined demonstration only">
+          <div className="padded" style={{ paddingTop: 0 }}>
+            <dl className="detail-grid">
+              <div>
+                <dt>Patient</dt>
+                <dd>Mira Chen · Fictional adult</dd>
+              </div>
+              <div>
+                <dt>Medical conditions</dt>
+                <dd>Not specified in sample</dd>
+              </div>
+              <div>
+                <dt>Medications</dt>
+                <dd>Not collected</dd>
+              </div>
+              <div>
+                <dt>Allergies</dt>
+                <dd>Not collected</dd>
+              </div>
+            </dl>
+            <div className="mt-6">
+              <Notice>
+                No absence of an illness or allergy is implied. This is illustrative sample context,
+                not a medical record.
+              </Notice>
+            </div>
+          </div>
+        </Panel>
+        <Panel title="Sample record summary">
+          <div className="padded" style={{ paddingTop: 0 }}>
+            <div className="history-counts">
+              <div>
+                <strong>{cases.length}</strong>
+                <span>Sample cases</span>
+              </div>
+              <div>
+                <strong>{reviews.length}</strong>
+                <span>Review records</span>
+              </div>
+            </div>
+            <p className="muted text-small mt-6">
+              Professional reviews are kept separately from future AI predictions. No diagnosis or
+              treatment history is available.
+            </p>
+          </div>
+        </Panel>
+      </div>
+      <div className="mt-6">
+        <ActivityView role="patient" embedded />
+      </div>
+    </>
+  );
+}
+export function ActivityView({ role, embedded = false }: { role: Role; embedded?: boolean }) {
+  const { state, dispatch } = useDemo();
+  const cases = roleCases(state, role);
+  const events = state.events.filter(
+    (e) => role === 'admin' || cases.some((c) => e.description.includes(c.id)),
+  );
+  const [filter, setFilter] = useState('All');
+  const [unread, setUnread] = useState(false);
+  const filtered = events.filter(
+    (e) =>
+      (filter === 'All' || e.action === filter) &&
+      (!unread || !state.readNotifications.includes(e.id)),
+  );
+  return (
+    <>
+      {!embedded && (
+        <PageHeading
+          eyebrow="YOUR WORKSPACE, IN MOTION"
+          title={role === 'patient' ? 'Notifications' : 'Activity'}
+          description="Sample workflow updates held in page memory. No real alerts are sent."
+        />
+      )}
+      <Panel
+        title={embedded ? 'Sample history timeline' : 'Workspace updates'}
+        description="Fictional events · Not a production audit system"
+        action={
+          role === 'patient' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                events.forEach((e) => dispatch({ type: 'readNotification', id: e.id }));
+                toast.success('Sample notifications marked as read.');
+              }}
+            >
+              <CheckCheck size={14} />
+              Mark all read
+            </Button>
+          )
+        }
+      >
+        <div className="toolbar">
+          <label className="field">
+            <span className="sr-only">Filter activity type</span>
+            <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <option value="All">All activity</option>
+              <option>Case</option>
+              <option>Review</option>
+            </select>
+          </label>
+          {role === 'patient' && (
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={unread}
+                onChange={(e) => setUnread(e.target.checked)}
+              />
+              Unread only
+            </label>
+          )}
+        </div>
+        {filtered.length ? (
+          <ul className="notification-list">
+            {filtered.slice(0, 30).map((e) => (
+              <li key={e.id} className={state.readNotifications.includes(e.id) ? 'is-read' : ''}>
+                <span className="notification-symbol">
+                  {e.action === 'Review' ? <Stethoscope size={18} /> : <Bell size={18} />}
+                </span>
+                <div>
+                  <strong>{e.description}</strong>
+                  <p>
+                    {formatDate(e.time)} · {e.actor}
+                  </p>
+                </div>
+                {role === 'patient' && !state.readNotifications.includes(e.id) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => dispatch({ type: 'readNotification', id: e.id })}
+                  >
+                    Mark read
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState
+            title="You’re all caught up"
+            description="No sample notifications match this view."
+          />
+        )}
+      </Panel>
+    </>
+  );
+}
