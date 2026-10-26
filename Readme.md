@@ -26,13 +26,29 @@ demonstration data; this is not a clinically deployed healthcare service.
 
 ![MedAssist public product experience](docs/screenshots/home.png)
 
-Requires Node.js **22.12 or newer**. From the repository root:
+Requires Node.js **22.12 or newer**. From the repository root, use the commands
+for your terminal.
+
+**macOS or Linux:**
 
 ```bash
 cd frontend
 npm ci
 npm run dev
 ```
+
+**Windows PowerShell:**
+
+```powershell
+cd frontend
+npm.cmd ci
+npm.cmd run dev
+```
+
+The Windows commands use Node.js's `.cmd` launchers, so they also work when
+PowerShell blocks `npm.ps1`. For the other frontend commands in this README or
+the frontend guide, use `npm.cmd` in place of `npm` and `npx.cmd` in place of
+`npx` in PowerShell. No execution-policy change is needed.
 
 Open **http://127.0.0.1:5173** and choose **Explore Demo**. No backend or account is
 needed for the fictional product demonstration. Do not enter real health information.
@@ -259,6 +275,9 @@ Git. Keep credentials and real patient information out of the repository.
 
 ## Troubleshooting
 
+- **PowerShell says `npm.ps1` or `npx.ps1` cannot be loaded:** from `frontend`,
+  run `npm.cmd ci` and `npm.cmd run dev`. For other frontend commands, use
+  `npm.cmd` and `npx.cmd` as described in the frontend quickstart above.
 - **`uvicorn` is not recognized:** use `python -m uvicorn` from the active
   environment, or the full virtual environment Python command shown above.
 - **Cannot import `app.main`:** run the server from `backend`, where the `app`
