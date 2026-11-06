@@ -1,6 +1,6 @@
 # Final report: scope and evidence checklist
 
-> Academic reporting aid, reviewed against repository documentation on 4 November 2026; demonstration rows updated 6 November 2026 after the frontend redesign batches (see [FRONTEND_DELIVERY_HANDOFF.md](FRONTEND_DELIVERY_HANDOFF.md)). This checklist is **not** a claim of new implementation or test execution. Recheck source files and run tests before submitting the final report.
+> Academic reporting aid, reviewed against repository documentation on 4 November 2026; demonstration rows updated 6 November 2026 after the frontend redesign batches. For current code versions, CI results and screenshots, see [FRONTEND_DELIVERY_HANDOFF.md](FRONTEND_DELIVERY_HANDOFF.md) (status as of 7 November 2026). This checklist is **not** a claim of new implementation or test execution. Recheck source files and run tests before submitting the final report.
 
 ## Project focus
 
@@ -19,7 +19,7 @@ The following status reflects the checked-in [README](../Readme.md), [frontend g
 
 | Capability | Reporting status | Evidence to inspect |
 | --- | --- | --- |
-| Responsive public website and patient/doctor/admin demo workspaces | Implemented academic demo with fictional data | `frontend/src/`, [frontend guide](FRONTEND_GUIDE.md), [screenshots](screenshots/README.md) |
+| Responsive public website and patient/doctor/admin demo workspaces | Implemented academic demo with fictional data | `frontend/src/`, [frontend guide](FRONTEND_GUIDE.md), report screenshots in [SCREENSHOT_MANIFEST.md](SCREENSHOT_MANIFEST.md) (historical: [screenshots/README.md](screenshots/README.md)) |
 | Fictional case, assessment, review, and appointment workflows | Implemented **in-memory mock interactions**; reset on reload | `frontend/src/data/mock/`, frontend tests |
 | Sample dashboard analytics and CSV export | Implemented using **synthetic** records | `frontend/src/data/mock/`, frontend tests |
 | FastAPI welcome, liveness, OpenAPI, request IDs and CORS configuration | Implemented system-level API only | `backend/app/`, `backend/tests/`, `backend/requests.http` |

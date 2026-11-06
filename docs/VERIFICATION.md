@@ -60,7 +60,9 @@ The homepage, patient overview, split-panel review, administrator dark theme and
 
 Scope: batches F1–F4 on branch `docs/frontend-redesign-f0`. These were the shared minimal design, restyled screens, consultation and medication-information demonstrations, and screenshot tooling. Environment: a cloud session with Node.js 22.23.4 and no access to the npm registry (`npm view` → `ENOTFOUND registry.npmjs.org`). The project's dependencies therefore **could not be installed**, and the project's own scripts could not run.
 
-**Not executed in this session:** `npm ci`, `npm run typecheck`, `npm run build`, Vitest through `npm test`, `npm run test:e2e` (Playwright and axe), `npm run format:check` with the pinned Prettier, `npm run screenshots:report`, and the backend `unittest` suite (no backend files were changed). These must be run, and their results recorded here with date, commit, OS, Node and browser versions, before they are cited.
+> **Superseded later the same day:** every command listed as not executed below was afterwards run in GitHub Actions and passed. See the two "Real CI" sections that follow and [FRONTEND_DELIVERY_HANDOFF.md](FRONTEND_DELIVERY_HANDOFF.md). This table is kept as a historical record.
+
+**Not executed in this session (historical):** `npm ci`, `npm run typecheck`, `npm run build`, Vitest through `npm test`, `npm run test:e2e` (Playwright and axe), `npm run format:check` with the pinned Prettier, `npm run screenshots:report`, and the backend `unittest` suite (no backend files were changed). These must be run, and their results recorded here with date, commit, OS, Node and browser versions, before they are cited.
 
 Checks that were executed, with substitutes named:
 
