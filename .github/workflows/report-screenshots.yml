@@ -59,11 +59,11 @@ jobs:
             docs/SCREENSHOT_MANIFEST.md
           retention-days: 30
       - name: Publish screenshots to a review branch
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
         working-directory: .
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           short="${SOURCE_SHA:0:7}"
           stage="$(mktemp -d)"
