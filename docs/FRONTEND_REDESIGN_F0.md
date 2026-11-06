@@ -1,5 +1,7 @@
 # MedAssist frontend redesign: F0 audit and screenshot plan
 
+> **Historical working note.** Statements here that pushing was refused, that the project's checks could not run, or that screenshots were pending were true when written. They are superseded. Current status, CI results and screenshots: [FRONTEND_DELIVERY_HANDOFF.md](FRONTEND_DELIVERY_HANDOFF.md).
+
 Working note, 6 November 2026 (IST). This is an editorial and engineering control note. It is not report prose. No application code was changed in F0.
 
 ## 1 Baseline and what was actually done

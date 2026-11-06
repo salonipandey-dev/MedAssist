@@ -1,5 +1,7 @@
 # MedAssist frontend redesign: F1 notes
 
+> **Historical working note.** Statements here that pushing was refused, that the project's checks could not run, or that screenshots were pending were true when written. They are superseded. Current status, CI results and screenshots: [FRONTEND_DELIVERY_HANDOFF.md](FRONTEND_DELIVERY_HANDOFF.md).
+
 Working note, 6 November 2026 (IST). Not report prose. Covers batch F1 only: the shared visual system, layout and navigation, the homepage, demo access, the patient overview and the profile. Base commit: `ea3e137` plus the F0 note.
 
 ## What changed

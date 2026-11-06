@@ -60,7 +60,9 @@ The homepage, patient overview, split-panel review, administrator dark theme and
 
 Scope: batches F1–F4 on branch `docs/frontend-redesign-f0`. These were the shared minimal design, restyled screens, consultation and medication-information demonstrations, and screenshot tooling. Environment: a cloud session with Node.js 22.23.4 and no access to the npm registry (`npm view` → `ENOTFOUND registry.npmjs.org`). The project's dependencies therefore **could not be installed**, and the project's own scripts could not run.
 
-**Not executed in this session:** `npm ci`, `npm run typecheck`, `npm run build`, Vitest through `npm test`, `npm run test:e2e` (Playwright and axe), `npm run format:check` with the pinned Prettier, `npm run screenshots:report`, and the backend `unittest` suite (no backend files were changed). These must be run, and their results recorded here with date, commit, OS, Node and browser versions, before they are cited.
+> **Superseded later the same day:** every command listed as not executed below was afterwards run in GitHub Actions and passed. See the two "Real CI" sections that follow and [FRONTEND_DELIVERY_HANDOFF.md](FRONTEND_DELIVERY_HANDOFF.md). This table is kept as a historical record.
+
+**Not executed in this session (historical):** `npm ci`, `npm run typecheck`, `npm run build`, Vitest through `npm test`, `npm run test:e2e` (Playwright and axe), `npm run format:check` with the pinned Prettier, `npm run screenshots:report`, and the backend `unittest` suite (no backend files were changed). These must be run, and their results recorded here with date, commit, OS, Node and browser versions, before they are cited.
 
 Checks that were executed, with substitutes named:
 
@@ -93,3 +95,12 @@ An earlier run on `5b280fc` ([42258264713](https://github.com/salonipandey-dev/M
 Report screenshots were captured from the production build of `961d532` by the `Report screenshots` workflow ([run 42258489108](https://github.com/salonipandey-dev/MedAssist/actions/runs/42258489108)): 13 screenshots and 3 crops, uploaded as the `report-screenshots` artifact. They are added to `docs/screenshots/report/` only after visual inspection.
 
 Not covered: Firefox and Safari, manual screen-reader testing, and the backend suite (no backend files changed).
+
+### Follow-up pull request #5: screenshots and a mobile fix (6 November 2026)
+
+Pull request [#4](https://github.com/salonipandey-dev/MedAssist/pull/4) was merged into `main` (`138a9c6`), and CI passed on `main` after the merge ([run 42261177461](https://github.com/salonipandey-dev/MedAssist/actions/runs/42261177461)). Follow-up work is in pull request [#5](https://github.com/salonipandey-dev/MedAssist/pull/5).
+
+- Inspecting a first set of real screenshots showed two problems. At 400 px and below, the demo-role selector clipped its label ("Patient dem"); the CSS was fixed in `71876a9`. A confirmation toast covered the recorded review in SS07; from `b83b015`, the capture script closes toasts and refuses to capture over one. Both early sets were discarded.
+- CI on `b83b015` ([run 42267504081](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267504081)) ran `npm ci`, the format check, the typecheck and build, `npm test` and `npm run test:e2e`. All passed.
+- The report screenshots were captured from the production build of `b83b015` by [run 42267504146](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267504146) (Chromium 141.0.7390.37) and published to the `report-screenshots/b83b015` review branch. All 13 screenshots and 5 crops were inspected before being committed to `docs/screenshots/report/`. Capture details are in [SCREENSHOT_MANIFEST.md](SCREENSHOT_MANIFEST.md).
+

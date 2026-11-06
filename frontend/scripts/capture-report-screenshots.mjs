@@ -35,6 +35,26 @@ await mkdir(outDir, { recursive: true });
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 390, height: 844 };
 
+/** Close confirmation toasts with their own close button so they never cover the captured state. */
+async function waitForToasts(page) {
+  const toasts = page.locator('[data-sonner-toast]');
+  for (let attempt = 0; attempt < 5 && (await toasts.count()) > 0; attempt++) {
+    const close = page.getByRole('button', { name: /close toast/i });
+    if (await close.count())
+      await close
+        .first()
+        .click({ force: true })
+        .catch(() => {});
+    await page.waitForTimeout(400);
+  }
+  await toasts
+    .first()
+    .waitFor({ state: 'detached', timeout: 8000 })
+    .catch(() => {
+      throw new Error('A confirmation toast is still visible; refusing to capture over it.');
+    });
+}
+
 /** Each step mirrors an interaction exercised by tests/e2e/workflows.spec.ts. */
 const SHOTS = [
   {
@@ -108,6 +128,7 @@ const SHOTS = [
       await page.getByLabel('I understand this records a fictional workflow review only.').check();
       await page.getByRole('button', { name: 'Record sample review' }).click();
       await page.locator('.review-record').first().waitFor();
+      await waitForToasts(page);
     },
     crop: '.review-right',
     caption: 'Demonstration review recorded for fictional case MA-2402 with a predefined note.',
@@ -165,6 +186,7 @@ const SHOTS = [
     file: 'ss11-medication-information.png',
     route: '/app/patient/medications',
     state: 'Scripted example “Same ingredient in two products”',
+    crop: '.med-layout',
     caption: 'Scripted medication-information example with invented medicine names.',
     status: 'Demonstration only',
     limitation:
@@ -176,6 +198,7 @@ const SHOTS = [
     route: '/app/patient/medications',
     state: 'Scripted example “Incomplete information”',
     steps: async (page) => page.getByRole('button', { name: /^Incomplete information/ }).click(),
+    crop: '.med-layout',
     caption: 'Scripted example showing missing information kept separate from possible issues.',
     status: 'Demonstration only',
     limitation: '“Not recorded” is shown as different from “none”; no assessment is performed.',
@@ -220,6 +243,7 @@ try {
     await page.getByRole('heading', { level: 1 }).waitFor();
     await page.evaluate(() => document.fonts.ready);
     if (shot.steps) await shot.steps(page);
+    await waitForToasts(page);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: join(outDir, shot.file) });
     const files = [shot.file];
@@ -259,7 +283,7 @@ if (writeMarkdown) {
   const rows = results
     .map(
       (r) =>
-        `| ${r.id} | ${r.files.map((f) => `\`screenshots/report/${f}\``).join('<br>')} | \`${r.route}\` | ${r.state} | ${r.viewport} | ${r.capturedAt} (${r.timeZone}) | \`${r.commit.slice(0, 12)}\`${r.dirty ? ' (uncommitted changes)' : ''} | ${r.caption} | ${r.status}. ${r.limitation} |`,
+        `| ${r.id} | ${r.files.map((f) => `\`screenshots/report/${f}\``).join('<br>')} | \`${r.route}\` | ${r.state} | ${r.viewport} | ${r.capturedAt.replace('T', ' ').slice(0, 19)} UTC | \`${r.commit.slice(0, 12)}\`${r.dirty ? ' (uncommitted changes)' : ''} | ${r.caption} | ${r.status}. ${r.limitation} |`,
     )
     .join('\n');
   const md = `# Screenshot manifest
