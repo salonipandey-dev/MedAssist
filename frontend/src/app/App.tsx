@@ -21,6 +21,12 @@ const AboutPage = lazy(() =>
 const DemoAccess = lazy(() =>
   import('../features/auth/DemoAccess').then((m) => ({ default: m.DemoAccess })),
 );
+const Consultations = lazy(() =>
+  import('../features/consultations/Consultations').then((m) => ({ default: m.Consultations })),
+);
+const Medications = lazy(() =>
+  import('../features/medications/Medications').then((m) => ({ default: m.Medications })),
+);
 const PatientOverview = lazy(() =>
   import('../features/patient/Patient').then((m) => ({ default: m.PatientOverview })),
 );
@@ -148,6 +154,8 @@ export function App() {
                 <Route path="cases" element={<CaseList role="patient" />} />
                 <Route path="cases/:caseId" element={<CaseDetailPage role="patient" />} />
                 <Route path="appointments" element={<Appointments role="patient" />} />
+                <Route path="consultations" element={<Consultations />} />
+                <Route path="medications" element={<Medications />} />
                 <Route path="reports" element={<Reports role="patient" />} />
                 <Route path="settings" element={<Settings role="patient" />} />
                 <Route path="*" element={<NotFound role="patient" />} />

@@ -19,6 +19,8 @@ const roleRoutes = {
     'assessments',
     'cases',
     'appointments',
+    'consultations',
+    'medications',
     'reports',
     'notifications',
     'settings',
@@ -341,4 +343,48 @@ test('patient appointment preview follows the selected fictional professional', 
   await page.getByRole('link', { name: 'Overview', exact: true }).click();
   await expect(page.locator('.appointment-doctor')).toContainText('Dr. Robin Hale');
   await expect(page.locator('.appointment-doctor')).toContainText('Internal medicine');
+});
+
+test('consultation demo filters fictional options and limits comparison to three', async ({
+  page,
+}) => {
+  await page.goto('/app/patient/consultations');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Find and compare consultations',
+  );
+  const options = page
+    .getByRole('list', { name: 'Sample consultation options' })
+    .getByRole('listitem');
+  await page.getByLabel('Fee').selectOption('Free (illustrative)');
+  await expect(options).toHaveCount(2);
+  await page.getByLabel('Specialty').selectOption('ENT');
+  await expect(page.getByRole('heading', { name: 'No sample options match' })).toBeVisible();
+  await page.getByRole('button', { name: 'Clear filters' }).first().click();
+  await expect(options).toHaveCount(9);
+  const compare = page.getByRole('button', { name: /^Compare / });
+  for (let i = 0; i < 3; i++) await compare.first().click();
+  await expect(page.getByRole('table', { name: 'consultation comparison' })).toContainText(
+    'illustrative',
+  );
+  await compare.first().click();
+  await expect(page.getByRole('status').filter({ hasText: 'compare up to 3' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Comparing / })).toHaveCount(3);
+  await page
+    .getByRole('button', { name: /^Remove .* from comparison$/ })
+    .first()
+    .click();
+  await expect(page.getByRole('button', { name: /^Comparing / })).toHaveCount(2);
+});
+
+test('medication demo separates possible issues from missing information', async ({ page }) => {
+  await page.goto('/app/patient/medications');
+  await expect(page.locator('main input, main select, main textarea')).toHaveCount(0);
+  await expect(page.getByText('Possible issue (scripted)')).toBeVisible();
+  await page.getByRole('button', { name: /^Incomplete information/ }).click();
+  await expect(page.getByText('Information incomplete')).toBeVisible();
+  await expect(page.getByText('Not enough information').first()).toBeVisible();
+  await expect(page.getByText('Possible issue (scripted)')).toHaveCount(0);
+  await expect(page.getByText('Not recorded in this example')).toBeVisible();
+  await page.getByRole('button', { name: /^No scripted notice/ }).click();
+  await expect(page.getByRole('main')).toContainText('does not mean the medicine is safe');
 });
