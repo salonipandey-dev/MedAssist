@@ -1,4 +1,4 @@
-import { ArrowRight, Check, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Stethoscope, UserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar, Badge, Button, Notice } from '../../components/ui';
 import { DEMO_ACCOUNTS } from '../../data/mock/seed';
@@ -6,20 +6,20 @@ import type { Role } from '../../types';
 export function DemoAccess() {
   const icons = { patient: UserRound, doctor: Stethoscope, admin: ShieldCheck };
   const copies = {
-    patient: 'A clearer picture of your cases, appointments and documents.',
-    doctor: 'A focused review workspace with patient context, side by side.',
-    admin: 'A considered command center for sample operations and analytics.',
+    patient:
+      'View sample cases, try the fixed assessment walkthrough and request fictional appointments.',
+    doctor: 'Open assigned sample cases and record a demonstration review with predefined notes.',
+    admin: 'Browse fictional accounts, sample case activity and analytics from synthetic records.',
   };
   return (
     <section className="container demo-access">
       <div className="section-header centered">
         <Badge tone="teal">No account needed</Badge>
-        <h1>
-          One platform.
-          <br />
-          Choose your perspective.
-        </h1>
-        <p>Step inside MedAssist with an entirely fictional demo account.</p>
+        <h1>Choose your perspective</h1>
+        <p>
+          Open the prototype as a fictional patient, doctor or administrator. Choosing a role is not
+          a sign-in.
+        </p>
       </div>
       <div className="demo-role-grid">
         {(['patient', 'doctor', 'admin'] as Role[]).map((role) => {
@@ -65,12 +65,6 @@ export function DemoAccess() {
           information. Clinical triage, real report uploads and secure patient storage are
           unavailable.
         </Notice>
-      </div>
-      <div className="demo-footnote">
-        <Check size={14} />
-        No credentials <span />
-        No real patient data <span />
-        No clinical decision support
       </div>
     </section>
   );

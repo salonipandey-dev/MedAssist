@@ -128,8 +128,8 @@ export function AppointmentRequest() {
   }
   return (
     <Panel
-      title="Find a little space in your day"
-      description="Try an appointment request using fictional availability only"
+      title="Request a sample appointment"
+      description="Choose a date and time from fictional availability. Nothing is booked."
     >
       <div className="appointment-request-grid">
         <SampleCalendar
@@ -237,9 +237,9 @@ export function Appointments({ role }: { role: Role }) {
   return (
     <>
       <PageHeading
-        eyebrow={role === 'patient' ? 'MAKE ROOM FOR WHAT MATTERS' : 'APPOINTMENT COORDINATION'}
+        eyebrow={role === 'patient' ? 'Patient · Appointments' : 'Appointment coordination'}
         title={role === 'patient' ? 'My appointments' : 'Appointments'}
-        description="Fictional schedules, thoughtful details and a clear view of what comes next."
+        description="Fictional appointment requests and their status. No appointment message is sent and nothing is booked."
         action={<Badge tone="teal">Sample Data · IST</Badge>}
       />
       {role === 'patient' && (

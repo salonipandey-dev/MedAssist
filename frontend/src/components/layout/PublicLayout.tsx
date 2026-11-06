@@ -45,13 +45,8 @@ export function PublicLayout() {
           </nav>
           <div className="public-nav-actions">
             <ThemeToggle />
-            <Link to="/demo" className="public-signin">
-              Demo access <ArrowUpRight size={14} />
-            </Link>
-            <Button asChild size="sm" className="desktop-only">
-              <Link to="/demo">
-                Explore demo <ArrowUpRight size={13} />
-              </Link>
+            <Button asChild size="sm" variant="secondary" className="desktop-only">
+              <Link to="/demo">Demo access</Link>
             </Button>
             <Button
               className="mobile-only"
@@ -76,13 +71,12 @@ export function PublicLayout() {
             <div className="footer-intro">
               <Logo />
               <p>
-                Healthcare information,
-                <br />
-                thoughtfully connected.
+                An academic prototype for organising fictional patient records, case tracking and
+                professional review.
               </p>
               <span className="prototype-label">
                 <span />
-                An academic product prototype
+                Academic prototype · Fictional data
               </span>
             </div>
             <div>
@@ -95,7 +89,7 @@ export function PublicLayout() {
               <h3>Experiences</h3>
               <Link to="/patients">Patient portal</Link>
               <Link to="/professionals">Doctor workspace</Link>
-              <Link to="/app/admin">Admin command center</Link>
+              <Link to="/app/admin">Administrator workspace</Link>
             </div>
             <div>
               <h3>Project</h3>

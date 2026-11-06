@@ -27,9 +27,9 @@ export function Assessment() {
   return (
     <>
       <PageHeading
-        eyebrow="A CONSIDERED FIRST STEP"
-        title="Explore an assessment"
-        description="A guided walkthrough of the intended experience, using predefined fictional information."
+        eyebrow="Patient · Assessment"
+        title="Fixed assessment walkthrough"
+        description="Six steps showing the intended structure, using predefined fictional information only."
       />
       <Notice kind="safe">
         <strong>Sample walkthrough only.</strong> No health information can be entered. This demo
@@ -68,7 +68,7 @@ export function Assessment() {
                   <span className="assessment-symbol">
                     <ClipboardList size={30} />
                   </span>
-                  <h2>Start with a clear picture.</h2>
+                  <h2>How this walkthrough works</h2>
                   <p>
                     Follow a fictional sample through the structure proposed in the MedAssist
                     synopsis. Every detail is predefined. Nothing is collected from you.
@@ -103,7 +103,7 @@ export function Assessment() {
                 </>
               ) : step === 2 ? (
                 <>
-                  <h2>A little more context.</h2>
+                  <h2>Duration and severity</h2>
                   <p>
                     Duration and self-described severity belong to the sample record. They do not
                     create a medical urgency classification.

@@ -44,9 +44,9 @@ export function Profile() {
   return (
     <>
       <PageHeading
-        eyebrow="YOUR SPACE, THOUGHTFULLY ORGANIZED"
+        eyebrow="Patient · Profile preferences"
         title="My profile"
-        description="Explore a fictional profile. Personal and medical information are not collected."
+        description="Change a fictional display alias and a language-preference label. Personal, contact and medical details are not collected."
       />
       <div className="profile-identity">
         <Avatar name="Mira Chen" size="lg" />

@@ -14,8 +14,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { Badge, Panel } from '../ui';
-const COLORS = ['#0D9488', '#6366F1', '#5BA5B7', '#9AAEC7'];
+import { Panel } from '../ui';
+// Teal accent plus neutral slates; categories are also named in the legend and data table.
+const COLORS = ['#0F766E', '#475569', '#5EA9A2', '#A3B1C2'];
 const tooltip = {
   background: 'var(--surface)',
   color: 'var(--text)',
@@ -35,7 +36,7 @@ export function DistributionChart({
 }) {
   const total = data.reduce((n, d) => n + d.value, 0);
   return (
-    <Panel title={title} description={description} action={<Badge>Sample Data</Badge>}>
+    <Panel title={title} description={description}>
       <div className="distribution-chart">
         <div
           className="donut-wrap"
@@ -105,8 +106,8 @@ export function TrendChart({
   data,
   kind = 'area',
   series = [
-    { key: 'cases', label: 'Cases', color: '#0D9488' },
-    { key: 'appointments', label: 'Appointments', color: '#6366F1' },
+    { key: 'cases', label: 'Cases', color: '#0F766E' },
+    { key: 'appointments', label: 'Appointments', color: '#64748B' },
   ],
   description,
 }: {
@@ -139,7 +140,7 @@ export function TrendChart({
     </>
   );
   return (
-    <Panel title={title} description={description} action={<Badge>Sample Data</Badge>}>
+    <Panel title={title} description={description}>
       <div
         className="trend-chart"
         role="img"

@@ -4,7 +4,6 @@ import {
   Bell,
   CalendarDays,
   ChartNoAxesCombined,
-  ChevronDown,
   ClipboardList,
   FileText,
   HeartPulse,
@@ -14,6 +13,8 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Pill,
+  Search,
   Settings,
   ShieldCheck,
   Stethoscope,
@@ -37,6 +38,8 @@ export const NAV: Record<Role, { path: string; label: string; icon: typeof Activ
     { path: 'assessments', label: 'Assessments', icon: ClipboardList },
     { path: 'cases', label: 'My Cases', icon: HeartPulse },
     { path: 'appointments', label: 'Appointments', icon: CalendarDays },
+    { path: 'consultations', label: 'Find Consultations', icon: Search },
+    { path: 'medications', label: 'Medication Info', icon: Pill },
     { path: 'reports', label: 'Medical Reports', icon: FileText },
     { path: 'notifications', label: 'Notifications', icon: Bell },
     { path: 'settings', label: 'Settings', icon: Settings },
@@ -168,7 +171,6 @@ export function AppLayout() {
             {account.label}
             <small>Fictional workspace</small>
           </span>
-          <ChevronDown size={14} />
         </div>
         <p className="nav-category">WORKSPACE</p>
         <nav>
@@ -189,16 +191,6 @@ export function AppLayout() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <div className="sidebar-help">
-            <span className="help-orbit">
-              <HeartPulse size={21} />
-            </span>
-            <h3>Thoughtfully connected.</h3>
-            <p>Explore a more considered healthcare experience.</p>
-            <Link to="/platform">
-              About this prototype <ArrowUpRight size={14} />
-            </Link>
-          </div>
           <Link className="sidebar-link" to="/">
             <LogOut size={19} />
             <span>Back to website</span>
@@ -271,7 +263,7 @@ export function AppLayout() {
           <Outlet />
         </main>
         <footer className="app-footer">
-          <span>MedAssist · Built with care, designed for people.</span>
+          <span>MedAssist academic prototype · Fictional records only</span>
           <span>Demo clock: 25 Oct 2026 · No clinical decision support</span>
         </footer>
       </div>
