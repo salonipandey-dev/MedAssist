@@ -50,9 +50,9 @@ export function DoctorOverview() {
   return (
     <>
       <PageHeading
-        eyebrow="DOCTOR WORKSPACE · FICTIONAL PROFESSIONAL"
-        title="Good to see you, Dr. Morgan."
-        description="The context you need. The space to make your own assessment."
+        eyebrow="Doctor · Fictional professional"
+        title="Doctor overview"
+        description="Sample cases assigned to Dr. Avery Morgan, their review status and the fictional schedule."
         action={
           <Button asChild>
             <Link to={pending[0] ? `/app/doctor/reviews/${pending[0].id}` : '/app/doctor/cases'}>
@@ -354,8 +354,8 @@ export function ReviewWorkspace() {
         Back to assigned cases
       </Link>
       <PageHeading
-        eyebrow="FOCUSED REVIEW WORKSPACE"
-        title="Context first. Your review, independent."
+        eyebrow="Doctor · Case review"
+        title="Record a sample review"
         description="Review a fictional sample case and record a separate demonstration review."
         action={
           <label className="field">
@@ -375,7 +375,7 @@ export function ReviewWorkspace() {
       />
       <div className="review-workspace">
         <div>
-          <Panel title="Patient context & case record" action={<Badge>Sample Data</Badge>}>
+          <Panel title="Patient context & case record">
             <div className="padded" style={{ paddingTop: 0 }}>
               <CaseContent record={record} />
             </div>
@@ -397,7 +397,7 @@ export function PatientRecords() {
   return (
     <>
       <PageHeading
-        eyebrow="CONTEXT, THOUGHTFULLY CONNECTED"
+        eyebrow="Doctor · Patient records"
         title="Patient records"
         description="Fictional patients linked to assigned sample cases. These UI filters are not authorization."
       />
@@ -506,8 +506,8 @@ export function DoctorSchedule() {
   return (
     <>
       <PageHeading
-        eyebrow="A CONSIDERED VIEW OF YOUR DAY"
-        title="Your schedule"
+        eyebrow="Doctor · Schedule"
+        title="Sample schedule"
         description="Fictional availability and sample appointments. Demo time zone: Asia/Kolkata."
       />
       <div className="schedule-layout">

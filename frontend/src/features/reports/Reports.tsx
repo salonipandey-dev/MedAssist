@@ -86,9 +86,9 @@ export function Reports({ role }: { role: Role }) {
   return (
     <>
       <PageHeading
-        eyebrow={role === 'patient' ? 'YOUR DOCUMENT LIBRARY' : 'CONNECTED DOCUMENTS'}
+        eyebrow={role === 'patient' ? 'Patient · Documents' : 'Documents'}
         title={role === 'patient' ? 'Medical reports' : 'Report references'}
-        description="A considered home for fictional documents and their connected case references."
+        description="Built-in previews of fictional documents and the cases they belong to. Real uploads are not available."
         action={
           <Button variant="secondary" onClick={() => setExplain(true)}>
             <LockKeyhole size={15} />

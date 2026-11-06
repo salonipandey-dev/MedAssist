@@ -4,7 +4,7 @@
   gap: 22px;
 }
 .lead-copy {
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.9;
   color: var(--muted);
   margin-block: 20px;
@@ -20,10 +20,10 @@
   margin-top: 2px;
 }
 .principle-row h3 {
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 .principle-row p {
-  font-size: 11px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin-top: 7px;
 }
@@ -32,14 +32,14 @@
 }
 .public-page-hero h1 {
   white-space: pre-line;
-  font-size: 49px;
+  font-size: 40px;
   line-height: 1.2;
-  letter-spacing: -2px;
-  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-weight: 600;
   margin-top: 20px;
 }
 .public-page-hero > p:not(.eyebrow) {
-  font-size: 14px;
+  font-size: var(--text-md);
   line-height: 1.9;
   color: var(--muted);
   max-width: 600px;
@@ -121,7 +121,7 @@
   display: flex;
   gap: 9px;
   align-items: flex-start;
-  font-size: 11px;
+  font-size: var(--text-sm);
   color: var(--muted);
   line-height: 1.6;
 }
@@ -134,7 +134,7 @@
   margin: 70px auto 20px;
 }
 .security-faq > h2 {
-  font-size: 26px;
+  font-size: var(--text-xl);
   margin-bottom: 30px;
 }
 .security-faq .accordion {
@@ -142,7 +142,7 @@
   margin: 0;
 }
 .security-faq .accordion > p {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin-top: 17px;
   line-height: 1.9;
@@ -155,7 +155,7 @@
   align-items: start;
 }
 .about-section h2 {
-  font-size: 27px;
+  font-size: var(--text-2xl);
   line-height: 1.4;
   margin-top: 16px;
 }
@@ -483,11 +483,11 @@
     padding-block: 45px 35px;
   }
   .public-page-hero h1 {
-    font-size: 36px;
-    letter-spacing: -1.5px;
+    font-size: var(--text-2xl);
+    letter-spacing: -0.01em;
   }
   .public-page-hero > p:not(.eyebrow) {
-    font-size: 12px;
+    font-size: var(--text-sm);
     line-height: 1.85;
   }
   .public-page-hero > .inline-actions {
@@ -525,17 +525,17 @@
     margin-top: 45px;
   }
   .security-faq > h2 {
-    font-size: 23px;
+    font-size: var(--text-xl);
   }
   .security-faq summary {
-    font-size: 11px;
+    font-size: var(--text-sm);
   }
   .about-section {
     grid-template-columns: 1fr;
     gap: 30px;
   }
   .about-section h2 {
-    font-size: 25px;
+    font-size: var(--text-xl);
   }
   .product-stage .preview-sidebar {
     display: none;
@@ -685,14 +685,14 @@
   padding-block: 72px;
 }
 .home-hero-copy h1 {
-  font-size: 44px;
+  font-size: 40px;
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin-top: var(--space-2);
   max-width: 600px;
 }
 .home-hero-copy > p:not(.home-note) {
-  font-size: 18px;
+  font-size: var(--text-lg);
   color: var(--muted);
   margin-top: var(--space-2);
   max-width: 560px;
@@ -959,7 +959,7 @@
 }
 .demo-access h1 {
   margin-top: var(--space-2);
-  font-size: 36px;
+  font-size: var(--text-2xl);
   line-height: 1.2;
 }
 .demo-role-grid {
@@ -1078,7 +1078,7 @@
     padding-inline: var(--space-2);
   }
   .home-hero-copy h1 {
-    font-size: 32px;
+    font-size: var(--text-2xl);
   }
   .home-hero-copy > p:not(.home-note) {
     font-size: var(--text-md);
@@ -1098,7 +1098,7 @@
     padding-block: var(--space-4) var(--space-6);
   }
   .demo-access h1 {
-    font-size: 28px;
+    font-size: var(--text-2xl);
   }
   .final-cta {
     margin-inline: var(--space-2);

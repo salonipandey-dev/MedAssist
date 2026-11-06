@@ -41,9 +41,9 @@ export function Settings({ role }: { role: Role }) {
   return (
     <>
       <PageHeading
-        eyebrow="MAKE YOURSELF AT HOME"
+        eyebrow="Settings"
         title={role === 'admin' ? 'System settings' : 'Workspace settings'}
-        description="A considered workspace, with preferences that stay in this demo session."
+        description="Theme and demonstration preferences for this session. Nothing is kept after reload."
       />
       <div className="settings-layout">
         <div className="stack">

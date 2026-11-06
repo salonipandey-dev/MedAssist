@@ -185,7 +185,7 @@ export function CaseList({ role, onlyPending = false }: { role: Role; onlyPendin
   return (
     <>
       <PageHeading
-        eyebrow={role === 'patient' ? 'YOUR CONNECTED RECORDS' : 'CASE COORDINATION'}
+        eyebrow={role === 'patient' ? 'Patient · Cases' : 'Case coordination'}
         title={
           onlyPending
             ? 'Cases awaiting review'
@@ -195,7 +195,7 @@ export function CaseList({ role, onlyPending = false }: { role: Role; onlyPendin
                 ? 'Assigned cases'
                 : 'Case management'
         }
-        description="A clear view of each case, its context and its workflow progress."
+        description="Fictional cases and their workflow status. Status shows coordination progress, not medical urgency."
         action={
           role === 'patient' ? (
             <Button asChild>

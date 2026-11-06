@@ -75,9 +75,9 @@ export function AdminOverview({ detailed = false }: { detailed?: boolean }) {
   return (
     <>
       <PageHeading
-        eyebrow="ADMINISTRATOR COMMAND CENTER"
-        title={detailed ? 'A closer look at the bigger picture.' : 'Your platform, at a glance.'}
-        description="A clear, connected view of fictional activity. Every number comes from the sample dataset."
+        eyebrow={detailed ? 'Administrator · Analytics' : 'Administrator'}
+        title={detailed ? 'Sample analytics' : 'Administrator overview'}
+        description="Counts, trends and activity calculated from the fictional sample dataset."
         action={
           <div className="inline-actions">
             <PeriodSelector value={range} onChange={setRange} />
@@ -88,22 +88,11 @@ export function AdminOverview({ detailed = false }: { detailed?: boolean }) {
           </div>
         }
       />
-      <div className="admin-sample-banner">
-        <div>
-          <span className="admin-sample-icon">
-            <ChartNoAxesCombined size={19} />
-          </span>
-          <div>
-            <strong>Good data tells a clear story.</strong>
-            <p>
-              These metrics illustrate product workflows. They are not real hospital statistics.
-            </p>
-          </div>
-        </div>
-        <Badge tone="teal">
-          <span className="status-dot" />
-          Sample Data
-        </Badge>
+      <div className="admin-notice">
+        <Notice>
+          These figures are calculated from fictional sample records. They are not real patient or
+          hospital statistics.
+        </Notice>
       </div>
       <div className="stat-grid">
         <Stat
@@ -275,9 +264,9 @@ export function AdminOverview({ detailed = false }: { detailed?: boolean }) {
       </div>
       <div className="mt-6">
         <Notice>
-          <strong>Consistent by construction.</strong> Date filters recompute the metrics and charts
-          from the same in-memory records. Frontend role controls, sample events and displayed
-          status labels are not production authorization or secure audit logging.
+          Date filters recalculate every figure and chart from the same sample records in this
+          session. Role controls and activity events are demonstrations, not secure permissions or
+          an audit log.
         </Notice>
       </div>
     </>
@@ -292,7 +281,7 @@ export function UserManagement({ doctorsOnly = false }: { doctorsOnly?: boolean 
   return (
     <>
       <PageHeading
-        eyebrow="PEOPLE, THOUGHTFULLY ORGANIZED"
+        eyebrow="Administrator · Accounts"
         title={doctorsOnly ? 'Doctor management' : 'User management'}
         description="Explore fictional accounts, role details and reversible demonstration controls."
         action={<Badge tone="teal">{users.length} sample accounts</Badge>}
@@ -464,7 +453,7 @@ export function AuditActivity() {
   return (
     <>
       <PageHeading
-        eyebrow="A TRACEABLE DEMONSTRATION"
+        eyebrow="Administrator · Audit"
         title="Audit activity"
         description="A chronological viewer for fictional and session-generated sample events."
         action={

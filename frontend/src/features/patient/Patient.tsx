@@ -195,9 +195,9 @@ export function PatientHistory() {
   return (
     <>
       <PageHeading
-        eyebrow="YOUR CONNECTED STORY"
+        eyebrow="Patient · Health history"
         title="Health history"
-        description="Fixed fictional context and sample case history, thoughtfully organized."
+        description="Fixed fictional context and the sample case history for this patient."
       />
       <div className="grid-2">
         <Panel title="Fictional patient context" description="Predefined demonstration only">
@@ -270,7 +270,7 @@ export function ActivityView({ role, embedded = false }: { role: Role; embedded?
     <>
       {!embedded && (
         <PageHeading
-          eyebrow="YOUR WORKSPACE, IN MOTION"
+          eyebrow={role === 'patient' ? 'Patient · Notifications' : 'Activity'}
           title={role === 'patient' ? 'Notifications' : 'Activity'}
           description="Sample workflow updates held in page memory. No real alerts are sent."
         />

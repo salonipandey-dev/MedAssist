@@ -38,7 +38,7 @@ export function ProductPreview({ role = 'patient' }: { role?: Role }) {
               ? 'Patient portal'
               : role === 'doctor'
                 ? 'Doctor workspace'
-                : 'Command center'}
+                : 'Administrator workspace'}
           </div>
           {[LayoutDashboard, ClipboardList, CalendarDays, FileText].map((Icon, i) => (
             <div key={i} className={`preview-nav ${i === 0 ? 'selected' : ''}`}>
@@ -71,19 +71,18 @@ export function ProductPreview({ role = 'patient' }: { role?: Role }) {
           <div className="preview-body">
             <div className="preview-welcome">
               <div>
-                <small>YOUR {role === 'patient' ? 'HEALTH' : 'WORKSPACE'}, AT A GLANCE</small>
+                <small>
+                  {role === 'patient' ? 'PATIENT' : role === 'doctor' ? 'DOCTOR' : 'ADMINISTRATOR'}{' '}
+                  OVERVIEW
+                </small>
                 <h3>
                   {role === 'patient'
-                    ? 'Good morning, Mira.'
+                    ? 'Welcome back, Mira.'
                     : role === 'doctor'
-                      ? 'Ready for your next review?'
-                      : 'A clear view of operations.'}
+                      ? 'Doctor overview'
+                      : 'Administrator overview'}
                 </h3>
-                <p>
-                  {role === 'patient'
-                    ? 'A little clarity for your health journey.'
-                    : 'Everything you need, thoughtfully organized.'}
-                </p>
+                <p>Fictional records · demonstration only</p>
               </div>
               <span className="preview-calendar">
                 <CalendarDays size={12} />
@@ -133,13 +132,13 @@ export function ProductPreview({ role = 'patient' }: { role?: Role }) {
                 </div>
               </div>
               <div className="preview-appointment">
-                <div className="preview-panel-title">Your care, connected.</div>
+                <div className="preview-panel-title">Prototype boundary</div>
                 <span className="care-ring">
                   <HeartPulse size={25} />
                 </span>
-                <h4>One shared view.</h4>
-                <p>Patient context and professional review, together.</p>
-                <Badge tone="teal">Human-led workflow</Badge>
+                <h4>No clinical decisions</h4>
+                <p>Status shows workflow progress, not medical urgency.</p>
+                <Badge tone="teal">Human review</Badge>
               </div>
             </div>
             <div className="preview-bottom-line">

@@ -45,18 +45,18 @@ export function FinalCTA() {
 const features = [
   {
     icon: ClipboardList,
-    title: 'Every case. In context.',
-    copy: 'Keep structured information, record references and review progress in one clear view.',
+    title: 'Case tracking',
+    copy: 'Follow structured sample information, document references and review progress for each fictional case.',
   },
   {
     icon: CalendarDays,
-    title: 'Less friction. More clarity.',
-    copy: 'A considered appointment experience, from the first sample request to the next follow-up.',
+    title: 'Appointment requests',
+    copy: 'Request, view and cancel fictional appointment slots. Nothing is booked and no message is sent.',
   },
   {
     icon: Stethoscope,
-    title: 'Designed around people.',
-    copy: 'A dedicated workspace that brings relevant context to an independent professional review.',
+    title: 'Independent review',
+    copy: 'A doctor workspace shows case context next to a separate demonstration review.',
   },
 ];
 export function Workflow({ standalone = false }: { standalone?: boolean }) {
@@ -256,19 +256,19 @@ export function Home() {
 }
 const pageIntro: Record<string, { tag: string; title: string; copy: string }> = {
   platform: {
-    tag: 'THE MEDASSIST PLATFORM',
-    title: 'A connected workspace.\nA considered experience.',
-    copy: 'One coherent product concept for patient information, professional review and operational coordination.',
+    tag: 'Platform',
+    title: 'What the prototype includes',
+    copy: 'Patient, doctor and administrator workspaces built on fictional records, with each limitation shown where it applies.',
   },
   patients: {
-    tag: 'THE PATIENT EXPERIENCE',
-    title: 'A calmer way to follow\nyour health information.',
-    copy: 'A welcoming portal makes case progress, sample appointments and documents easier to understand.',
+    tag: 'For patients',
+    title: 'Follow sample cases, appointments\nand documents',
+    copy: 'The patient workspace shows case progress, fictional appointment requests and built-in document previews.',
   },
   professionals: {
-    tag: 'THE PROFESSIONAL EXPERIENCE',
-    title: 'More context.\nRoom for your judgment.',
-    copy: 'A focused workspace that keeps submitted information, document references and independent review side by side.',
+    tag: 'For professionals',
+    title: 'Review sample cases\nwith their context',
+    copy: 'The doctor workspace keeps submitted sample information, document references and a separate demonstration review side by side.',
   },
 };
 export function PlatformPage({
@@ -318,13 +318,13 @@ export function PlatformPage({
       </section>
       <section className="section container">
         <div className="section-header">
-          <p className="eyebrow">PURPOSEFUL BY DESIGN</p>
+          <p className="eyebrow">What you can do</p>
           <h2>
             {kind === 'professionals'
-              ? 'A review workspace that respects the workflow.'
+              ? 'Review without automated conclusions'
               : kind === 'patients'
-                ? 'A shared view of what happens next.'
-                : 'Three perspectives. A single connected thread.'}
+                ? 'See what happens next'
+                : 'Three demonstration perspectives'}
           </h2>
         </div>
         <div className="feature-grid">
@@ -342,7 +342,7 @@ export function PlatformPage({
                 },
                 {
                   icon: CalendarDays,
-                  title: 'A considered schedule',
+                  title: 'Sample schedule',
                   copy: 'Fictional appointment requests, confirmations and a day-by-day sample schedule.',
                 },
               ]
@@ -393,14 +393,11 @@ export function HowItWorks() {
   return (
     <>
       <section className="public-page-hero container">
-        <p className="eyebrow">HOW MEDASSIST WORKS</p>
-        <h1>
-          One case.
-          <br />A clearer path through it.
-        </h1>
+        <p className="eyebrow">How it works</p>
+        <h1>How a sample case moves through the prototype</h1>
         <p>
-          Explore the intended patient-to-professional workflow, with each responsibility visible
-          and each decision kept in context.
+          Follow the intended patient-to-professional workflow. Each step uses fictional records and
+          shows what is and is not implemented.
         </p>
       </section>
       <Workflow standalone />
@@ -442,12 +439,8 @@ export function SecurityPage() {
   return (
     <>
       <section className="public-page-hero container">
-        <p className="eyebrow">SECURITY & PRIVACY</p>
-        <h1>
-          Trust begins
-          <br />
-          with clear boundaries.
-        </h1>
+        <p className="eyebrow">Security and privacy</p>
+        <h1>Prototype boundaries and privacy</h1>
         <p>
           MedAssist is an academic prototype. Good intentions are a starting point; implemented
           controls and verified evidence must come before real healthcare use.
@@ -537,30 +530,22 @@ export function AboutPage() {
   return (
     <>
       <section className="public-page-hero container">
-        <p className="eyebrow">ABOUT MEDASSIST</p>
-        <h1>
-          Built with curiosity.
-          <br />
-          Designed with care.
-        </h1>
+        <p className="eyebrow">About</p>
+        <h1>About MedAssist</h1>
         <p>
-          MedAssist — An AI-Assisted Healthcare Triage and Patient Management Platform — is a
-          final-year engineering project exploring the intersection of thoughtful software and
-          responsible healthcare workflows.
+          MedAssist is a B.Tech academic project. The original proposal described an AI-assisted
+          healthcare triage and patient management platform; the revised design goals are
+          consultation discovery and medication-information awareness.
         </p>
       </section>
       <section className="container section about-section">
         <div>
-          <p className="eyebrow">THE PROJECT</p>
-          <h2>
-            A practical engineering journey,
-            <br />
-            with an honest scope.
-          </h2>
+          <p className="eyebrow">The project</p>
+          <h2>An academic project with a stated scope</h2>
           <p className="lead-copy">
-            Created by Saloni Pandey, B.Tech CSE, SOEIT, with faculty guide Mr. Amit Jain. The
-            project synopsis proposes a connected platform for patients, healthcare professionals
-            and administrators.
+            Created by Saloni Pandey, B.Tech Computer Science and Engineering, SOEIT, Sanskriti
+            University. The project synopsis proposes a connected platform for patients, healthcare
+            professionals and administrators.
           </p>
           <p className="lead-copy">
             This build brings that interface to life as a synthetic-data product demonstration.
@@ -587,12 +572,12 @@ export function AboutPage() {
               },
               {
                 icon: Layers3,
-                title: 'A considered frontend',
+                title: 'A working frontend demonstration',
                 copy: 'React, TypeScript, accessible components and role-specific experiences.',
               },
               {
                 icon: Database,
-                title: 'An honest next chapter',
+                title: 'Future work',
                 copy: 'Authentication, authorized persistence and validated research integration.',
               },
             ].map((m, i) => (
