@@ -52,8 +52,12 @@ Measured in this session (details in VERIFICATION.md):
 
 ## Unfinished work
 
-1. Run the full frontend checks on a machine with npm access and record the results in VERIFICATION.md.
-2. Capture the report screenshots with `npm run screenshots:report` and inspect them before use.
-3. Push the branch and open a pull request. This session's push was refused (HTTP 403, Claude GitHub App not installed for the repository).
-4. Optional clean-up: `@fontsource/manrope` is no longer imported. Remove it with `npm uninstall @fontsource/manrope` so the lockfile is regenerated.
-5. Real consultation data, a verified medicine reference source, clinical review, authentication and persistence remain outside this frontend delivery.
+Completed since this handoff was first written:
+- The real frontend checks passed in CI on pull requests #4 and #5; see VERIFICATION.md.
+- The report screenshots were captured from the real build, inspected, and committed with the generated SCREENSHOT_MANIFEST.md.
+- The branch was pushed, and pull request #4 was merged.
+
+Still open:
+1. Optional clean-up: `@fontsource/manrope` is no longer imported. Remove it with `npm uninstall @fontsource/manrope` so the lockfile is regenerated.
+2. Real consultation data, a verified medicine reference source, clinical review, authentication and persistence remain outside this frontend delivery.
+3. The `report-screenshots/*` branches were created by CI only for review. They can be deleted once pull request #5 is merged.
