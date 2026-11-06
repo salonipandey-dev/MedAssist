@@ -1,6 +1,6 @@
 # Final report: scope and evidence checklist
 
-> Academic reporting aid, reviewed against repository documentation on 4 November 2026. This checklist is **not** a claim of new implementation or test execution. Recheck source files and run tests before submitting the final report.
+> Academic reporting aid, reviewed against repository documentation on 4 November 2026; demonstration rows updated 6 November 2026 after the frontend redesign batches (see [FRONTEND_DELIVERY_HANDOFF.md](FRONTEND_DELIVERY_HANDOFF.md)). This checklist is **not** a claim of new implementation or test execution. Recheck source files and run tests before submitting the final report.
 
 ## Project focus
 
@@ -24,8 +24,10 @@ The following status reflects the checked-in [README](../Readme.md), [frontend g
 | Sample dashboard analytics and CSV export | Implemented using **synthetic** records | `frontend/src/data/mock/`, frontend tests |
 | FastAPI welcome, liveness, OpenAPI, request IDs and CORS configuration | Implemented system-level API only | `backend/app/`, `backend/tests/`, `backend/requests.http` |
 | User authentication, server roles, database persistence and private uploads | Not implemented in documented prototype | [frontend guide](FRONTEND_GUIDE.md), [README](../Readme.md) |
-| Real provider search, fee/availability comparison, confirmed free or low-cost consultations | Revised project goal; **implementation evidence required** | Add source paths, data source, consent/terms review and tested screenshots if built |
-| Medication profile and drug interaction/allergy/condition warnings | Revised project goal; **implementation and clinical-source evidence required** | Add source paths, approved source/version, limitations and clinical review if built |
+| Consultation discovery and comparison (frontend demonstration, added 6 November 2026) | **Demonstration only**: fictional directory, filters and comparison of up to three options with illustrative fees | `frontend/src/features/consultations/`, `frontend/src/data/mock/consultations.ts`, `consultations.test.ts`, e2e test "consultation demo…", [screenshot manifest](SCREENSHOT_MANIFEST.md) SS10 |
+| Real provider search, fee/availability comparison, confirmed free or low-cost consultations | Revised project goal; **not implemented** (the demonstration above uses invented data) | Add data source, consent/terms review and tested screenshots if built |
+| Medication-information presentation (frontend demonstration, added 6 November 2026) | **Demonstration only**: scripted examples with invented names; possible issues separated from missing information; no input or checking | `frontend/src/features/medications/`, `frontend/src/data/mock/medications.ts`, `medications.test.ts`, e2e test "medication demo…", SS11/SS11b |
+| Medication profile and drug interaction/allergy/condition warnings | Revised project goal; **not implemented** (no medicine reference source, rules engine or clinical review) | Add approved source/version, limitations and clinical review if built |
 | Trained AI model, diagnosis, prescription or clinically validated triage | **Do not claim implemented or clinically validated** | Would require dataset rights, evaluation, model records and independent safety review |
 
 Historical synopsis, evaluation report and presentation in this repository are **planning documents**, not proof that all proposed features have shipped. If the application has changed since the documentation above, update the table only after inspecting the current code, runtime and tests.

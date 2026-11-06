@@ -45,7 +45,9 @@ The header role selector changes perspective without discarding in-memory change
 4. Open Appointments, select a future weekday and a sample time, confirm a request, then inspect and cancel it. Reserved slots become unavailable until cancellation.
 5. Switch to Doctor. Open the review queue and a split-panel case review. Confirm the fictional-review checkbox, select a predefined note, and record a Reviewed or Closed workflow state. Professional review is separate from future AI predictions.
 6. Switch to Administrator. Inspect the same case, filter analytics by month, export fictional aggregate CSV data, search/sort/page through users, and pause/resume sample availability with confirmation. Review the resulting sample event in Audit Activity.
-7. Try dark mode, mobile navigation, document previews and the deliberately unavailable upload explanation. Reset the demonstration in Settings.
+7. As the patient, open **Find Consultations**. Filter the fictional directory by specialty, mode or fee, open an option's details and compare up to three options. Fees are illustrative or marked as not listed; there is no booking.
+8. Open **Medication Info** and switch between the scripted examples. Compare a "Possible issue (scripted)" example with "Incomplete information" and "No scripted notice". Nothing can be typed and nothing is checked.
+9. Try dark mode, mobile navigation, document previews and the deliberately unavailable upload explanation. Reset the demonstration in Settings.
 
 ## Route architecture
 
@@ -53,12 +55,12 @@ The header role selector changes perspective without discarding in-memory change
 | --- | --- |
 | Public | `/`, `/platform`, `/how-it-works`, `/patients`, `/professionals`, `/security`, `/about`, `/demo` |
 | Access aliases | `/sign-in` and `/app` redirect to `/demo` |
-| Patient | `/app/patient`, `/profile`, `/history`, `/assessments`, `/cases`, `/cases/:caseId`, `/appointments`, `/reports`, `/notifications`, `/settings` (suffixes relative to `/app/patient`) |
+| Patient | `/app/patient`, `/profile`, `/history`, `/assessments`, `/cases`, `/cases/:caseId`, `/appointments`, `/consultations`, `/medications`, `/reports`, `/notifications`, `/settings` (suffixes relative to `/app/patient`) |
 | Doctor | `/app/doctor`, `/cases`, `/cases/:caseId`, `/patients`, `/reviews`, `/reviews/:caseId`, `/appointments`, `/schedule`, `/activity`, `/settings` (suffixes relative to `/app/doctor`) |
 | Administrator | `/app/admin`, `/users`, `/doctors`, `/cases`, `/cases/:caseId`, `/appointments`, `/reports`, `/analytics`, `/audit`, `/settings` (suffixes relative to `/app/admin`) |
 | Preserved prototype | `/legacy/index.html` |
 
-Unknown pages and missing sample cases have useful fallback states. Role workspaces use separate navigation, visual accents and workflow compositions. The public website has its own layout and footer.
+Unknown pages and missing sample cases have useful fallback states. Role workspaces share one visual system and differ in navigation and workflow composition. The public website has its own layout and footer.
 
 ## Component and service organization
 
@@ -92,7 +94,7 @@ frontend/
 
 The React context owns temporary state. The pure reducer centralizes mutation rules, including slot conflicts, permitted review transitions and sample resets. Aggregates are computed from those same records. There is no browser-storage persistence or automatic mock-to-API fallback. All fonts are bundled locally. Motion respects the device's reduced-motion preference. Accessible primitives provide dialog trapping/restoration, status announcements, focus outlines, labeled controls and keyboard navigation.
 
-`components.json`, the `@/` alias and Tailwind v4 integration support extending the local Radix/shadcn-style component system. Bespoke CSS supplies the product compositions and design tokens. The requested teal/indigo colors remain accents; darker text/button variants meet small-text contrast requirements.
+`components.json`, the `@/` alias and Tailwind v4 integration support extending the local Radix/shadcn-style component system. Bespoke CSS supplies the product compositions and design tokens (`frontend/src/styles/global.css`): one teal accent `#0F766E` on white and `#F8FAFC`, text `#0F172A`, muted text `#475569`, borders `#E2E8F0` and form-control borders `#64748B`; an 8 px spacing scale; 8–12 px radii; Inter for all text at 12–30 px. Amber and red are used only for status. There are no decorative gradients, blur or animations.
 
 ## Real, mocked and unfinished
 
@@ -112,6 +114,8 @@ The React context owns temporary state. The pure reducer centralizes mutation ru
 | Audit activity | Searchable chronological sample and session events | Not a secure, immutable production audit trail |
 | System API | Optional GET `/health` with no-store, timeout, response validation and request ID | Liveness only, not database readiness |
 | Authentication / storage | Explicit unavailable states | No credentials, sessions, JWT, database or private file storage |
+| Consultation comparison | Fictional directory with search, specialty/mode/fee filters, details dialog and comparison of up to three options (`features/consultations`, `data/mock/consultations.ts`) | Demonstration only: invented providers and illustrative fees; no real listings, verified free services, availability, contact or booking |
+| Medication information | Six scripted examples with invented medicine, ingredient, allergy and condition names; possible issues shown separately from missing information (`features/medications`, `data/mock/medications.ts`) | Demonstration only: no input, no medicine reference source and no checking; no notice is not a safety statement |
 | AI / SHAP | Nonfunctional conceptual panel, proposed labels and unavailable provenance | Dataset permission, training, evaluation, integration and appropriate validation required |
 
 ## Optional connection to the actual FastAPI service
@@ -136,11 +140,12 @@ npm test
 npx playwright install chromium
 npm run test:e2e
 npm run format:check
+npm run screenshots:report   # after a committed build; writes docs/screenshots/report/ and docs/SCREENSHOT_MANIFEST.md
 ```
 
 On Linux CI or a minimal container, use `npx playwright install --with-deps chromium` to install required browser system libraries as well. Playwright is pinned and its core dependency is aligned to keep browser tooling reproducible.
 
-`npm test` runs the four unchanged legacy-safety behaviors, modern source-boundary checks and Vitest reducer/API-contract checks. Browser tests exercise the actual compiled build, all 34 public/workspace entry routes at five widths, light/dark automated accessibility checks on eight representative screens, and critical workflows. Automated accessibility checks support review; they do not establish certification or replace manual assistive-technology testing.
+`npm test` runs the four unchanged legacy-safety behaviors, modern source-boundary checks and Vitest reducer/API-contract checks. Browser tests exercise the actual compiled build, all 36 public/workspace entry routes at five widths, light/dark automated accessibility checks on eight representative screens, and critical workflows. Automated accessibility checks support review; they do not establish certification or replace manual assistive-technology testing.
 
 From `backend`, run its existing `.venv` Python:
 

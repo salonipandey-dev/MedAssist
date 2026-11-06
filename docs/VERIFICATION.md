@@ -53,3 +53,25 @@ The homepage, patient overview, split-panel review, administrator dark theme and
 - No real backend workflow, authentication, database, private upload storage, external calendar, notification service, trained model or clinical validation was added.
 - The manual system API adapter is covered with response-contract tests; existing FastAPI endpoints retain their 23 HTTP/configuration tests.
 - Production hosting must supply SPA route fallback. This delivery contains runnable source and build instructions, not a production deployment.
+
+---
+
+## 6 November 2026: frontend redesign session (separate from the record above)
+
+Scope: batches F1–F4 on branch `docs/frontend-redesign-f0`. These were the shared minimal design, restyled screens, consultation and medication-information demonstrations, and screenshot tooling. Environment: a cloud session with Node.js 22.23.4 and no access to the npm registry (`npm view` → `ENOTFOUND registry.npmjs.org`). The project's dependencies therefore **could not be installed**, and the project's own scripts could not run.
+
+**Not executed in this session:** `npm ci`, `npm run typecheck`, `npm run build`, Vitest through `npm test`, `npm run test:e2e` (Playwright and axe), `npm run format:check` with the pinned Prettier, `npm run screenshots:report`, and the backend `unittest` suite (no backend files were changed). These must be run, and their results recorded here with date, commit, OS, Node and browser versions, before they are cited.
+
+Checks that were executed, with substitutes named:
+
+| Check | How it was run | Outcome |
+| --- | --- | --- |
+| Node source-boundary tests | `node --test tests/nonclinical-demo.test.cjs tests/modern-safeguards.test.cjs` (the Node half of `npm test`) | 10 passed, 0 failed (8 existing + 2 new for the F3 demonstrations) |
+| Vitest unit files | Each file bundled with esbuild 0.28.2 against a minimal `describe`/`it`/`expect` stand-in and run with `node --test` (Vitest itself unavailable). `system.test.ts` was not run because it needs `vi` mocks. | `service.test.ts` 8/8, `consultations.test.ts` 3/3, `medications.test.ts` 3/3 |
+| Formatting | Prettier 3.8.1 (project pins 3.9.10): `prettier --check "src/**/*.{ts,tsx,css}" tests/e2e` | All files pass |
+| Partial type check | TypeScript 6.0.3 on `frontend/src` with third-party modules declared as `any` and `noUnusedLocals`/`noUnusedParameters` on, compared against the same check on `ea3e137` | No new errors (cannot check props passed to third-party components) |
+| Rendered review | A preview bundle of the real `src/` built with esbuild and Tailwind 4.3.3. Router, Radix, lucide icons, sonner, motion, recharts and react-hook-form are replaced by local stand-ins. Viewed in Chromium. | Screens inspected at 1440 × 900 and 390 × 844, light and dark. Icons appear as placeholders in these renders, so they are not report evidence. |
+| Route sweep (preview bundle) | All 36 routes from `tests/e2e/workflows.spec.ts` at 320/375/768/1024/1440 px: horizontal overflow, one `h1`, no page errors | Clean after fixing two regressions found during F1 |
+| Workflow replays (preview bundle) | The e2e scenarios for homepage → demo → patient, profile validation, mobile navigation focus trap, public mobile menu, consultation filters and comparison limit, and medication information states, with a minimal polling `expect` | 6/6 passed |
+| Text contrast | Script measuring the WCAG ratio of visible text against its composited background, light and dark, on F1–F3 screens | No app text below 4.5:1 (3:1 for large text) |
+| Screenshot script | `capture-report-screenshots.mjs --base-url=<preview bundle> --out=<scratch> --allow-dirty` | All 13 states and 3 crops reached. The images were discarded because the preview bundle is not the real build. |
