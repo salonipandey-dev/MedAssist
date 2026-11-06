@@ -1,14 +1,11 @@
 import {
   ArrowRight,
   Bell,
-  CalendarDays,
   CheckCheck,
   ChevronRight,
   ClipboardList,
-  Clock3,
   FileText,
   Plus,
-  ShieldCheck,
   Stethoscope,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -17,7 +14,6 @@ import { toast } from 'sonner';
 import { useDemo } from '../../app/Provider';
 import {
   Avatar,
-  Badge,
   Button,
   EmptyState,
   Notice,
@@ -29,7 +25,6 @@ import {
 } from '../../components/ui';
 import { PATIENT_ID } from '../../data/mock/seed';
 import { roleAppointments, roleCases } from '../../data/mock/service';
-import { CareIllustration } from '../../pages/public/ProductPreview';
 import type { DemoReport, Role } from '../../types';
 import { formatDate } from '../../utils/format';
 import { CaseDrawer } from '../cases/Cases';
@@ -51,18 +46,12 @@ export function PatientOverview() {
     .filter((e) => cases.some((c) => e.description.includes(c.id)))
     .slice(0, 4);
   const pending = cases.filter((c) => ['Submitted', 'Assigned'].includes(c.status)).length;
-  const completion = Math.round(
-    ([!!state.profile.alias, !!state.profile.language, state.profile.reminders].filter(Boolean)
-      .length /
-      3) *
-      100,
-  );
   return (
     <>
       <PageHeading
-        eyebrow="SUNDAY, 25 OCTOBER 2026 · DEMO CLOCK"
+        eyebrow="Patient overview · Demo clock 25 Oct 2026"
         title={`Welcome back, ${state.profile.alias.split(' ')[0]}.`}
-        description="A little clarity for your health journey. Everything you need, in one place."
+        description="Your sample cases, appointment requests and documents. All records are fictional."
         action={
           <Button asChild>
             <Link to="/app/patient/assessments">
@@ -72,88 +61,40 @@ export function PatientOverview() {
           </Button>
         }
       />
-      <div className="patient-welcome">
-        <div>
-          <Badge>YOUR CARE, CONNECTED</Badge>
-          <h2>
-            A clearer picture.
-            <br />A more considered experience.
-          </h2>
-          <p>
-            Follow your sample cases, keep appointments in view,
-            <br className="desktop-only" />
-            and know what happens next.
-          </p>
-          <Link to="/app/patient/cases">
-            Explore your cases <ArrowRight size={14} />
-          </Link>
-        </div>
-        <CareIllustration />
-        <div className="welcome-note">
-          <ShieldCheck size={12} />
-          Fictional patient workspace
-        </div>
-      </div>
       <div className="stat-grid">
-        <Stat
-          label="My cases"
-          value={cases.length}
-          detail="Connected sample records"
-          icon={<ClipboardList />}
-        />
-        <Stat
-          label="Awaiting review"
-          value={pending}
-          detail="Workflow status only"
-          icon={<Clock3 />}
-          tone="amber"
-        />
-        <Stat
-          label="Appointments"
-          value={appointments.length}
-          detail="Upcoming sample requests"
-          icon={<CalendarDays />}
-          tone="indigo"
-        />
-        <Stat
-          label="Medical reports"
-          value={reports.length}
-          detail="Safe built-in previews"
-          icon={<FileText />}
-        />
+        <Stat label="My cases" value={cases.length} detail="Sample records" />
+        <Stat label="Awaiting review" value={pending} detail="Workflow status only" />
+        <Stat label="Appointments" value={appointments.length} detail="Requested or confirmed" />
+        <Stat label="Documents" value={reports.length} detail="Built-in previews" />
       </div>
       <div className="patient-main-grid">
         <div className="stack">
           <Panel
             title="Recent cases"
-            description="A clear view of your sample case progress"
+            description="Select a case to see its workflow history"
             action={<TextLink to="/app/patient/cases">View all</TextLink>}
           >
             <div className="patient-case-list">
               {cases.slice(0, 3).map((c) => (
                 <button key={c.id} className="patient-case-row" onClick={() => setSelected(c.id)}>
-                  <span className="case-symbol">
-                    <ClipboardList size={19} />
-                  </span>
                   <span className="patient-case-title">
                     <strong>{c.title}</strong>
                     <small>
-                      {c.id} <span>·</span> {formatDate(c.submitted)}
+                      {c.id} <span>·</span> Submitted {formatDate(c.submitted)}
                     </small>
                   </span>
                   <Status status={c.status} />
-                  <ChevronRight size={15} />
+                  <ChevronRight size={16} />
                 </button>
               ))}
             </div>
             <div className="panel-footnote">
-              <span className="status-dot" />
-              Case progress describes workflow, not medical urgency.
+              Case status describes workflow progress, not medical urgency.
             </div>
           </Panel>
           <Panel
             title="Recent activity"
-            description="The latest updates in your fictional workspace"
+            description="Workflow events recorded in this demo session"
             action={<TextLink to="/app/patient/history">View history</TextLink>}
           >
             <ul className="timeline">
@@ -179,7 +120,7 @@ export function PatientOverview() {
           </Panel>
         </div>
         <div className="stack">
-          <Panel title="Next appointment" action={<CalendarDays size={16} className="muted" />}>
+          <Panel title="Next appointment" description="Fictional availability · not a booking">
             {next ? (
               <div className="next-appointment">
                 <div className="appointment-day">
@@ -187,9 +128,9 @@ export function PatientOverview() {
                   <span>{formatDate(next.date, { month: 'short', timeZone: 'UTC' })}</span>
                 </div>
                 <div>
-                  <Badge tone={next.status === 'Confirmed' ? 'teal' : 'amber'}>{next.status}</Badge>
+                  <Status status={next.status} />
                   <h3>{next.kind}</h3>
-                  <p>{next.time} IST · Fictional availability</p>
+                  <p>{next.time} IST</p>
                 </div>
                 <div className="appointment-doctor">
                   <Avatar name={nextDoctor?.name ?? 'Not assigned'} size="sm" />
@@ -202,39 +143,23 @@ export function PatientOverview() {
                 </div>
                 <Button variant="secondary" className="full-width" asChild>
                   <Link to="/app/patient/appointments">
-                    View appointments <ArrowRight size={13} />
+                    View appointments <ArrowRight size={14} />
                   </Link>
                 </Button>
               </div>
             ) : (
               <EmptyState
-                title="A little space in your schedule"
-                description="Explore fictional slots to try a sample appointment request."
+                title="No upcoming sample appointment"
+                description="Choose a fictional slot on the appointments page to try a request."
                 action={
-                  <Button asChild size="sm">
-                    <Link to="/app/patient/appointments">Explore slots</Link>
+                  <Button asChild size="sm" variant="secondary">
+                    <Link to="/app/patient/appointments">Open appointments</Link>
                   </Button>
                 }
               />
             )}
           </Panel>
-          <Panel title="Your demo profile" action={<Badge tone="teal">{completion}%</Badge>}>
-            <div className="profile-completion">
-              <div className="progress-track">
-                <span style={{ width: `${completion}%` }} />
-              </div>
-              <p>
-                {
-                  [!!state.profile.alias, !!state.profile.language, state.profile.reminders].filter(
-                    Boolean,
-                  ).length
-                }{' '}
-                of 3 interface preferences set. Real patient details are not collected.
-              </p>
-              <TextLink to="/app/patient/profile">Review your preferences</TextLink>
-            </div>
-          </Panel>
-          <Panel title="Your documents" action={<FileText size={16} className="muted" />}>
+          <Panel title="Documents" description="Built-in previews · no uploaded files">
             {reports.slice(0, 2).map((r) => (
               <button className="document-shortcut" key={r.id} onClick={() => setReport(r)}>
                 <span className="file-icon">
@@ -242,41 +167,17 @@ export function PatientOverview() {
                 </span>
                 <span>
                   <strong>{r.name}</strong>
-                  <small>{r.type} metadata · Safe preview</small>
+                  <small>
+                    {r.caseId} · {formatDate(r.date)} · {r.type} metadata
+                  </small>
                 </span>
-                <ChevronRight size={14} />
+                <ChevronRight size={16} />
               </button>
             ))}
-            <div className="padded" style={{ paddingTop: 14, paddingBottom: 18 }}>
+            <div className="panel-link-row">
               <TextLink to="/app/patient/reports">Open document library</TextLink>
             </div>
           </Panel>
-        </div>
-      </div>
-      <div className="next-actions">
-        <div>
-          <span className="action-icon">
-            <ClipboardList size={20} />
-          </span>
-          <div>
-            <h3>Understand the first step.</h3>
-            <p>Walk through a predefined assessment sample.</p>
-          </div>
-          <Link to="/app/patient/assessments" aria-label="Explore a predefined sample assessment">
-            <ArrowRight size={20} />
-          </Link>
-        </div>
-        <div>
-          <span className="action-icon indigo">
-            <ShieldCheck size={20} />
-          </span>
-          <div>
-            <h3>Designed with clear boundaries.</h3>
-            <p>Read what this prototype can and cannot do.</p>
-          </div>
-          <Link to="/security" aria-label="Read prototype privacy and safety boundaries">
-            <ArrowRight size={20} />
-          </Link>
         </div>
       </div>
       <CaseDrawer

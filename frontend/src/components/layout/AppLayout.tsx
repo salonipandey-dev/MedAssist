@@ -4,7 +4,6 @@ import {
   Bell,
   CalendarDays,
   ChartNoAxesCombined,
-  ChevronDown,
   ClipboardList,
   FileText,
   HeartPulse,
@@ -168,7 +167,6 @@ export function AppLayout() {
             {account.label}
             <small>Fictional workspace</small>
           </span>
-          <ChevronDown size={14} />
         </div>
         <p className="nav-category">WORKSPACE</p>
         <nav>
@@ -189,16 +187,6 @@ export function AppLayout() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <div className="sidebar-help">
-            <span className="help-orbit">
-              <HeartPulse size={21} />
-            </span>
-            <h3>Thoughtfully connected.</h3>
-            <p>Explore a more considered healthcare experience.</p>
-            <Link to="/platform">
-              About this prototype <ArrowUpRight size={14} />
-            </Link>
-          </div>
           <Link className="sidebar-link" to="/">
             <LogOut size={19} />
             <span>Back to website</span>
@@ -271,7 +259,7 @@ export function AppLayout() {
           <Outlet />
         </main>
         <footer className="app-footer">
-          <span>MedAssist · Built with care, designed for people.</span>
+          <span>MedAssist academic prototype · Fictional records only</span>
           <span>Demo clock: 25 Oct 2026 · No clinical decision support</span>
         </footer>
       </div>

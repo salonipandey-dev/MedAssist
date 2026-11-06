@@ -281,14 +281,18 @@ export function Stat({
   label: string;
   value: number | string;
   detail: string;
-  icon: ReactNode;
+  icon?: ReactNode;
   tone?: string;
 }) {
   return (
     <div className="stat">
       <div className="stat-top">
         <span>{label}</span>
-        <span className={cx('stat-icon', tone)}>{icon}</span>
+        {icon && (
+          <span className={cx('stat-icon', tone)} aria-hidden="true">
+            {icon}
+          </span>
+        )}
       </div>
       <strong>{value}</strong>
       <p>{detail}</p>

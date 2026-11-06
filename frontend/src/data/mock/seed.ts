@@ -7,7 +7,7 @@ export const DOCTOR_ID = 'd-01';
 export const DEMO_ACCOUNTS: Record<Role, { name: string; initials: string; label: string }> = {
   patient: { name: 'Mira Chen', initials: 'MC', label: 'Patient portal' },
   doctor: { name: 'Dr. Avery Morgan', initials: 'AM', label: 'Doctor workspace' },
-  admin: { name: 'Jordan Ellis', initials: 'JE', label: 'Admin command center' },
+  admin: { name: 'Jordan Ellis', initials: 'JE', label: 'Administrator workspace' },
 };
 export const SLOTS = ['09:00', '10:00', '11:30', '14:00', '15:30'];
 export const REVIEW_NOTES = [

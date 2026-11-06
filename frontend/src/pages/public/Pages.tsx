@@ -1,8 +1,8 @@
 import {
-  ArrowDown,
   ArrowRight,
   ArrowUpRight,
   CalendarDays,
+  ChartNoAxesCombined,
   Check,
   CheckCheck,
   ChevronRight,
@@ -10,8 +10,6 @@ import {
   Code2,
   Database,
   FileText,
-  Fingerprint,
-  HeartPulse,
   Layers3,
   LockKeyhole,
   ScanLine,
@@ -20,47 +18,27 @@ import {
   UserRound,
   Waypoints,
 } from 'lucide-react';
-import { motion } from 'motion/react';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Badge, Button, Notice, Panel, TextLink } from '../../components/ui';
+import { Badge, Button, Notice, Panel, TextLink } from '../../components/ui';
 import { AIConcept } from '../../components/ui/AIConcept';
 import type { Role } from '../../types';
-import { CareIllustration, ProductPreview } from './ProductPreview';
-function Reveal({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ y: 16 }}
-      whileInView={{ y: 0 }}
-      viewport={{ once: true, amount: 0.08 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+import { ProductPreview } from './ProductPreview';
 export function FinalCTA() {
   return (
     <section className="final-cta container">
       <div>
-        <span className="cta-symbol">
-          <HeartPulse size={26} />
-        </span>
-        <p className="eyebrow">EXPERIENCE MEDASSIST</p>
-        <h2>
-          A clearer picture.
-          <br />A more connected experience.
-        </h2>
-        <p>Step inside a thoughtfully designed healthcare workspace.</p>
-        <Button asChild>
-          <Link to="/demo">
-            Explore the demo <ArrowUpRight size={15} />
-          </Link>
-        </Button>
-        <small>Fictional records. No account or personal information needed.</small>
+        <h2>Explore the fictional demo</h2>
+        <p>
+          Choose a patient, doctor or administrator perspective. No account or personal information
+          is needed.
+        </p>
       </div>
-      <CareIllustration />
+      <Button asChild>
+        <Link to="/demo">
+          Explore the demo <ArrowRight size={15} />
+        </Link>
+      </Button>
     </section>
   );
 }
@@ -69,22 +47,16 @@ const features = [
     icon: ClipboardList,
     title: 'Every case. In context.',
     copy: 'Keep structured information, record references and review progress in one clear view.',
-    to: '/platform',
-    label: 'Explore case coordination',
   },
   {
     icon: CalendarDays,
     title: 'Less friction. More clarity.',
     copy: 'A considered appointment experience, from the first sample request to the next follow-up.',
-    to: '/patients',
-    label: 'Meet the patient portal',
   },
   {
     icon: Stethoscope,
     title: 'Designed around people.',
     copy: 'A dedicated workspace that brings relevant context to an independent professional review.',
-    to: '/professionals',
-    label: 'See the doctor workspace',
   },
 ];
 export function Workflow({ standalone = false }: { standalone?: boolean }) {
@@ -119,15 +91,11 @@ export function Workflow({ standalone = false }: { standalone?: boolean }) {
   return (
     <section className={`workflow-section ${standalone ? '' : 'section'}`}>
       <div className="container">
-        <Reveal className="section-header">
-          <p className="eyebrow">ONE CONNECTED WORKFLOW</p>
-          <h2>
-            From information
-            <br />
-            to a shared understanding.
-          </h2>
-          <p>Different perspectives. The same thoughtful thread.</p>
-        </Reveal>
+        <div className="section-header">
+          <p className="eyebrow">How a sample case moves</p>
+          <h2>From a sample submission to an independent review</h2>
+          <p>Select a stage to see what the prototype demonstrates at that point.</p>
+        </div>
         <div className="workflow-grid">
           <div className="workflow-steps" aria-label="Workflow stages">
             {steps.map(({ title, label }, i) => (
@@ -146,11 +114,8 @@ export function Workflow({ standalone = false }: { standalone?: boolean }) {
               </button>
             ))}
           </div>
-          <Reveal className="workflow-visual">
-            <div className="workflow-illustration">
-              <CareIllustration />
-              <Badge tone="teal">Fictional workflow walkthrough</Badge>
-            </div>
+          <div className="workflow-visual">
+            <Badge tone="teal">Fictional workflow walkthrough</Badge>
             <div className="workflow-caption" aria-live="polite">
               <span className="feature-icon">
                 <current.icon size={20} />
@@ -160,249 +125,132 @@ export function Workflow({ standalone = false }: { standalone?: boolean }) {
                 <p>{current.copy}</p>
               </div>
             </div>
-          </Reveal>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+const homeModules = [
+  {
+    to: '/app/patient',
+    icon: UserRound,
+    title: 'Patient overview, cases and documents',
+    note: 'Fictional records held in page memory',
+  },
+  {
+    to: '/app/patient/assessments',
+    icon: ClipboardList,
+    title: 'Fixed assessment walkthrough',
+    note: 'Predefined content · no symptom analysis',
+  },
+  {
+    to: '/app/doctor/reviews/MA-2402',
+    icon: Stethoscope,
+    title: 'Independent professional review',
+    note: 'Predefined notes · no clinical conclusion',
+  },
+  {
+    to: '/app/patient/appointments',
+    icon: CalendarDays,
+    title: 'Appointment requests',
+    note: 'Fictional slots · nothing is booked',
+  },
+  {
+    to: '/app/admin/analytics',
+    icon: ChartNoAxesCombined,
+    title: 'Administrator analytics',
+    note: 'Counts from synthetic sample records',
+  },
+];
 export function Home() {
   return (
     <>
-      <section className="hero">
-        <div className="container hero-grid">
-          <div className="hero-copy">
-            <div className="hero-pill">
-              <span />A considered approach to connected care <ArrowUpRight size={11} />
-            </div>
-            <h1>
-              Healthcare
-              <br />
-              information,
-              <br />
-              <span>
-                thoughtfully
-                <br className="hero-line" /> connected.
-              </span>
-            </h1>
+      <section className="home-hero">
+        <div className="container home-hero-grid">
+          <div className="home-hero-copy">
+            <Badge tone="teal">Academic prototype · Fictional data</Badge>
+            <h1>Healthcare records and case review in one workspace</h1>
             <p>
-              MedAssist brings patient records, structured assessments, case coordination, and
-              healthcare professional review together in one intelligent workspace.
+              MedAssist is an academic prototype. Explore fictional patient records, a fixed
+              assessment walkthrough, case tracking, professional review and appointment requests.
             </p>
-            <div className="hero-actions">
+            <div className="home-actions">
               <Button asChild>
                 <Link to="/demo">
-                  Explore Demo <ArrowUpRight size={16} />
+                  Explore Demo <ArrowRight size={16} />
                 </Link>
               </Button>
               <Button asChild variant="secondary">
-                <Link to="/platform">
-                  Discover the Platform <ArrowRight size={15} />
-                </Link>
+                <Link to="/how-it-works">How it works</Link>
               </Button>
             </div>
-            <div className="hero-note">
-              <ShieldCheck size={14} />
-              An academic prototype. Built with responsibility.
-            </div>
+            <p className="home-note">
+              <ShieldCheck size={16} />
+              No real patient data, accounts or clinical advice.
+            </p>
           </div>
-          <Reveal className="hero-product">
-            <div className="hero-orbit orbit-one" />
-            <div className="hero-orbit orbit-two" />
-            <div className="hero-visual-label">
-              <span /> PATIENTS. PROFESSIONALS. ONE WORKSPACE.
-            </div>
-            <ProductPreview floating />
-            <span className="hero-sample-label">
-              INTERACTIVE PRODUCT DEMONSTRATION · SAMPLE DATA
-            </span>
-          </Reveal>
-        </div>
-        <div className="container hero-principles">
-          <span>THOUGHTFUL BY DESIGN</span>
-          <div>
-            <UserRound size={16} />
-            Patient-centered
-          </div>
-          <div>
-            <Layers3 size={16} />
-            Context, connected
-          </div>
-          <div>
-            <ShieldCheck size={16} />
-            Human-led decisions
-          </div>
-          <a href="#platform-overview" aria-label="Discover more">
-            <ArrowDown size={17} />
-          </a>
-        </div>
-      </section>
-      <section id="platform-overview" className="section container">
-        <Reveal className="section-header row-header">
-          <div>
-            <p className="eyebrow">LESS FRAGMENTATION. MORE CONNECTION.</p>
-            <h2>
-              The right information.
-              <br />A more thoughtful experience.
-            </h2>
-          </div>
-          <p>
-            MedAssist explores how patient information and professional workflows can come together,
-            without losing sight of the people behind them.
-          </p>
-        </Reveal>
-        <div className="feature-grid">
-          {features.map((f, i) => (
-            <Reveal className="feature-story" key={f.title}>
-              <span className={`feature-icon feature-${i}`}>
-                <f.icon size={22} />
-              </span>
-              <h3>{f.title}</h3>
-              <p>{f.copy}</p>
-              <TextLink to={f.to}>{f.label}</TextLink>
-              <div className={`feature-art art-${i}`} aria-hidden="true">
-                {i === 0 ? (
-                  <>
-                    <span>
-                      <FileText size={15} />
-                      Sample record <Check size={12} />
-                    </span>
-                    <span>
-                      <ClipboardList size={15} />
-                      Case MA-2401 <span className="tiny-status">Submitted</span>
-                    </span>
-                    <span>
-                      <Stethoscope size={15} />
-                      Independent review
-                    </span>
-                  </>
-                ) : i === 1 ? (
-                  <>
-                    <div className="mini-calendar">
-                      {['M', 'T', 'W', 'T', 'F', 'S', 'S', 26, 27, 28, 29, 30, 31, 1].map(
-                        (v, n) => (
-                          <span key={n} className={n === 8 ? 'chosen' : ''}>
-                            {v}
-                          </span>
-                        ),
-                      )}
-                    </div>
-                    <div className="mini-time">
-                      <CalendarDays size={13} />
-                      10:00 · Fictional availability
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="mini-review-person">
-                      <Avatar name="Avery Morgan" size="sm" />
-                      <span>
-                        Dr. Avery Morgan<small>Fictional professional</small>
-                      </span>
-                      <CheckCheck size={14} />
-                    </div>
-                    <div className="mini-lines">
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <div className="mini-review-status">
-                      Professional review <Badge tone="indigo">Independent record</Badge>
-                    </div>
-                  </>
-                )}
+          <section className="panel home-modules" aria-labelledby="home-modules-title">
+            <div className="panel-heading">
+              <div>
+                <h2 id="home-modules-title">What you can explore</h2>
+                <p>Every module is a demonstration with fictional records.</p>
               </div>
-            </Reveal>
-          ))}
+            </div>
+            <ul>
+              {homeModules.map(({ to, icon: Icon, title, note }) => (
+                <li key={to}>
+                  <Link to={to}>
+                    <Icon size={18} />
+                    <span>
+                      <strong>{title}</strong>
+                      <small>{note}</small>
+                    </span>
+                    <ChevronRight size={16} />
+                  </Link>
+                </li>
+              ))}
+              <li className="home-module-unavailable">
+                <div>
+                  <LockKeyhole size={18} />
+                  <span>
+                    <strong>AI urgency classification</strong>
+                    <small>No trained or evaluated model</small>
+                  </span>
+                  <Badge>Not available</Badge>
+                </div>
+              </li>
+            </ul>
+          </section>
         </div>
       </section>
       <Workflow />
-      <section className="section container experience-showcase">
-        <Reveal className="experience-copy">
-          <p className="eyebrow">A LITTLE MORE CLARITY</p>
-          <h2>
-            Your health journey,
-            <br />
-            easier to follow.
-          </h2>
-          <p>
-            A welcoming patient portal that turns scattered information into an organized,
-            understandable view.
-          </p>
-          <ul className="check-list">
+      <section className="section container home-boundaries">
+        <div>
+          <p className="eyebrow">Prototype boundaries</p>
+          <h2>What this prototype does not do</h2>
+          <ul className="boundary-list">
             <li>
-              <Check size={16} />
-              Follow a case from submission to review
+              <ShieldCheck size={18} />
+              No sign-in or server-side permissions. Demo roles are switched in the browser.
             </li>
             <li>
-              <Check size={16} />
-              See appointments and report references together
+              <ShieldCheck size={18} />
+              No stored patient data. Records are fictional and reset when the page reloads.
             </li>
             <li>
-              <Check size={16} />
-              Know what’s available and what’s still being built
+              <ShieldCheck size={18} />
+              No clinical assessment, urgency classification or medical advice.
+            </li>
+            <li>
+              <ShieldCheck size={18} />
+              No real report uploads, appointment bookings or outgoing messages.
             </li>
           </ul>
-          <Button asChild variant="secondary">
-            <Link to="/patients">
-              Explore patient experience <ArrowRight size={15} />
-            </Link>
-          </Button>
-        </Reveal>
-        <Reveal className="experience-visual">
-          <ProductPreview />
-        </Reveal>
-      </section>
-      <section className="doctor-showcase section">
-        <div className="container">
-          <Reveal className="section-header centered">
-            <p className="eyebrow">SPACE FOR PROFESSIONAL JUDGMENT</p>
-            <h2>
-              Less searching.
-              <br />
-              More context for every review.
-            </h2>
-            <p>A focused doctor workspace, built around the information that matters.</p>
-            <TextLink to="/professionals">Discover the professional experience</TextLink>
-          </Reveal>
-          <Reveal className="wide-preview">
-            <ProductPreview role="doctor" />
-          </Reveal>
+          <TextLink to="/security">Read the prototype boundaries</TextLink>
         </div>
+        <AIConcept />
       </section>
-      <section className="section container responsible-grid">
-        <Reveal>
-          <p className="eyebrow">INTELLIGENCE, WITH RESPONSIBILITY</p>
-          <h2>
-            Technology supports.
-            <br />
-            People decide.
-          </h2>
-          <p className="lead-copy">
-            The proposed AI module is designed to assist professional review. It is a future
-            research component, with no trained model or clinical validation in this prototype.
-          </p>
-          <div className="principle-row">
-            <ShieldCheck size={21} />
-            <div>
-              <h3>Honest about what’s ready</h3>
-              <p>No invented predictions, medical accuracy or real integrations.</p>
-            </div>
-          </div>
-          <div className="principle-row">
-            <Fingerprint size={21} />
-            <div>
-              <h3>Privacy starts with restraint</h3>
-              <p>Fictional examples only. No real medical uploads or health inputs.</p>
-            </div>
-          </div>
-          <TextLink to="/security">Read our prototype boundaries</TextLink>
-        </Reveal>
-        <Reveal>
-          <AIConcept />
-        </Reveal>
-      </section>
-      <FinalCTA />
     </>
   );
 }
