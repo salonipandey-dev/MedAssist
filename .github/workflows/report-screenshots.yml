@@ -1,8 +1,9 @@
 name: Report screenshots
 
 # Captures the agreed report screenshots (SS01–SS12) from the real production build of the
-# pull request's head commit and uploads them, with the generated manifest, as an artifact.
-# Nothing is committed automatically.
+# pull request's head commit, uploads them with the generated manifest as an artifact, and
+# publishes the same files to a separate review branch (report-screenshots/<sha>) so they can
+# be inspected and committed by a person. The pull request branch itself is never modified.
 on:
   pull_request:
     paths:
@@ -21,6 +22,8 @@ jobs:
   capture:
     name: Capture report screenshots
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     timeout-minutes: 15
     defaults:
       run:
@@ -55,3 +58,25 @@ jobs:
             docs/screenshots/report/
             docs/SCREENSHOT_MANIFEST.md
           retention-days: 30
+      - name: Publish screenshots to a review branch
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        working-directory: .
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          short="${SOURCE_SHA:0:7}"
+          stage="$(mktemp -d)"
+          cp -r docs/screenshots/report "$stage/report"
+          cp docs/SCREENSHOT_MANIFEST.md "$stage/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan "report-screenshots/$short"
+          git rm -rfq .
+          rm -rf docs
+          mkdir -p docs/screenshots
+          cp -r "$stage/report" docs/screenshots/report
+          cp "$stage/SCREENSHOT_MANIFEST.md" docs/
+          git add docs
+          git commit -qm "Report screenshots captured from $SOURCE_SHA"
+          git push -q "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/report-screenshots/$short"
