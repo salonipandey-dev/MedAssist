@@ -35,13 +35,24 @@ await mkdir(outDir, { recursive: true });
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 390, height: 844 };
 
-/** Confirmation toasts are dismissed on their own; wait so they never cover the captured state. */
+/** Close confirmation toasts with their own close button so they never cover the captured state. */
 async function waitForToasts(page) {
-  await page
-    .locator('[data-sonner-toast]')
+  const toasts = page.locator('[data-sonner-toast]');
+  for (let attempt = 0; attempt < 5 && (await toasts.count()) > 0; attempt++) {
+    const close = page.getByRole('button', { name: /close toast/i });
+    if (await close.count())
+      await close
+        .first()
+        .click({ force: true })
+        .catch(() => {});
+    await page.waitForTimeout(400);
+  }
+  await toasts
     .first()
-    .waitFor({ state: 'detached', timeout: 10000 })
-    .catch(() => {});
+    .waitFor({ state: 'detached', timeout: 8000 })
+    .catch(() => {
+      throw new Error('A confirmation toast is still visible; refusing to capture over it.');
+    });
 }
 
 /** Each step mirrors an interaction exercised by tests/e2e/workflows.spec.ts. */
