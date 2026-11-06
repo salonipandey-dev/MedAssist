@@ -75,3 +75,21 @@ Checks that were executed, with substitutes named:
 | Workflow replays (preview bundle) | The e2e scenarios for homepage → demo → patient, profile validation, mobile navigation focus trap, public mobile menu, consultation filters and comparison limit, and medication information states, with a minimal polling `expect` | 6/6 passed |
 | Text contrast | Script measuring the WCAG ratio of visible text against its composited background, light and dark, on F1–F3 screens | No app text below 4.5:1 (3:1 for large text) |
 | Screenshot script | `capture-report-screenshots.mjs --base-url=<preview bundle> --out=<scratch> --allow-dirty` | All 13 states and 3 crops reached. The images were discarded because the preview bundle is not the real build. |
+
+### Real CI execution on GitHub Actions (6 November 2026)
+
+These results come from running the project's actual commands, not the substitutes above. Pull request [#4](https://github.com/salonipandey-dev/MedAssist/pull/4), commit `961d532b7a963654daf24693605a63008c8279c8` (F0–F4 plus the screenshot workflow), workflow run [42258488918](https://github.com/salonipandey-dev/MedAssist/actions/runs/42258488918), 17:06–17:17 UTC. Runner image `ubuntu-24.04`, version 20261101.360.1; Node.js v22.23.4; Playwright-pinned Chromium 141.0.7390.37.
+
+| Step | Command | Outcome |
+| --- | --- | --- |
+| Install | `npm ci` | 215 packages installed |
+| Formatting | `npm run format:check` | All matched files use Prettier code style |
+| Typecheck and build | `npm run build` (`tsc --noEmit && vite build`, Vite 8.3.5) | Passed |
+| Unit and source tests | `npm test` | Node: 10 passed, 0 failed. Vitest: 4 files, 18 tests passed |
+| Browser workflows, 36 routes at five widths, light/dark accessibility checks | `npm run test:e2e` | 22 passed (2.0 min), including the two new consultation and medication scenarios |
+
+An earlier run on `5b280fc` ([42258264713](https://github.com/salonipandey-dev/MedAssist/actions/runs/42258264713)) passed install, formatting, build and `npm test`. It was cancelled during the browser step when the next push superseded it.
+
+Report screenshots were captured from the production build of `961d532` by the `Report screenshots` workflow ([run 42258489108](https://github.com/salonipandey-dev/MedAssist/actions/runs/42258489108)): 13 screenshots and 3 crops, uploaded as the `report-screenshots` artifact. They are added to `docs/screenshots/report/` only after visual inspection.
+
+Not covered: Firefox and Safari, manual screen-reader testing, and the backend suite (no backend files changed).
