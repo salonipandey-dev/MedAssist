@@ -1427,7 +1427,9 @@ hr {
     white-space: nowrap;
   }
   .role-select select {
-    max-width: 112px;
+    max-width: 120px;
+    font-size: var(--text-xs);
+    padding-inline: 6px 2px;
   }
   .topbar-actions > .btn {
     width: 36px;
