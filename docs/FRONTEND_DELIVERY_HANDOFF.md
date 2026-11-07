@@ -1,25 +1,25 @@
 # Frontend evidence handoff for the report writer
 
-**Status as of 7 November 2026.** This replaces the draft of 6 November. Every claim below links to a commit, pull request, workflow run or file that can be checked. Historical records are listed separately at the end and are not current status.
+**Status as of 7 November 2026.**
 
 ## 1 Code versions
 
 | Item | Value |
 | --- | --- |
 | Repository | <https://github.com/salonipandey-dev/MedAssist> |
-| Merged code on `main` | [`138a9c6`](https://github.com/salonipandey-dev/MedAssist/commit/138a9c6102f51898aee1ebf7cdc987b49fc21a17), the merge of [pull request #4](https://github.com/salonipandey-dev/MedAssist/pull/4) (redesign batches F0–F4), merged 6 Nov 2026 17:23 UTC |
-| Pending follow-up | [Pull request #5](https://github.com/salonipandey-dev/MedAssist/pull/5), **open, not yet merged**. It adds the report screenshots and manifest, a 4-line CSS fix for the demo-role selector at 400 px and below (`frontend/src/styles/global.css`), the screenshot workflow and capture-script fixes, and these documentation updates. |
-| Screenshot source version | [`b83b015`](https://github.com/salonipandey-dev/MedAssist/commit/b83b0151b2c0ca4d321f59805b7d72a15d8556e5) on PR #5. Its frontend source equals `main` plus the selector fix. |
+| Original redesign merge on `main` | [`138a9c6`](https://github.com/salonipandey-dev/MedAssist/commit/138a9c6102f51898aee1ebf7cdc987b49fc21a17), the merge of [pull request #4](https://github.com/salonipandey-dev/MedAssist/pull/4) (redesign batches F0–F4), merged 6 Nov 2026 17:23 UTC |
+| Merged frontend and report assets on `main` | `5f1e12d` includes the demo-role selector fix for widths of 400 px and below, the screenshot workflow and capture-script fixes, and the inspected report images and manifest. [Merge commit](https://github.com/salonipandey-dev/MedAssist/commit/5f1e12d96a9b7d4eb48ecdc23e54833ba416a52f) · [Pull request #5](https://github.com/salonipandey-dev/MedAssist/pull/5) |
+| Screenshot build | `b83b015` is the capture source recorded in the manifest. [Capture commit](https://github.com/salonipandey-dev/MedAssist/commit/b83b0151b2c0ca4d321f59805b7d72a15d8556e5) |
 
-Until PR #5 is merged, cite `138a9c6` for the merged code, and `b83b015` for the screenshots and the selector fix.
+The `frontend/` tree is identical at `b83b015` and `5f1e12d`. [Commit comparison](https://github.com/salonipandey-dev/MedAssist/compare/b83b0151b2c0ca4d321f59805b7d72a15d8556e5...5f1e12d96a9b7d4eb48ecdc23e54833ba416a52f)
 
 Commits in PR #4: [`c0e7d94`](https://github.com/salonipandey-dev/MedAssist/commit/c0e7d94) F0 audit · [`8d92a2a`](https://github.com/salonipandey-dev/MedAssist/commit/8d92a2a) F1 shared design, homepage, demo access, patient overview, profile · [`a878097`](https://github.com/salonipandey-dev/MedAssist/commit/a878097) F2 workflow and public screens · [`a9893fd`](https://github.com/salonipandey-dev/MedAssist/commit/a9893fd) F3 consultation and medication demonstrations · [`5b280fc`](https://github.com/salonipandey-dev/MedAssist/commit/5b280fc) F4 screenshot tooling and docs · [`961d532`](https://github.com/salonipandey-dev/MedAssist/commit/961d532) screenshot workflow · [`92cb5c8`](https://github.com/salonipandey-dev/MedAssist/commit/92cb5c8) CI results recorded.
 
-Commits in PR #5: [`2cceb20`](https://github.com/salonipandey-dev/MedAssist/commit/2cceb20), [`d3b814a`](https://github.com/salonipandey-dev/MedAssist/commit/d3b814a) review-branch publishing · [`71876a9`](https://github.com/salonipandey-dev/MedAssist/commit/71876a9) selector fix · [`b83b015`](https://github.com/salonipandey-dev/MedAssist/commit/b83b015) toast handling in the capture script · [`d82fb84`](https://github.com/salonipandey-dev/MedAssist/commit/d82fb84) screenshots and manifest · plus this documentation commit.
+Commits in PR #5: [`2cceb20`](https://github.com/salonipandey-dev/MedAssist/commit/2cceb20), [`d3b814a`](https://github.com/salonipandey-dev/MedAssist/commit/d3b814a) review-branch publishing · [`71876a9`](https://github.com/salonipandey-dev/MedAssist/commit/71876a9) selector fix · [`b83b015`](https://github.com/salonipandey-dev/MedAssist/commit/b83b015) toast handling in the capture script · [`d82fb84`](https://github.com/salonipandey-dev/MedAssist/commit/d82fb84) screenshots and manifest · [`c3bfab7`](https://github.com/salonipandey-dev/MedAssist/commit/c3bfab7e4c859683ff4c37b2600c00374ba56284) evidence handoff.
 
 ## 2 Verification (actual CI runs)
 
-All runs used GitHub Actions on `ubuntu-24.04` with Node.js v22.23.4, run from `frontend/`. Browser checks ran in Playwright-pinned Chromium 141.0.7390.37. Every run below ran the same commands with the same results.
+All runs used GitHub Actions on `ubuntu-24.04` with Node.js v22.23.4, run from `frontend/`. Browser checks ran in Playwright-pinned Chromium 141.0.7390.37. The runs in the table recorded the following command results.
 
 | Command | Result |
 | --- | --- |
@@ -36,11 +36,13 @@ All runs used GitHub Actions on `ubuntu-24.04` with Node.js v22.23.4, run from `
 | [42267504081](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267504081) | `b83b015` (PR #5, screenshot source) | 6 Nov 18:05–18:07 | Success |
 | [42267995886](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267995886) | `d82fb84` (PR #5) | 6 Nov 18:08–18:11 | Success |
 
+The frontend workflow also passed on `main` at `5f1e12d` after PR #5 merged. [Post-merge frontend run](https://github.com/salonipandey-dev/MedAssist/actions/runs/42277306257)
+
 Not covered: Firefox and Safari, manual screen-reader testing, and the backend suite (no backend files changed). The automated accessibility checks support review; they are not certification.
 
 ## 3 Screenshots
 
-The screenshots were captured from the production build of `b83b015` by [run 42267504146](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267504146) between 2026-11-06 18:05:56 and 18:06:05 UTC. Each was taken in Chromium 141.0.7390.37 in a fresh browser context, with fictional seeded records, the light theme and device scale factor 2, from a clean tree. All were inspected before commit. Full details are in [SCREENSHOT_MANIFEST.md](SCREENSHOT_MANIFEST.md) and `screenshots/report/manifest.json`. Files are in `docs/screenshots/report/` on PR #5.
+The screenshots were captured from the production build of `b83b015` by [run 42267504146](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267504146) between 2026-11-06 18:05:56 and 18:06:05 UTC. Each was taken in Chromium 141.0.7390.37 in a fresh browser context, with fictional seeded records, the light theme and device scale factor 2, from a clean tree. All were inspected before commit and are available on `main`. [Report screenshots](screenshots/report/) · [Screenshot manifest](SCREENSHOT_MANIFEST.md) · [Capture metadata](screenshots/report/manifest.json)
 
 | ID | File(s) | Route | State | Status |
 | --- | --- | --- | --- | --- |
@@ -81,10 +83,9 @@ Report-relevant corrections made in the code:
 
 ## 5 Remaining items
 
-1. Merge pull request #5. Until then, the screenshots and the selector fix are not on `main`.
-2. Optionally delete the CI review branches named `report-screenshots/*`. Optionally remove the unused `@fontsource/manrope` dependency.
-3. The screenshot workflow has `contents: write` so that it can publish review branches. This applies only to same-repository pull requests and manual runs. Remove the publishing step if it is no longer wanted.
-4. Real data sources, clinical review, authentication and persistence remain outside this frontend delivery.
+1. Optionally delete the CI review branches named `report-screenshots/*`. Optionally remove the unused `@fontsource/manrope` dependency.
+2. The screenshot workflow has `contents: write` so that it can publish review branches. This applies only to same-repository pull requests and manual runs. Remove the publishing step if it is no longer wanted.
+3. Real data sources, clinical review, authentication and persistence remain outside this frontend delivery.
 
 ## Historical records (not current status)
 

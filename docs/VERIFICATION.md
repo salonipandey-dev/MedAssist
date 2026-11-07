@@ -98,9 +98,10 @@ Not covered: Firefox and Safari, manual screen-reader testing, and the backend s
 
 ### Follow-up pull request #5: screenshots and a mobile fix (6 November 2026)
 
-Pull request [#4](https://github.com/salonipandey-dev/MedAssist/pull/4) was merged into `main` (`138a9c6`), and CI passed on `main` after the merge ([run 42261177461](https://github.com/salonipandey-dev/MedAssist/actions/runs/42261177461)). Follow-up work is in pull request [#5](https://github.com/salonipandey-dev/MedAssist/pull/5).
+Pull request [#4](https://github.com/salonipandey-dev/MedAssist/pull/4) was merged into `main` (`138a9c6`), and CI passed on `main` after the merge ([run 42261177461](https://github.com/salonipandey-dev/MedAssist/actions/runs/42261177461)).
 
 - Inspecting a first set of real screenshots showed two problems. At 400 px and below, the demo-role selector clipped its label ("Patient dem"); the CSS was fixed in `71876a9`. A confirmation toast covered the recorded review in SS07; from `b83b015`, the capture script closes toasts and refuses to capture over one. Both early sets were discarded.
 - CI on `b83b015` ([run 42267504081](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267504081)) ran `npm ci`, the format check, the typecheck and build, `npm test` and `npm run test:e2e`. All passed.
 - The report screenshots were captured from the production build of `b83b015` by [run 42267504146](https://github.com/salonipandey-dev/MedAssist/actions/runs/42267504146) (Chromium 141.0.7390.37) and published to the `report-screenshots/b83b015` review branch. All 13 screenshots and 5 crops were inspected before being committed to `docs/screenshots/report/`. Capture details are in [SCREENSHOT_MANIFEST.md](SCREENSHOT_MANIFEST.md).
+- Pull request #5 merged into `main` at `5f1e12d`. The post-merge frontend job passed dependency installation, formatting, type checking, the production build, source and service tests, and the Chromium browser suite. [Pull request #5](https://github.com/salonipandey-dev/MedAssist/pull/5) · [Post-merge frontend run](https://github.com/salonipandey-dev/MedAssist/actions/runs/42277306257)
 
