@@ -459,6 +459,44 @@ for (const dark of [false, true])
     }
   });
 
+test('consultation details explain the comparison limit and allow retry after removal', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/app/patient/consultations');
+  const options = page.getByRole('list', { name: 'Sample consultation options' });
+  const compare = options.getByRole('button', { name: /^Compare / });
+  for (let i = 0; i < 3; i++) await compare.first().click();
+
+  const details = options
+    .getByRole('listitem')
+    .filter({ hasText: 'Northgate Hospital Outpatients' })
+    .getByRole('button', { name: 'Details' });
+  const dialog = page.getByRole('dialog', { name: /Northgate Hospital Outpatients/ });
+  const add = dialog.getByRole('button', { name: 'Add to comparison' });
+  const status = dialog.getByRole('status');
+  await details.click();
+  await add.click();
+  await expect(status).toContainText('You can compare up to 3 options');
+  await expect(status).toBeInViewport();
+
+  await page.keyboard.press('Escape');
+  await expect(details).toBeFocused();
+  await expect(options.getByRole('button', { pressed: true })).toHaveCount(3);
+  await details.click();
+  await expect(status).toBeEmpty();
+  await page.keyboard.press('Escape');
+
+  await page
+    .getByRole('button', { name: /^Remove .* from comparison$/ })
+    .first()
+    .click();
+  await details.click();
+  await add.click();
+  await expect(dialog.getByRole('button', { name: 'Remove from comparison' })).toBeVisible();
+  await expect(status).toBeEmpty();
+});
+
 test('medication demo separates possible issues from missing information', async ({ page }) => {
   await page.goto('/app/patient/medications');
   await expect(page.locator('main input, main select, main textarea')).toHaveCount(0);
