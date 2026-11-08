@@ -45,7 +45,7 @@ The header role selector changes perspective without discarding in-memory change
 4. Open Appointments, select a future weekday and a sample time, confirm a request, then inspect and cancel it. Reserved slots become unavailable until cancellation.
 5. Switch to Doctor. Open the review queue and a split-panel case review. Confirm the fictional-review checkbox, select a predefined note, and record a Reviewed or Closed workflow state. Professional review is separate from future AI predictions.
 6. Switch to Administrator. Inspect the same case, filter analytics by month, export fictional aggregate CSV data, search/sort/page through users, and pause/resume sample availability with confirmation. Review the resulting sample event in Audit Activity.
-7. As the patient, open **Find Consultations**. Filter the fictional directory by specialty, mode or fee, open an option's details and compare up to three options. Fees are illustrative or marked as not listed; there is no booking.
+7. As the patient, open **Find Consultations** from the homepage's priority demos, the patient overview's **Priority demos** section or the sidebar. Filter the fictional directory by specialty, mode or fee, open an option's details and compare up to three options. Fees are illustrative or marked as not listed; there is no booking.
 8. Open **Medication Info** and switch between the scripted examples. Compare a "Possible issue (scripted)" example with "Incomplete information" and "No scripted notice". Nothing can be typed and nothing is checked.
 9. Try dark mode, mobile navigation, document previews and the deliberately unavailable upload explanation. Reset the demonstration in Settings.
 

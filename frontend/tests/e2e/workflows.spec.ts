@@ -283,6 +283,7 @@ for (const dark of [false, true])
     for (const path of [
       '/',
       '/demo',
+      '/app/patient',
       '/app/patient/profile',
       '/app/patient/appointments',
       '/app/doctor/reviews',
@@ -375,6 +376,88 @@ test('consultation demo filters fictional options and limits comparison to three
     .click();
   await expect(page.getByRole('button', { name: /^Comparing / })).toHaveCount(2);
 });
+
+test('homepage and patient overview link to the priority patient demos', async ({ page }) => {
+  await page.goto('/');
+  const priority = page.getByRole('list', { name: 'Start with the priority demos' });
+  await priority.getByRole('link', { name: /^Find Consultations/ }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Find and compare consultations',
+  );
+  await page.goBack();
+  await priority.getByRole('link', { name: /^Medication Information/ }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Medication information demonstration',
+  );
+  await page.goBack();
+  const perspectives = page.getByRole('list', {
+    name: 'Patient, doctor and administrator perspectives',
+  });
+  for (const [name, href] of [
+    [/^Patient:/, '/app/patient'],
+    [/^Doctor:/, '/app/doctor/reviews/MA-2402'],
+    [/^Administrator:/, '/app/admin/analytics'],
+  ] as const)
+    await expect(perspectives.getByRole('link', { name })).toHaveAttribute('href', href);
+  await expect(page.getByRole('link', { name: 'Explore Demo', exact: true })).toHaveAttribute(
+    'href',
+    '/demo',
+  );
+
+  // Keyboard path on the patient overview: the entry links follow the heading action.
+  await page.goto('/app/patient');
+  const entry = page.getByRole('region', { name: 'Priority demos' });
+  const consultations = entry.getByRole('link', { name: 'Find Consultations', exact: true });
+  const medications = entry.getByRole('link', { name: 'Medication Information', exact: true });
+  await expect(consultations).toHaveAccessibleDescription(/Fees are illustrative/);
+  await expect(medications).toHaveAccessibleDescription(/no scripted notice/);
+  await page.getByRole('link', { name: 'Explore sample assessment' }).focus();
+  await page.keyboard.press('Tab');
+  await expect(consultations).toBeFocused();
+  await expect(consultations).toHaveCSS('outline-style', 'solid');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/app\/patient\/consultations$/);
+  await page.goBack();
+  await page.getByRole('link', { name: 'Explore sample assessment' }).focus();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  await expect(medications).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/app\/patient\/medications$/);
+});
+
+for (const dark of [false, true])
+  test(`priority demo links fit the viewport in ${dark ? 'dark' : 'light'} mode`, async ({
+    page,
+  }) => {
+    test.setTimeout(60000);
+    await page.emulateMedia({ colorScheme: dark ? 'dark' : 'light' });
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const path of ['/', '/app/patient']) {
+        await page.goto(path);
+        await expect(page.locator('html')).toHaveAttribute('data-theme', dark ? 'dark' : 'light');
+        const links =
+          path === '/'
+            ? page.getByRole('list', { name: 'Start with the priority demos' }).getByRole('link')
+            : page.getByRole('region', { name: 'Priority demos' }).getByRole('link');
+        await expect(links).toHaveCount(2);
+        for (const link of await links.all()) {
+          await link.scrollIntoViewIfNeeded();
+          const box = await link.boundingBox();
+          expect(box, `${path} at ${width}px`).not.toBeNull();
+          expect(box!.x, `${path} at ${width}px`).toBeGreaterThanOrEqual(0);
+          expect(box!.x + box!.width, `${path} at ${width}px`).toBeLessThanOrEqual(width + 1);
+          expect(box!.height, `${path} at ${width}px`).toBeGreaterThanOrEqual(44);
+        }
+        const scroll = await page.evaluate(() => [
+          document.documentElement.scrollWidth,
+          document.documentElement.clientWidth,
+        ]);
+        expect(scroll[0], `${path} at ${width}px`).toBeLessThanOrEqual(scroll[1] + 1);
+      }
+    }
+  });
 
 test('medication demo separates possible issues from missing information', async ({ page }) => {
   await page.goto('/app/patient/medications');
