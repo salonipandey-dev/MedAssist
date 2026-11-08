@@ -12,7 +12,9 @@ import {
   FileText,
   Layers3,
   LockKeyhole,
+  Pill,
   ScanLine,
+  Search,
   ShieldCheck,
   Stethoscope,
   UserRound,
@@ -131,38 +133,54 @@ export function Workflow({ standalone = false }: { standalone?: boolean }) {
     </section>
   );
 }
-const homeModules = [
+const priorityModules = [
+  {
+    to: '/app/patient/consultations',
+    icon: Search,
+    title: 'Find Consultations',
+    note: 'Fictional providers · illustrative fees · no booking',
+  },
+  {
+    to: '/app/patient/medications',
+    icon: Pill,
+    title: 'Medication Information',
+    note: 'Scripted notices · nothing is typed or checked',
+  },
+];
+const perspectiveModules = [
   {
     to: '/app/patient',
     icon: UserRound,
-    title: 'Patient overview, cases and documents',
+    title: 'Patient: cases, appointments and documents',
     note: 'Fictional records held in page memory',
-  },
-  {
-    to: '/app/patient/assessments',
-    icon: ClipboardList,
-    title: 'Fixed assessment walkthrough',
-    note: 'Predefined content · no symptom analysis',
   },
   {
     to: '/app/doctor/reviews/MA-2402',
     icon: Stethoscope,
-    title: 'Independent professional review',
+    title: 'Doctor: independent professional review',
     note: 'Predefined notes · no clinical conclusion',
-  },
-  {
-    to: '/app/patient/appointments',
-    icon: CalendarDays,
-    title: 'Appointment requests',
-    note: 'Fictional slots · nothing is booked',
   },
   {
     to: '/app/admin/analytics',
     icon: ChartNoAxesCombined,
-    title: 'Administrator analytics',
+    title: 'Administrator: sample analytics',
     note: 'Counts from synthetic sample records',
   },
 ];
+function HomeModuleLink({ to, icon: Icon, title, note }: (typeof priorityModules)[number]) {
+  return (
+    <li>
+      <Link to={to}>
+        <Icon size={18} />
+        <span>
+          <strong>{title}</strong>
+          <small>{note}</small>
+        </span>
+        <ChevronRight size={16} />
+      </Link>
+    </li>
+  );
+}
 export function Home() {
   return (
     <>
@@ -170,10 +188,11 @@ export function Home() {
         <div className="container home-hero-grid">
           <div className="home-hero-copy">
             <Badge tone="teal">Academic prototype · Fictional data</Badge>
-            <h1>Healthcare records and case review in one workspace</h1>
+            <h1>Healthcare consultations and medication information in one demo</h1>
             <p>
-              MedAssist is an academic prototype. Explore fictional patient records, a fixed
-              assessment walkthrough, case tracking, professional review and appointment requests.
+              MedAssist is an academic prototype with fictional data. Compare consultation options
+              from an invented directory, and step through scripted medication examples that keep
+              “not enough information” separate from “no scripted notice”.
             </p>
             <div className="home-actions">
               <Button asChild>
@@ -187,7 +206,7 @@ export function Home() {
             </div>
             <p className="home-note">
               <ShieldCheck size={16} />
-              No real patient data, accounts or clinical advice.
+              No real providers, bookings, medication checks, accounts or clinical advice.
             </p>
           </div>
           <section className="panel home-modules" aria-labelledby="home-modules-title">
@@ -197,18 +216,20 @@ export function Home() {
                 <p>Every module is a demonstration with fictional records.</p>
               </div>
             </div>
-            <ul>
-              {homeModules.map(({ to, icon: Icon, title, note }) => (
-                <li key={to}>
-                  <Link to={to}>
-                    <Icon size={18} />
-                    <span>
-                      <strong>{title}</strong>
-                      <small>{note}</small>
-                    </span>
-                    <ChevronRight size={16} />
-                  </Link>
-                </li>
+            <h3 className="home-module-group" id="home-priority-title">
+              Start with the priority demos
+            </h3>
+            <ul className="home-module-priority" aria-labelledby="home-priority-title">
+              {priorityModules.map((module) => (
+                <HomeModuleLink key={module.to} {...module} />
+              ))}
+            </ul>
+            <h3 className="home-module-group" id="home-perspectives-title">
+              Patient, doctor and administrator perspectives
+            </h3>
+            <ul aria-labelledby="home-perspectives-title">
+              {perspectiveModules.map((module) => (
+                <HomeModuleLink key={module.to} {...module} />
               ))}
               <li className="home-module-unavailable">
                 <div>
@@ -245,6 +266,11 @@ export function Home() {
             <li>
               <ShieldCheck size={18} />
               No real report uploads, appointment bookings or outgoing messages.
+            </li>
+            <li>
+              <ShieldCheck size={18} />
+              No real provider listings or medication checking. Fees are illustrative and medication
+              notices are scripted.
             </li>
           </ul>
           <TextLink to="/security">Read the prototype boundaries</TextLink>

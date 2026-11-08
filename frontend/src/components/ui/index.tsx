@@ -69,19 +69,25 @@ export function Panel({
   title,
   action,
   description,
+  headingId,
 }: {
   children: ReactNode;
   className?: string;
   title?: string;
   action?: ReactNode;
   description?: string;
+  /** Names the panel as a landmark region when set. */
+  headingId?: string;
 }) {
   return (
-    <section className={cx('panel', className)}>
+    <section
+      className={cx('panel', className)}
+      aria-labelledby={title && headingId ? headingId : undefined}
+    >
       {title && (
         <div className="panel-heading">
           <div>
-            <h2>{title}</h2>
+            <h2 id={headingId}>{title}</h2>
             {description && <p>{description}</p>}
           </div>
           {action}

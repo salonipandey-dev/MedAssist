@@ -5,7 +5,9 @@ import {
   ChevronRight,
   ClipboardList,
   FileText,
+  Pill,
   Plus,
+  Search,
   Stethoscope,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -61,6 +63,7 @@ export function PatientOverview() {
           </Button>
         }
       />
+      <PatientDemoEntry />
       <div className="stat-grid">
         <Stat label="My cases" value={cases.length} detail="Sample records" />
         <Stat label="Awaiting review" value={pending} detail="Workflow status only" />
@@ -186,6 +189,56 @@ export function PatientOverview() {
       />
       <ReportPreview report={report} onClose={() => setReport(null)} />
     </>
+  );
+}
+const demoEntries = [
+  {
+    id: 'consultations',
+    to: '/app/patient/consultations',
+    icon: Search,
+    title: 'Find Consultations',
+    description:
+      'Filter a fictional directory and compare up to three options. Fees are illustrative and nothing can be booked.',
+  },
+  {
+    id: 'medications',
+    to: '/app/patient/medications',
+    icon: Pill,
+    title: 'Medication Information',
+    description:
+      'Switch between scripted examples and see how “not enough information” differs from “no scripted notice”.',
+  },
+];
+function PatientDemoEntry() {
+  return (
+    <Panel
+      className="patient-demo-entry"
+      headingId="patient-demo-entry-title"
+      title="Priority demos"
+      description="Two focused demonstrations · fictional data, nothing is checked or booked"
+    >
+      <ul className="patient-demo-entry-links">
+        {demoEntries.map(({ id, to, icon: Icon, title, description }) => (
+          <li key={id}>
+            <Link
+              to={to}
+              className="patient-demo-entry-link"
+              aria-labelledby={`demo-entry-${id}-title`}
+              aria-describedby={`demo-entry-${id}-copy`}
+            >
+              <span className="feature-icon" aria-hidden="true">
+                <Icon size={18} />
+              </span>
+              <span className="patient-demo-entry-copy">
+                <strong id={`demo-entry-${id}-title`}>{title}</strong>
+                <small id={`demo-entry-${id}-copy`}>{description}</small>
+              </span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Panel>
   );
 }
 export function PatientHistory() {

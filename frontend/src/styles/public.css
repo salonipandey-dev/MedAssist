@@ -728,6 +728,24 @@
 .home-modules li > a:hover {
   background: var(--subtle);
 }
+/* The panel clips overflow, so keep the focus ring inside each module link. */
+.home-modules li > a:focus-visible {
+  outline-offset: -3px;
+}
+.home-module-group {
+  padding: 12px 24px 8px;
+  border-top: 1px solid var(--border);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.home-module-priority li > a {
+  background: var(--mint);
+}
+.home-module-priority li > a:hover {
+  background: var(--subtle);
+}
 .home-modules li > a > svg:first-child {
   color: var(--accent);
 }
@@ -1084,7 +1102,8 @@
     font-size: var(--text-md);
   }
   .home-modules li > a,
-  .home-modules li > div {
+  .home-modules li > div,
+  .home-module-group {
     padding-inline: var(--space-2);
   }
   .section-header h2,
