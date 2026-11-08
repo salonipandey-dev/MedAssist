@@ -46,6 +46,10 @@ export function Consultations() {
   function set<K extends keyof ConsultationFilters>(key: K, value: ConsultationFilters[K]) {
     setFilters((f) => ({ ...f, [key]: value }));
   }
+  function showDetail(option: ConsultationOption | null) {
+    setDetail(option);
+    setMessage('');
+  }
   function toggle(id: string) {
     const next = toggleCompare(compare, id);
     if (next === compare)
@@ -131,7 +135,7 @@ export function Consultations() {
                       <span className="consult-modes">{o.modes.join(' · ')}</span>
                     </div>
                     <div className="consult-actions">
-                      <Button variant="ghost" size="sm" onClick={() => setDetail(o)}>
+                      <Button variant="ghost" size="sm" onClick={() => showDetail(o)}>
                         Details
                       </Button>
                       <Button
@@ -166,7 +170,7 @@ export function Consultations() {
           className="consult-compare"
         >
           <p className="consult-message" role="status">
-            {message}
+            {!detail && message}
           </p>
           {compared.length ? (
             <div className="table-wrap">
@@ -220,7 +224,7 @@ export function Consultations() {
       </div>
       <DialogPanel
         open={!!detail}
-        onOpenChange={(open) => !open && setDetail(null)}
+        onOpenChange={(open) => !open && showDetail(null)}
         title={detail?.name ?? 'Sample option'}
         description="Fictional provider · illustrative details"
       >
@@ -239,6 +243,9 @@ export function Consultations() {
               <Badge>No contact details or booking in this demonstration</Badge>
             </div>
             <div className="form-actions">
+              <p className="consult-message" role="status">
+                {message}
+              </p>
               <Button
                 variant={compare.includes(detail.id) ? 'secondary' : 'primary'}
                 onClick={() => toggle(detail.id)}

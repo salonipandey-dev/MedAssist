@@ -1906,6 +1906,10 @@
 .consult-message:not(:empty) {
   padding-bottom: 12px;
 }
+.form-actions .consult-message {
+  align-self: center;
+  padding: 0;
+}
 .consult-compare table th[scope='row'] {
   width: 120px;
   text-transform: none;
