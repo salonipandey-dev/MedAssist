@@ -1,40 +1,40 @@
 """MedAssist API entry point."""
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from starlette.types import ASGIApp
 
 from app.config import get_cors_origins
 from app.middleware import RequestIDMiddleware
 from app.schemas import HealthResponse, WelcomeResponse
 
 
+class MedAssistAPI(FastAPI):
+    def __init__(self, cors_origins: list[str]) -> None:
+        super().__init__(
+            title="MedAssist API",
+            description="Backend foundation for the MedAssist student project.",
+            version="0.1.0",
+        )
+        self.cors_origins = cors_origins
+
+    def build_middleware_stack(self) -> ASGIApp:
+        # Wrap the error handler so CORS and request IDs also apply to its responses.
+        stack = super().build_middleware_stack()
+        if self.cors_origins:
+            stack = CORSMiddleware(
+                stack,
+                allow_origins=self.cors_origins,
+                allow_credentials=False,
+                allow_methods=["GET", "HEAD"],
+                expose_headers=["X-Request-ID"],
+            )
+        return RequestIDMiddleware(stack)
+
+
 def create_app() -> FastAPI:
     """Build an application with settings read when the instance is created."""
-    origins = get_cors_origins()
-    application = FastAPI(
-        title="MedAssist API",
-        description="Backend foundation for the MedAssist student project.",
-        version="0.1.0",
-    )
-    if origins:
-        application.add_middleware(
-            CORSMiddleware,
-            allow_origins=origins,
-            allow_credentials=False,
-            allow_methods=["GET", "HEAD"],
-            expose_headers=["X-Request-ID"],
-        )
-    application.add_middleware(RequestIDMiddleware)
-
-    @application.exception_handler(Exception)
-    async def server_error(request: Request, _exc: Exception) -> PlainTextResponse:
-        """Keep unexpected failures traceable without exposing exception details."""
-        return PlainTextResponse(
-            "Internal Server Error",
-            status_code=500,
-            headers={"X-Request-ID": request.state.request_id},
-        )
+    application = MedAssistAPI(get_cors_origins())
 
     @application.get("/", tags=["System"], summary="Check the API welcome message")
     def home() -> WelcomeResponse:

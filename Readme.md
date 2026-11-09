@@ -186,7 +186,7 @@ curl -i http://127.0.0.1:8000/health
 ```
 
 An allowed frontend can read the header with
-`response.headers.get("X-Request-ID")`; it is exposed by the CORS configuration.
+`response.headers.get("X-Request-ID")`, including on `500` responses.
 
 ## Connect a local frontend
 
