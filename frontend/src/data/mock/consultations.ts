@@ -162,9 +162,12 @@ export function filterConsultations(
   options: ConsultationOption[],
   filters: ConsultationFilters,
 ): ConsultationOption[] {
-  const q = filters.query.trim().toLowerCase();
+  const terms = filters.query.toLowerCase().match(/\S+/g) ?? [];
   return options.filter((o) => {
-    if (q && ![o.name, o.specialty, o.area].some((v) => v.toLowerCase().includes(q))) return false;
+    if (terms.length) {
+      const searchableText = `${o.name} ${o.specialty} ${o.area}`.toLowerCase();
+      if (!terms.every((term) => searchableText.includes(term))) return false;
+    }
     if (filters.specialty !== 'All specialties' && o.specialty !== filters.specialty) return false;
     if (filters.mode !== 'All modes' && !o.modes.includes(filters.mode as ConsultationMode))
       return false;
