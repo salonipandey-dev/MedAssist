@@ -1968,18 +1968,19 @@
   gap: 8px;
 }
 .consult-message {
-  min-height: 0;
-  padding: 0 24px;
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--amber);
 }
-.consult-message:not(:empty) {
-  padding-bottom: 12px;
+.consult-list .consult-message {
+  grid-column: 1 / -1;
+}
+/* Keep live regions mounted without adding an empty grid row. */
+.consult-list .consult-message:empty {
+  position: absolute;
 }
 .form-actions .consult-message {
   align-self: center;
-  padding: 0;
 }
 .consult-compare table th[scope='row'] {
   width: 120px;
@@ -2118,8 +2119,7 @@
   }
 }
 @media (max-width: 767px) {
-  .consult-filters,
-  .consult-message {
+  .consult-filters {
     padding-inline: var(--space-2);
   }
   .consult-list li,

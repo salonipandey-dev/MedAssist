@@ -23,6 +23,7 @@ import {
 } from '../../data/mock/consultations';
 
 const FEE_FILTERS: FeeFilter[] = ['Any', 'Free (illustrative)', 'Up to ₹300', 'Fee not listed'];
+const COMPARE_LIMIT_MESSAGE = `You can compare up to ${COMPARE_LIMIT} options. Remove one to add another.`;
 const COMPARE_ROWS: { label: string; value: (o: ConsultationOption) => string }[] = [
   { label: 'Specialty', value: (o) => o.specialty },
   { label: 'Provider type', value: (o) => o.providerType },
@@ -38,7 +39,7 @@ export function Consultations() {
   const searchInput = useRef<HTMLInputElement>(null);
   const [compare, setCompare] = useState<string[]>([]);
   const [detail, setDetail] = useState<ConsultationOption | null>(null);
-  const [message, setMessage] = useState('');
+  const [blockedOptionId, setBlockedOptionId] = useState<string | null>(null);
   const results = useMemo(() => filterConsultations(CONSULTATION_OPTIONS, filters), [filters]);
   const compared = compare
     .map((id) => CONSULTATION_OPTIONS.find((o) => o.id === id))
@@ -46,20 +47,20 @@ export function Consultations() {
   const filtered = JSON.stringify(filters) !== JSON.stringify(EMPTY_FILTERS);
   function set<K extends keyof ConsultationFilters>(key: K, value: ConsultationFilters[K]) {
     setFilters((f) => ({ ...f, [key]: value }));
+    setBlockedOptionId(null);
   }
   function clearFilters() {
     setFilters(EMPTY_FILTERS);
+    setBlockedOptionId(null);
     searchInput.current?.focus();
   }
   function showDetail(option: ConsultationOption | null) {
     setDetail(option);
-    setMessage('');
+    setBlockedOptionId(null);
   }
   function toggle(id: string) {
     const next = toggleCompare(compare, id);
-    if (next === compare)
-      setMessage(`You can compare up to ${COMPARE_LIMIT} options. Remove one to add another.`);
-    else setMessage('');
+    setBlockedOptionId(next === compare ? id : null);
     setCompare(next);
   }
   return (
@@ -154,6 +155,9 @@ export function Consultations() {
                         <span className="sr-only"> {o.name}</span>
                       </Button>
                     </div>
+                    <p className="consult-message" role="status">
+                      {!detail && blockedOptionId === o.id && COMPARE_LIMIT_MESSAGE}
+                    </p>
                   </li>
                 );
               })}
@@ -170,9 +174,6 @@ export function Consultations() {
           description={`${compared.length} of ${COMPARE_LIMIT} selected · illustrative values`}
           className="consult-compare"
         >
-          <p className="consult-message" role="status">
-            {!detail && message}
-          </p>
           {compared.length ? (
             <div className="table-wrap">
               <table aria-label="consultation comparison">
@@ -245,7 +246,7 @@ export function Consultations() {
             </div>
             <div className="form-actions">
               <p className="consult-message" role="status">
-                {message}
+                {blockedOptionId === detail.id && COMPARE_LIMIT_MESSAGE}
               </p>
               <Button
                 variant={compare.includes(detail.id) ? 'secondary' : 'primary'}
