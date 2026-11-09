@@ -118,6 +118,36 @@ class RequestIDTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "Unexpected route failure"):
             client.get("/unexpected-error")
 
+    def test_allowed_frontend_can_read_the_response_id_on_server_errors(self):
+        allowed_origin = "http://localhost:5173"
+        with patch.dict("os.environ", {"MEDASSIST_CORS_ORIGINS": allowed_origin}):
+            application = create_app()
+        route_request_ids = []
+
+        @application.get("/unexpected-error")
+        def unexpected_error(request: Request):
+            route_request_ids.append(request.state.request_id)
+            raise RuntimeError("Unexpected route failure")
+
+        client = self.make_client(
+            application=application, raise_server_exceptions=False
+        )
+        response = client.get("/unexpected-error", headers={"Origin": allowed_origin})
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.text, "Internal Server Error")
+        self.assertEqual(self.assert_request_id(response), route_request_ids[-1])
+        self.assertEqual(response.headers.get("Access-Control-Allow-Origin"), allowed_origin)
+        self.assertIn("Origin", response.headers["Vary"])
+        self.assertEqual(response.headers["Access-Control-Expose-Headers"], "X-Request-ID")
+        self.assertNotIn("Access-Control-Allow-Credentials", response.headers)
+
+        blocked = client.get(
+            "/unexpected-error", headers={"Origin": "https://unlisted.example"}
+        )
+        self.assertEqual(blocked.status_code, 500)
+        self.assertNotIn("Access-Control-Allow-Origin", blocked.headers)
+
     def test_caller_cannot_choose_the_server_request_id(self):
         supplied_id = "caller-controlled-value"
         response = self.make_client().get(
