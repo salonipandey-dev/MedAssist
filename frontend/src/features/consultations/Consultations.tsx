@@ -1,5 +1,5 @@
 import { MapPin, Search, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   Badge,
   Button,
@@ -35,6 +35,7 @@ const COMPARE_ROWS: { label: string; value: (o: ConsultationOption) => string }[
 
 export function Consultations() {
   const [filters, setFilters] = useState<ConsultationFilters>(EMPTY_FILTERS);
+  const searchInput = useRef<HTMLInputElement>(null);
   const [compare, setCompare] = useState<string[]>([]);
   const [detail, setDetail] = useState<ConsultationOption | null>(null);
   const [message, setMessage] = useState('');
@@ -45,6 +46,10 @@ export function Consultations() {
   const filtered = JSON.stringify(filters) !== JSON.stringify(EMPTY_FILTERS);
   function set<K extends keyof ConsultationFilters>(key: K, value: ConsultationFilters[K]) {
     setFilters((f) => ({ ...f, [key]: value }));
+  }
+  function clearFilters() {
+    setFilters(EMPTY_FILTERS);
+    searchInput.current?.focus();
   }
   function showDetail(option: ConsultationOption | null) {
     setDetail(option);
@@ -74,6 +79,7 @@ export function Consultations() {
               <span className="sr-only">Search consultations</span>
               <Search size={16} />
               <input
+                ref={searchInput}
                 type="search"
                 placeholder="Search name, specialty or area"
                 value={filters.query}
@@ -109,7 +115,7 @@ export function Consultations() {
               </select>
             </label>
             {filtered && (
-              <Button variant="ghost" size="sm" onClick={() => setFilters(EMPTY_FILTERS)}>
+              <Button variant="ghost" size="sm" onClick={clearFilters}>
                 Clear filters
               </Button>
             )}
@@ -156,11 +162,6 @@ export function Consultations() {
             <EmptyState
               title="No sample options match"
               description="Change or clear the filters to see more fictional options."
-              action={
-                <Button size="sm" variant="secondary" onClick={() => setFilters(EMPTY_FILTERS)}>
-                  Clear filters
-                </Button>
-              }
             />
           )}
         </Panel>

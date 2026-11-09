@@ -360,8 +360,11 @@ test('consultation demo filters fictional options and limits comparison to three
   await expect(options).toHaveCount(2);
   await page.getByLabel('Specialty').selectOption('ENT');
   await expect(page.getByRole('heading', { name: 'No sample options match' })).toBeVisible();
-  await page.getByRole('button', { name: 'Clear filters' }).first().click();
+  const clearFilters = page.getByRole('button', { name: 'Clear filters', exact: true });
+  await expect(clearFilters).toHaveCount(1);
+  await clearFilters.press('Enter');
   await expect(options).toHaveCount(9);
+  await expect(page.getByRole('searchbox', { name: 'Search consultations' })).toBeFocused();
   const compare = page.getByRole('button', { name: /^Compare / });
   for (let i = 0; i < 3; i++) await compare.first().click();
   await expect(page.getByRole('table', { name: 'consultation comparison' })).toContainText(
