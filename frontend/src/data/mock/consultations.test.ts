@@ -45,6 +45,22 @@ describe('fictional consultation directory', () => {
     expect(search.every((o) => /riverside/i.test(o.name + o.area))).toBe(true);
   });
 
+  it('matches every search term across fields in any order', () => {
+    const results = filterConsultations(CONSULTATION_OPTIONS, {
+      ...EMPTY_FILTERS,
+      query: '  rEmOtE   GENERAL practice  ',
+      mode: 'Video',
+      fee: 'Up to ₹300',
+    });
+    expect(results.map((option) => option.id)).toEqual(['c-02']);
+
+    const unmatched = filterConsultations(CONSULTATION_OPTIONS, {
+      ...EMPTY_FILTERS,
+      query: 'riverside remote',
+    });
+    expect(unmatched).toHaveLength(0);
+  });
+
   it('compares at most three options and lets one be removed', () => {
     let selected: string[] = [];
     for (const option of CONSULTATION_OPTIONS.slice(0, 4))

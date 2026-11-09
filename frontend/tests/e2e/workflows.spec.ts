@@ -349,6 +349,7 @@ test('patient appointment preview follows the selected fictional professional', 
 test('consultation demo filters fictional options and limits comparison to three', async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/app/patient/consultations');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Find and compare consultations',
@@ -370,14 +371,18 @@ test('consultation demo filters fictional options and limits comparison to three
   await expect(page.getByRole('table', { name: 'consultation comparison' })).toContainText(
     'illustrative',
   );
-  await compare.first().click();
-  await expect(page.getByRole('status').filter({ hasText: 'compare up to 3' })).toBeVisible();
+  const fourthOption = options.filter({ hasText: 'Northgate Hospital Outpatients' });
+  await fourthOption.getByRole('button', { name: /^Compare / }).click();
+  const limitMessage = fourthOption.getByRole('status');
+  await expect(limitMessage).toContainText('You can compare up to 3 options');
+  await expect(limitMessage).toBeInViewport();
   await expect(page.getByRole('button', { name: /^Comparing / })).toHaveCount(3);
   await page
     .getByRole('button', { name: /^Remove .* from comparison$/ })
     .first()
     .click();
   await expect(page.getByRole('button', { name: /^Comparing / })).toHaveCount(2);
+  await expect(limitMessage).toBeEmpty();
 });
 
 test('homepage and patient overview link to the priority patient demos', async ({ page }) => {
