@@ -1,7 +1,12 @@
-"""Environment settings for connecting a browser frontend."""
+"""Environment settings for the browser frontend and the database."""
+
+from __future__ import annotations
 
 import os
 from urllib.parse import urlsplit
+
+from sqlalchemy.engine import URL, make_url
+from sqlalchemy.exc import ArgumentError
 
 
 def get_cors_origins() -> list[str]:
@@ -39,3 +44,30 @@ def get_cors_origins() -> list[str]:
             origins.append(origin)
 
     return origins
+
+
+DATABASE_URL_ENV = "MEDASSIST_DATABASE_URL"
+TEST_DATABASE_URL_ENV = "MEDASSIST_TEST_DATABASE_URL"
+_POSTGRES_DRIVERS = {"postgresql", "postgres", "postgresql+psycopg"}
+
+
+def get_database_url(variable: str = DATABASE_URL_ENV) -> URL | None:
+    """Read a PostgreSQL URL; None means no database has been configured.
+
+    The value holds credentials, so configuration errors never repeat it.
+    """
+    value = os.getenv(variable, "").strip()
+    if not value:
+        return None
+
+    try:
+        url = make_url(value)
+    except ArgumentError:
+        url = None
+
+    if url is None or url.drivername not in _POSTGRES_DRIVERS or not url.database:
+        raise ValueError(
+            f"{variable} must be a PostgreSQL URL that names a database. "
+            "Example: postgresql://USER:PASSWORD@localhost:5432/medassist"
+        )
+    return url.set(drivername="postgresql+psycopg")

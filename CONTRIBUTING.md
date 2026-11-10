@@ -7,8 +7,11 @@ commands from `backend`, using the project's virtual environment.
 
 1. Start a branch from an up-to-date `main`, for example:
    `git switch -c feature/describe-your-change`.
-2. Put API routes and the app factory in `app/main.py`, response contracts in
-   `app/schemas.py`, and environment settings in `app/config.py`.
+2. Put the app factory and system routes in `app/main.py`, feature routes in
+   their own router module (see `app/consultations.py`), response contracts in
+   `app/schemas.py`, and environment settings in `app/config.py`. Change
+   tables with a new Alembic migration under `migrations/versions/` and keep
+   `app/models.py` in step with it.
 3. Add HTTP tests under `tests/` when changing endpoint behavior or response
    contracts. Include invalid input and configuration cases where relevant.
 4. Update the README when a route, setting, or setup step changes, and commit
@@ -51,8 +54,13 @@ welcome, health, schema, and error responses against the running server. Its
 Check the expected status in each request's title and inspect `X-Request-ID` in
 the response headers when investigating a problem.
 
-Use synthetic examples for project work. Authentication and database storage
-remain future work; real patient data should not be used in this prototype.
+Use synthetic examples for project work. The database holds only the
+fictional consultation directory. Authentication and patient storage remain
+future work; real patient data should not be used in this prototype.
+
+Tests that need PostgreSQL read `MEDASSIST_TEST_DATABASE_URL` and skip when it
+is unset, so the suite stays runnable without a database. See the README's
+[directory setup](Readme.md#set-up-the-consultation-directory).
 
 ## Work on the React frontend
 
