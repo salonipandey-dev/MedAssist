@@ -45,7 +45,7 @@ The header role selector changes perspective without discarding in-memory change
 4. Open Appointments, select a future weekday and a sample time, confirm a request, then inspect and cancel it. Reserved slots become unavailable until cancellation.
 5. Switch to Doctor. Open the review queue and a split-panel case review. Confirm the fictional-review checkbox, select a predefined note, and record a Reviewed or Closed workflow state. Professional review is separate from future AI predictions.
 6. Switch to Administrator. Inspect the same case, filter analytics by month, export fictional aggregate CSV data, search/sort/page through users, and pause/resume sample availability with confirmation. Review the resulting sample event in Audit Activity.
-7. As the patient, open **Find Consultations** from the homepage's priority demos, the patient overview's **Priority demos** section or the sidebar. Filter the fictional directory by specialty, mode or fee, open an option's details and compare up to three options. Fees are illustrative or marked as not listed; there is no booking.
+7. As the patient, open **Find Consultations** from the homepage's priority demos, the patient overview's **Priority demos** section or the sidebar. Without an API address the screen says the directory API is not connected; choose **Open offline demo** for the built-in fictional sample. With `VITE_API_BASE_URL` set it lists the records returned by `GET /api/v1/consultations`. In either view, filter by specialty, mode or fee, open a listing's details and compare up to three. Fees are illustrative or marked as not listed; there is no booking.
 8. Open **Medication Info** and switch between the scripted examples. Compare a "Possible issue (scripted)" example with "Incomplete information" and "No scripted notice". Nothing can be typed and nothing is checked.
 9. Try dark mode, mobile navigation, document previews and the deliberately unavailable upload explanation. Reset the demonstration in Settings.
 
@@ -114,19 +114,22 @@ The React context owns temporary state. The pure reducer centralizes mutation ru
 | Audit activity | Searchable chronological sample and session events | Not a secure, immutable production audit trail |
 | System API | Optional GET `/health` with no-store, timeout, response validation and request ID | Liveness only, not database readiness |
 | Authentication / storage | Explicit unavailable states | No credentials, sessions, JWT, database or private file storage |
-| Consultation comparison | Fictional directory with search, specialty/mode/fee filters, details dialog and comparison of up to three options (`features/consultations`, `data/mock/consultations.ts`) | Demonstration only: invented providers and illustrative fees; no real listings, verified free services, availability, contact or booking |
+| Consultation comparison | Directory API view with server-side search and specialty/mode/fee filters, loading, empty, not-connected and error states with Retry, details dialog and comparison of up to three listings kept by ID; separate offline demo at `?source=offline` (`features/consultations`, `services/api/consultations.ts`, `data/mock/consultations.ts`) | Every seeded record is fictional with illustrative fees; no real listings, verified free services, availability, contact or booking. Specialty choices are a fixed list and only the first 50 matches are shown |
 | Medication information | Six scripted examples with invented medicine, ingredient, allergy and condition names; possible issues shown separately from missing information (`features/medications`, `data/mock/medications.ts`) | Demonstration only: no input, no medicine reference source and no checking; no notice is not a safety statement |
 | AI / SHAP | Nonfunctional conceptual panel, proposed labels and unavailable provenance | Dataset permission, training, evaluation, integration and appropriate validation required |
 
 ## Optional connection to the actual FastAPI service
 
-Only the already implemented system endpoint is wired. Mock profiles, appointments, cases and reviews never call the backend.
+Two read-only endpoints are wired: liveness and the consultation directory. Mock profiles, appointments, cases and reviews never call the backend.
 
 1. In `frontend`, copy `.env.example` to `.env.local` (`Copy-Item` in PowerShell, `cp` in Unix). Set `VITE_API_BASE_URL=http://127.0.0.1:8000`. Vite must be restarted after configuration changes; rebuild for production preview.
 2. Start the existing backend from `backend`, following the root README. Set `MEDASSIST_CORS_ORIGINS` to the exact browser origin, e.g. `http://127.0.0.1:5173` for Vite or `http://127.0.0.1:4173` for preview.
 3. In Administrator → System Settings, select **Check API liveness**. Errors explain missing configuration or an unavailable service. Success displays the service version and exposed `X-Request-ID`.
+4. For Find Consultations, also set up PostgreSQL as described in the root README (migrate, seed, `MEDASSIST_DATABASE_URL`). Open `/app/patient/consultations`: the nine seeded fictional listings load from `GET /api/v1/consultations`. Stop PostgreSQL to see the error state with its request ID, start it again and select **Retry**.
 
-The client rejects invalid origins and credential-bearing URLs. It sends a credential-free GET to `/health`, with `cache: no-store` and a five-second timeout. It validates `{ status: 'ok', service: 'medassist-api', version: string }`. There are no invented patient, JWT, Express or ML endpoints. All FastAPI files remain unchanged.
+The client rejects invalid origins and credential-bearing URLs. It sends a credential-free GET to `/health`, with `cache: no-store` and a five-second timeout. It validates `{ status: 'ok', service: 'medassist-api', version: string }`. There are no invented patient, JWT, Express or ML endpoints.
+
+The consultation client (`services/api/consultations.ts`) uses the same origin check, sends a credential-free GET with `cache: no-store` and an eight-second timeout, and validates the whole page with Zod, including the rule that a fee is a known amount, explicitly free with a basis, or unknown. Search is debounced by 300 ms and each new request aborts the previous one, so a slow response cannot replace a newer result. "Up to ₹300" is sent as `max_fee_minor=30000`, "Free" as `fee_state=free` and "Fee not listed" as `fee_state=unknown`; the count comes from the API's `total`. A failed request stays in the API view with **Retry**; the offline demo is opened only by its own button.
 
 ## Verification commands
 
@@ -142,6 +145,8 @@ npm run test:e2e
 npm run format:check
 npm run screenshots:report   # after a committed build; writes docs/screenshots/report/ and docs/SCREENSHOT_MANIFEST.md
 ```
+
+`npm run test:e2e` also builds a second copy of the app with a placeholder API origin (`dist-e2e-api`) and answers its directory requests inside the tests, so the browser suite needs no backend or database.
 
 On Linux CI or a minimal container, use `npx playwright install --with-deps chromium` to install required browser system libraries as well. Playwright is pinned and its core dependency is aligned to keep browser tooling reproducible.
 

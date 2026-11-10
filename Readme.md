@@ -13,7 +13,9 @@ demonstration data; this is not a clinically deployed healthcare service.
   schemas, request IDs, optional frontend origins, generated API docs, HTTP
   contract tests, and automated backend checks.
 - Implemented: a read-only consultation directory API backed by PostgreSQL,
-  seeded with nine fictional listings. The frontend does not call it yet.
+  seeded with nine fictional listings. Find Consultations reads from it when
+  `VITE_API_BASE_URL` is set; otherwise it sends no request and offers a
+  built-in offline demo.
 - Frontend: public product website and distinct patient, doctor and administrator
   workspaces, with light/dark themes, case/review workflows, fictional appointments,
   safe document previews, searchable tables and derived sample analytics. Changes
@@ -366,7 +368,6 @@ Git. Keep credentials and real patient information out of the repository.
 
 ## Next development steps
 
-1. Connect the Find Consultations screen to the directory API (MA-03).
-2. Add authentication and access controls before storing patient information.
-3. Build and validate the patient management workflow.
-4. Explore triage assistance after the core workflow is working.
+1. Add authentication and access controls before storing patient information.
+2. Build and validate the patient management workflow.
+3. Explore triage assistance after the core workflow is working.

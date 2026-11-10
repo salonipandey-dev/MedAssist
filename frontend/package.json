@@ -11,6 +11,7 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview --host 127.0.0.1",
+    "preview:e2e-api": "vite build --outDir dist-e2e-api --logLevel warn && vite preview --host 127.0.0.1 --outDir dist-e2e-api --port 4176 --strictPort",
     "test": "node --test tests/nonclinical-demo.test.cjs tests/modern-safeguards.test.cjs && vitest run",
     "test:e2e": "playwright test",
     "format": "prettier --write src vite.config.ts playwright.config.ts tests/e2e components.json scripts",

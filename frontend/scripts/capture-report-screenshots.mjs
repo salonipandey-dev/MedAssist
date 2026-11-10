@@ -165,7 +165,7 @@ const SHOTS = [
   {
     id: 'SS10',
     file: 'ss10-consultation-comparison.png',
-    route: '/app/patient/consultations',
+    route: '/app/patient/consultations?source=offline',
     state: 'First three fictional options added to the comparison',
     steps: async (page) => {
       for (let i = 0; i < 3; i++)
