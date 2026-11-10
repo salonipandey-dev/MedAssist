@@ -24,3 +24,39 @@ Accept: application/json
 ### Unsupported health write: 405 with a detail field and X-Request-ID
 POST {{baseUrl}}/health
 Accept: application/json
+
+### Consultation directory: 200 with nine fictional listings ordered by ID.
+### Needs PostgreSQL migrated and seeded; see the README.
+GET {{baseUrl}}/api/v1/consultations
+Accept: application/json
+
+### Search: every term must match name, specialty or area (c-01 and c-06)
+GET {{baseUrl}}/api/v1/consultations?q=riverside%20clinic
+Accept: application/json
+
+### "Up to ₹300": free examples plus known fees up to 30000 paise (c-01, c-02, c-03, c-08)
+GET {{baseUrl}}/api/v1/consultations?max_fee_minor=30000
+Accept: application/json
+
+### Explicit free only (c-03, c-08)
+GET {{baseUrl}}/api/v1/consultations?fee_state=free
+Accept: application/json
+
+### Fee not listed (c-06, c-09)
+GET {{baseUrl}}/api/v1/consultations?fee_state=unknown
+Accept: application/json
+
+### Combined filters (c-09)
+GET {{baseUrl}}/api/v1/consultations?specialty=Dermatology&mode=video&fee_state=unknown
+Accept: application/json
+
+### No matches: 200 with an empty items list and total 0
+GET {{baseUrl}}/api/v1/consultations?q=no-such-provider
+Accept: application/json
+
+### Invalid filter: 422 with a detail list naming the query parameter
+GET {{baseUrl}}/api/v1/consultations?mode=fax
+Accept: application/json
+
+# With PostgreSQL stopped or MEDASSIST_DATABASE_URL unset, the directory
+# returns 503 with a generic detail and request_id; /health still returns 200.
