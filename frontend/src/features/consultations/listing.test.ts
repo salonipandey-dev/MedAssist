@@ -39,7 +39,7 @@ describe('consultation filter mapping', () => {
     expect(toConsultationQuery({ ...EMPTY_FILTERS, mode: 'Phone' })).toEqual({ mode: 'phone' });
   });
 
-  it('combines filters and normalises the search text', () => {
+  it('combines filters and preserves the search text as typed', () => {
     expect(
       toConsultationQuery({
         query: '  Remote   DERMATOLOGY ',
@@ -48,7 +48,7 @@ describe('consultation filter mapping', () => {
         fee: 'Fee not listed',
       }),
     ).toEqual({
-      q: 'Remote DERMATOLOGY',
+      q: '  Remote   DERMATOLOGY ',
       specialty: 'Dermatology',
       mode: 'video',
       feeState: 'unknown',

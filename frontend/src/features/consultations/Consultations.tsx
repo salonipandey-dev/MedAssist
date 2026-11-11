@@ -93,7 +93,7 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
   const [attempt, setAttempt] = useState(0);
   const [loaded, setLoaded] = useState<Loaded>({ status: 'loading', page: null });
   const searchText = useDebouncedText(filters.query, SEARCH_DEBOUNCE_MS);
-  // Serialised so retyping the same search or adding spaces does not send a request.
+  // Only changes to the effective server filters start a request.
   const queryKey = JSON.stringify(toConsultationQuery({ ...filters, query: searchText }));
 
   useEffect(() => {

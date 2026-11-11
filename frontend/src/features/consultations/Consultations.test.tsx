@@ -109,7 +109,7 @@ describe('Find Consultations with the directory API', () => {
     expect(queries().at(-1)).toMatchObject({ feeState: 'unknown' });
   });
 
-  it('waits for typing to pause before searching and ignores extra spaces', async () => {
+  it('waits for typing to pause before searching and sends spaces as typed', async () => {
     renderScreen();
     await flush();
     expect(listConsultations).toHaveBeenCalledTimes(1);
@@ -125,7 +125,8 @@ describe('Find Consultations with the directory API', () => {
 
     type('riverside  ');
     await act(async () => vi.advanceTimersByTime(300));
-    expect(listConsultations).toHaveBeenCalledTimes(2);
+    expect(listConsultations).toHaveBeenCalledTimes(3);
+    expect(queries().at(-1)).toEqual({ q: 'riverside  ' });
   });
 
   it('keeps the newest results when an older response arrives late', async () => {

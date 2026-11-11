@@ -130,8 +130,7 @@ const TIMEOUT_MS = 8000;
 
 function buildUrl(origin: string, query: ConsultationQuery): string {
   const params = new URLSearchParams();
-  const q = query.q?.trim();
-  if (q) params.set('q', q);
+  if (query.q?.trim()) params.set('q', query.q);
   if (query.specialty) params.set('specialty', query.specialty);
   if (query.mode) params.set('mode', query.mode);
   if (query.feeState) params.set('fee_state', query.feeState);

@@ -127,7 +127,7 @@ test('debounces search, shows an empty result and resets with one control', asyn
     'Little Steps Children’s Clinic (fictional)',
   ]);
   // One request for the finished text, not one per keystroke.
-  expect(directory.queries()).toEqual(['?limit=50', '?q=Riverside+CLINIC&limit=50']);
+  expect(directory.queries()).toEqual(['?limit=50', '?q=Riverside++CLINIC&limit=50']);
 
   await searchBox.fill('no-such-provider');
   await expect(page.getByRole('heading', { name: 'No listings match' })).toBeVisible();

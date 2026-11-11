@@ -26,8 +26,7 @@ export const AFFORDABLE_MAX_FEE_MINOR = 30000;
 /** Translate the screen's filter labels into the API's query parameters. */
 export function toConsultationQuery(filters: ConsultationFilters): ConsultationQuery {
   const query: ConsultationQuery = {};
-  const q = filters.query.trim().split(/\s+/).filter(Boolean).join(' ');
-  if (q) query.q = q;
+  if (filters.query.trim()) query.q = filters.query;
   if (filters.specialty !== 'All specialties') query.specialty = filters.specialty;
   const mode = (Object.keys(MODE_LABELS) as ConsultationMode[]).find(
     (key) => MODE_LABELS[key] === filters.mode,

@@ -58,7 +58,7 @@ describe('consultation directory client', () => {
 
     const [url, init] = fetch.mock.calls[0];
     expect(url).toBe(
-      `${ORIGIN}/api/v1/consultations?q=riverside+clinic&specialty=General+practice` +
+      `${ORIGIN}/api/v1/consultations?q=++riverside+clinic+&specialty=General+practice` +
         '&mode=in_person&fee_state=known&max_fee_minor=30000&limit=50',
     );
     expect(init).toMatchObject({ method: 'GET', cache: 'no-store', credentials: 'omit' });
