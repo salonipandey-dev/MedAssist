@@ -205,7 +205,8 @@ test('mock workflows do not use network mutations or browser storage', async ({ 
   page.on('pageerror', (e) => errors.push(e.message));
   const apiRequests: string[] = [];
   page.on('request', (r) => {
-    if (r.url().includes('/health') || r.method() === 'POST') apiRequests.push(r.url());
+    if (r.url().includes('/health') || r.url().includes('/api/') || r.method() !== 'GET')
+      apiRequests.push(r.url());
   });
   await page.goto('/app/patient/assessments');
   await page.getByRole('button', { name: 'Begin sample walkthrough' }).click();
@@ -221,6 +222,18 @@ test('mock workflows do not use network mutations or browser storage', async ({ 
     .getByRole('dialog')
     .getByRole('button', { name: 'Reset demo data', exact: true })
     .click();
+  // Without an API origin the consultation screen and its offline demo stay local.
+  await page.getByLabel('Demo role').selectOption('patient');
+  await page
+    .getByLabel('patient navigation')
+    .getByRole('link', { name: 'Find Consultations' })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Directory API not connected' })).toBeVisible();
+  await page.getByRole('button', { name: 'Open offline demo' }).click();
+  await page.getByLabel('Fee').selectOption('Up to ₹300');
+  await expect(
+    page.getByRole('list', { name: 'Sample consultation options' }).getByRole('listitem'),
+  ).toHaveCount(4);
   expect(errors).toEqual([]);
   expect(apiRequests).toEqual([]);
   expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0]);
@@ -346,11 +359,38 @@ test('patient appointment preview follows the selected fictional professional', 
   await expect(page.locator('.appointment-doctor')).toContainText('Internal medicine');
 });
 
-test('consultation demo filters fictional options and limits comparison to three', async ({
+test('consultation screen without an API origin offers the offline demo as an explicit choice', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto('/app/patient/consultations');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'Find and compare consultations',
+  );
+  // This build has no API origin: the screen says so and shows no listings by itself.
+  await expect(page.getByRole('heading', { name: 'Directory API not connected' })).toBeVisible();
+  await expect(page.getByText('no request was made')).toBeVisible();
+  await expect(page.getByRole('list', { name: /consultation/i })).toHaveCount(0);
+  await expect(page.getByRole('searchbox')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Open offline demo' }).click();
+  await expect(page).toHaveURL(/\/app\/patient\/consultations\?source=offline$/);
+  await expect(page.getByRole('heading', { name: 'Offline demo directory' })).toBeVisible();
+  await expect(page.locator('.consult-source')).toContainText('Built-in fictional sample');
+  const options = page
+    .getByRole('list', { name: 'Sample consultation options' })
+    .getByRole('listitem');
+  await expect(options).toHaveCount(9);
+  await page.getByRole('button', { name: 'Use directory API' }).click();
+  await expect(page.getByRole('heading', { name: 'Directory API not connected' })).toBeVisible();
+  await page.goBack();
+  await expect(options).toHaveCount(9);
+});
+
+test('consultation demo filters fictional options and limits comparison to three', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/app/patient/consultations?source=offline');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Find and compare consultations',
   );
@@ -471,7 +511,7 @@ test('consultation details explain the comparison limit and allow retry after re
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto('/app/patient/consultations');
+  await page.goto('/app/patient/consultations?source=offline');
   const options = page.getByRole('list', { name: 'Sample consultation options' });
   const compare = options.getByRole('button', { name: /^Compare / });
   for (let i = 0; i < 3; i++) await compare.first().click();

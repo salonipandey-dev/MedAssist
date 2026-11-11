@@ -1,0 +1,250 @@
+{
+  "items": [
+    {
+      "id": "c-01",
+      "provider_name": "Riverside Family Clinic (fictional)",
+      "provider_type": "clinic",
+      "specialty": "General practice",
+      "modes": ["in_person"],
+      "area": "Riverside, Sample City",
+      "fee": {
+        "state": "known",
+        "amount_minor": 30000,
+        "currency": "INR",
+        "basis": "Illustrative fee for a first consultation."
+      },
+      "access_conditions": null,
+      "languages": ["English", "Hindi"],
+      "hours": "Weekdays · morning and evening (illustrative)",
+      "notes": "Illustrative fee for a first consultation.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-02",
+      "provider_name": "Lakeview Teleconsult (fictional)",
+      "provider_type": "teleconsultation",
+      "specialty": "General practice",
+      "modes": ["video", "phone"],
+      "area": "Remote only",
+      "fee": {
+        "state": "known",
+        "amount_minor": 19900,
+        "currency": "INR",
+        "basis": "Illustrative fee for one remote consultation."
+      },
+      "access_conditions": "Remote only; some concerns would need an in-person visit.",
+      "languages": ["English", "Hindi"],
+      "hours": "Daily · 08:00–20:00 (illustrative)",
+      "notes": "Remote consultation; some concerns would need an in-person visit.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-03",
+      "provider_name": "Sample Community Health Camp (fictional)",
+      "provider_type": "community_camp",
+      "specialty": "General practice",
+      "modes": ["in_person"],
+      "area": "Old Market, Sample City",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "Shown as free for demonstration only. A real free service would need a verified source."
+      },
+      "access_conditions": "Fictional example: walk-in on camp days only.",
+      "languages": ["Hindi"],
+      "hours": "First Saturday of the month (illustrative)",
+      "notes": "Shown as free for demonstration only. A real free service would need a verified source.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-04",
+      "provider_name": "Northgate Hospital Outpatients (fictional)",
+      "provider_type": "hospital_outpatient",
+      "specialty": "Internal medicine",
+      "modes": ["in_person"],
+      "area": "Northgate, Sample City",
+      "fee": {
+        "state": "known",
+        "amount_minor": 50000,
+        "currency": "INR",
+        "basis": "Illustrative registration and consultation fee."
+      },
+      "access_conditions": null,
+      "languages": ["English", "Hindi"],
+      "hours": "Weekdays · morning (illustrative)",
+      "notes": "Illustrative registration and consultation fee.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-05",
+      "provider_name": "Meadow Skin Clinic (fictional)",
+      "provider_type": "clinic",
+      "specialty": "Dermatology",
+      "modes": ["in_person", "video"],
+      "area": "Meadow Park, Sample City",
+      "fee": {
+        "state": "known",
+        "amount_minor": 60000,
+        "currency": "INR",
+        "basis": "Illustrative fee for a first consultation."
+      },
+      "access_conditions": null,
+      "languages": ["English"],
+      "hours": "Tuesday to Saturday (illustrative)",
+      "notes": "Video follow-ups shown for demonstration.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-06",
+      "provider_name": "Little Steps Children’s Clinic (fictional)",
+      "provider_type": "clinic",
+      "specialty": "Paediatrics",
+      "modes": ["in_person"],
+      "area": "Riverside, Sample City",
+      "fee": {
+        "state": "unknown",
+        "amount_minor": null,
+        "currency": null,
+        "basis": null
+      },
+      "access_conditions": null,
+      "languages": ["English", "Hindi"],
+      "hours": null,
+      "notes": "No fee information in the sample record.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-07",
+      "provider_name": "Harbour ENT Centre (fictional)",
+      "provider_type": "clinic",
+      "specialty": "ENT",
+      "modes": ["in_person"],
+      "area": "Harbour Road, Sample City",
+      "fee": {
+        "state": "known",
+        "amount_minor": 45000,
+        "currency": "INR",
+        "basis": "Illustrative fee for a first consultation."
+      },
+      "access_conditions": null,
+      "languages": ["English"],
+      "hours": "Weekdays · afternoon (illustrative)",
+      "notes": "Illustrative fee for a first consultation.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-08",
+      "provider_name": "Civic Polyclinic OPD (fictional)",
+      "provider_type": "hospital_outpatient",
+      "specialty": "Internal medicine",
+      "modes": ["in_person"],
+      "area": "Civic Centre, Sample City",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "Shown as free for demonstration only. A real free service would need a verified source."
+      },
+      "access_conditions": "Fictional example: morning outpatient registration.",
+      "languages": ["Hindi", "English"],
+      "hours": "Weekdays · morning (illustrative)",
+      "notes": "Shown as free for demonstration only. A real free service would need a verified source.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    },
+    {
+      "id": "c-09",
+      "provider_name": "Brightline Online Dermatology (fictional)",
+      "provider_type": "teleconsultation",
+      "specialty": "Dermatology",
+      "modes": ["video"],
+      "area": "Remote only",
+      "fee": {
+        "state": "unknown",
+        "amount_minor": null,
+        "currency": null,
+        "basis": null
+      },
+      "access_conditions": null,
+      "languages": ["English"],
+      "hours": null,
+      "notes": "No fee information in the sample record.",
+      "is_fictional": true,
+      "source": {
+        "kind": "fictional_seed",
+        "id": "medassist-fictional-seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "last_checked_on": null
+      }
+    }
+  ],
+  "total": 9,
+  "limit": 20,
+  "offset": 0
+}

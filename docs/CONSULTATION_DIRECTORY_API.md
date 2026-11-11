@@ -5,8 +5,9 @@ stored in PostgreSQL. The seeded records are the nine fictional options from
 `frontend/src/data/mock/consultations.ts`. Nothing in the seed is a real
 provider, price or free service.
 
-The browser does not call this endpoint yet. Wiring the Find Consultations
-screen to it is batch MA-03; the mapping below is the handoff for that work.
+Find Consultations (`/app/patient/consultations`) reads from this endpoint when
+the frontend is built with `VITE_API_BASE_URL` (batch MA-03). The mapping below
+is what `frontend/src/features/consultations/listing.ts` implements.
 This batch is engineering evidence toward FR12 / VT13. Validation against real
 sources belongs to MA-06.
 

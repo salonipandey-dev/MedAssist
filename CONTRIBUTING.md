@@ -74,7 +74,9 @@ The browser suite serves the compiled build, so rebuild after source changes.
 
 Keep mock workflow rules in `src/data/mock/service.ts`, records in `seed.ts`,
 and chart aggregates in `analytics.ts`. Use shared typed records across views.
-Only `src/services/api/system.ts` may contact the implemented system API.
+Only `src/services/api/system.ts` (liveness) and `src/services/api/consultations.ts`
+(read-only directory search) may contact the API, both through the origin check in
+`src/services/api/origin.ts`.
 Do not add a real health-input control, upload picker, credentials or prediction
 until the required backend and appropriate verification exist. Do not use browser
 storage for sample records or quietly redirect mock actions to real services.

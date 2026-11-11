@@ -1,33 +1,22 @@
 import { z } from 'zod';
+import { readApiOrigin } from './origin';
 const healthSchema = z.object({
   status: z.literal('ok'),
   service: z.literal('medassist-api'),
   version: z.string(),
 });
 export type SystemHealth = z.infer<typeof healthSchema> & { requestId: string | null };
-// Only implemented GET /health is exposed. No mock mutation uses this client.
+// Liveness only. The consultation directory has its own read-only client; no mock
+// mutation uses either.
 export async function getSystemHealth(): Promise<SystemHealth> {
-  const base = import.meta.env.VITE_API_BASE_URL;
-  if (!base)
+  const api = readApiOrigin();
+  if (!api.ok)
     throw new Error(
-      'API is not configured. Set VITE_API_BASE_URL and the backend CORS origin to check liveness. The demo works independently.',
+      api.reason === 'missing'
+        ? 'API is not configured. Set VITE_API_BASE_URL and the backend CORS origin to check liveness. The demo works independently.'
+        : 'VITE_API_BASE_URL must be an HTTP(S) origin without credentials or a path.',
     );
-  let origin: URL;
-  try {
-    origin = new URL(base);
-  } catch {
-    throw new Error('VITE_API_BASE_URL must be a valid HTTP(S) origin.');
-  }
-  if (
-    !['http:', 'https:'].includes(origin.protocol) ||
-    origin.username ||
-    origin.password ||
-    origin.pathname !== '/' ||
-    origin.search ||
-    origin.hash
-  )
-    throw new Error('VITE_API_BASE_URL must be an HTTP(S) origin without credentials or a path.');
-  const response = await fetch(`${origin.origin}/health`, {
+  const response = await fetch(`${api.origin}/health`, {
     method: 'GET',
     cache: 'no-store',
     credentials: 'omit',
