@@ -12,6 +12,7 @@ const PATHS = {
   signOut: '/api/v1/auth/sign-out',
   session: '/api/v1/auth/session',
   healthProfile: '/api/v1/me/health-profile',
+  medicationCheck: '/api/v1/me/medication-check',
 } as const;
 type AccountPath = (typeof PATHS)[keyof typeof PATHS];
 
@@ -59,6 +60,65 @@ export type ProfileEntry = z.infer<typeof entrySchema>;
 export type ProfileSection = z.infer<typeof sectionSchema>;
 export type HealthProfile = z.infer<typeof profileSchema>;
 export type HealthProfileUpdate = Omit<HealthProfile, 'updated_at'>;
+
+// The fictional demo medication check (docs/MEDICATION_CHECK_API.md).
+const sectionNameSchema = z.enum(['medicines', 'allergies', 'conditions']);
+const checkKindSchema = z.enum([
+  'duplicate_ingredient',
+  'allergy_ingredient',
+  'medicine_interaction',
+  'medicine_condition',
+]);
+const checkedEntrySchema = z.object({
+  section: sectionNameSchema,
+  entry: text,
+  matched_id: text,
+  matched_name: text,
+});
+const medicationCheckSchema = z
+  .object({
+    fixture: z.object({ id: text, version: text, is_fictional: z.literal(true) }),
+    profile_version: z.number().int().nonnegative(),
+    outcome: z.enum(['matches_found', 'no_matching_rules', 'more_information_needed']),
+    complete: z.boolean(),
+    matches: z.array(
+      z.object({
+        rule_id: text,
+        check: checkKindSchema,
+        title: text,
+        explanation: text,
+        entries: z.array(checkedEntrySchema).min(1),
+        ingredients: z.array(text),
+      }),
+    ),
+    unresolved: z.array(
+      z.object({
+        section: sectionNameSchema,
+        entry: text,
+        reason: z.enum(['unknown', 'ambiguous']),
+        candidates: z.array(text),
+      }),
+    ),
+    missing: z.array(
+      z.object({
+        section: sectionNameSchema,
+        reason: z.literal('not_recorded'),
+        affected_checks: z.array(checkKindSchema),
+      }),
+    ),
+    recognised: z.array(checkedEntrySchema),
+  })
+  // "No matching demo rules" is only possible when every input was covered.
+  .refine(
+    (r) =>
+      r.complete === (r.unresolved.length === 0 && r.missing.length === 0) &&
+      (r.outcome === 'matches_found') === r.matches.length > 0 &&
+      (r.outcome !== 'no_matching_rules' || r.complete),
+    { message: 'medication check outcome and details disagree' },
+  );
+
+export type MedicationCheck = z.infer<typeof medicationCheckSchema>;
+export type MedicationCheckKind = z.infer<typeof checkKindSchema>;
 
 export type AccountApiErrorKind =
   | 'not-configured'
@@ -229,6 +289,7 @@ async function request<T>(
 
 const parseSession = (payload: unknown) => sessionSchema.parse(payload);
 const parseProfile = (payload: unknown) => profileSchema.parse(payload);
+const parseMedicationCheck = (payload: unknown) => medicationCheckSchema.parse(payload);
 
 /** The current session, or an AccountApiError of kind not-signed-in / session-expired. */
 export function getSession(options: { signal?: AbortSignal } = {}) {
@@ -250,4 +311,9 @@ export function getHealthProfile(options: { signal?: AbortSignal } = {}) {
 /** Replace the whole profile. Rejects with kind 'conflict' when `version` is stale. */
 export function saveHealthProfile(update: HealthProfileUpdate, csrfToken: string) {
   return request('PUT', PATHS.healthProfile, parseProfile, { body: update, csrfToken });
+}
+
+/** Run the fictional demo rules against the signed-in patient's saved profile (read-only). */
+export function getMedicationCheck(options: { signal?: AbortSignal } = {}) {
+  return request('GET', PATHS.medicationCheck, parseMedicationCheck, options);
 }

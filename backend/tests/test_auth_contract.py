@@ -195,6 +195,21 @@ class PrivateEndpointContractTests(unittest.TestCase):
                 response = client.options(PROFILE, headers=headers)
                 self.assertEqual(response.status_code, 400)
 
+    def test_medication_check_follows_the_private_route_rules(self):
+        path = "/api/v1/me/medication-check"
+        client = self.make_client(UNREACHABLE_URL)
+        signed_out = client.get(path)
+        self.assertEqual(signed_out.status_code, 401)
+        self.assertEqual(signed_out.json()["code"], "not_signed_in")
+        self.assertEqual(signed_out.headers["cache-control"], "no-store")
+        self.assertEqual(client.get(path + "?account_id=2").status_code, 400)
+        unavailable = client.get(
+            path, headers={"Cookie": "medassist_session=fictional-session-token"}
+        )
+        self.assertEqual(unavailable.status_code, 503)
+        self.assertEqual(unavailable.headers["cache-control"], "no-store")
+        self.assertEqual(client.put(path, json={}).status_code, 405)
+
     def test_openapi_documents_the_private_routes_without_an_owner_parameter(self):
         schema = self.make_client().get("/openapi.json").json()
         for path, methods in (
@@ -202,6 +217,7 @@ class PrivateEndpointContractTests(unittest.TestCase):
             ("/api/v1/auth/sign-out", {"post"}),
             ("/api/v1/auth/session", {"get"}),
             (PROFILE, {"get", "put"}),
+            ("/api/v1/me/medication-check", {"get"}),
         ):
             with self.subTest(path=path):
                 self.assertEqual(set(schema["paths"][path]), methods)

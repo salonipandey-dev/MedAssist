@@ -143,13 +143,14 @@ class ConsultationListing(Base):
 # --- Accounts, sessions and private health profiles (migration 0002) ---------
 
 ACCOUNT_ROLES = ("patient",)
-PROFILE_SECTIONS = ("medicines", "allergies", "conditions")
-# not_recorded: the patient has said nothing yet. none: the patient has said
-# there is nothing to record. recorded: at least one entry follows.
-SECTION_STATES = ("not_recorded", "none", "recorded")
-ENTRY_NAME_MAX = 120
-ENTRY_NOTE_MAX = 300
-ENTRIES_PER_SECTION_MAX = 30
+# PROFILE_SECTIONS and the limits below are re-exported for existing imports.
+from app.limits import (  # noqa: E402
+    ENTRIES_PER_SECTION_MAX,
+    ENTRY_NAME_MAX,
+    ENTRY_NOTE_MAX,
+    PROFILE_SECTIONS,
+    SECTION_STATES,
+)
 
 
 class Account(Base):

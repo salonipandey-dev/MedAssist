@@ -21,6 +21,11 @@ demonstration data; this is not a clinically deployed healthcare service.
   and each patient can read and change only their own medicines, allergies and
   conditions, which persist in PostgreSQL. See
   [Sign-in and private health profiles](docs/HEALTH_PROFILE_API.md).
+- Implemented: medication checks with fictional data (MA-05). Medication Info runs
+  four deterministic checks (duplicate ingredients, allergy, medicine pair,
+  medicine–condition) from a versioned fictional dataset against the signed-in
+  patient's saved profile, and reports unrecognised or unrecorded inputs. See
+  [Medication checks with fictional data](docs/MEDICATION_CHECK_API.md).
 - Frontend: public product website and distinct patient, doctor and administrator
   workspaces, with light/dark themes, case/review workflows, fictional appointments,
   safe document previews, searchable tables and derived sample analytics. Changes
@@ -225,6 +230,7 @@ accounts.
 | GET | `/api/v1/auth/session` | Read the signed-in account and its CSRF token |
 | POST | `/api/v1/auth/sign-out` | End the session |
 | GET, PUT | `/api/v1/me/health-profile` | Read or replace your own health profile |
+| GET | `/api/v1/me/medication-check` | Check your saved profile against the fictional demo rules |
 
 Example response from `/health`:
 
@@ -377,6 +383,9 @@ consultation search still work without signing in.
   hashing, CSRF and origin checks.
 - `backend/app/health_profile.py`: the signed-in patient's own health profile.
 - `backend/app/seed_demo_accounts.py`: explicit seed for two fictional patients.
+- `backend/app/medication_rules.py`, `backend/app/fixtures/medication_demo_rules.json`:
+  the fictional demo dataset and the four checks; `backend/app/medication_check.py`
+  is its read-only endpoint.
 - `backend/app/consultations.py`: consultation directory route and query.
 - `backend/app/models.py`, `backend/app/db.py`: database tables and engine settings.
 - `backend/app/seed.py`: repeatable fictional seed command.

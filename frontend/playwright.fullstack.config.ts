@@ -10,6 +10,7 @@ import { defineConfig } from '@playwright/test';
 //   npx playwright test -c playwright.fullstack.config.ts --grep @after-restart
 //   (expire Patient B's sessions in PostgreSQL)
 //   npx playwright test -c playwright.fullstack.config.ts --grep @expired
+//   npx playwright test -c playwright.fullstack.config.ts --grep @medication-check
 export default defineConfig({
   testDir: './tests/fullstack',
   fullyParallel: false,

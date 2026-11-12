@@ -23,6 +23,7 @@ from app.consultations import (
 )
 from app.db import create_database_engine
 from app.health_profile import router as health_profile_router
+from app.medication_check import router as medication_check_router
 from app.middleware import PrivateNoStoreMiddleware, RequestIDMiddleware
 from app.schemas import HealthResponse, WelcomeResponse
 from app.security import (
@@ -106,6 +107,7 @@ def create_app() -> FastAPI:
     application.include_router(consultations_router)
     application.include_router(auth_router)
     application.include_router(health_profile_router)
+    application.include_router(medication_check_router)
     application.add_exception_handler(
         DirectoryUnavailableError, directory_unavailable_response
     )

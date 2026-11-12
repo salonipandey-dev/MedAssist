@@ -1,10 +1,10 @@
 name: Health profile (full stack)
 
-# Proves sign-in and private health profiles end to end with nothing mocked: a real
-# PostgreSQL service, the FastAPI app under uvicorn and the compiled React build in
-# Chromium. FastAPI is stopped and started again between the browser phases, and Patient
-# B's sessions are expired directly in PostgreSQL before the last phase. All accounts
-# and entries are fictional.
+# Proves sign-in, private health profiles (MA-04) and the demo medication check (MA-05)
+# end to end with nothing mocked: a real PostgreSQL service, the FastAPI app under
+# uvicorn and the compiled React build in Chromium. FastAPI is stopped and started
+# again between the browser phases, and Patient B's sessions are expired directly in
+# PostgreSQL before phase 3. All accounts and entries are fictional.
 on:
   push:
     branches: [main]
@@ -147,10 +147,18 @@ jobs:
       - name: "Phase 3: an expired session is refused"
         working-directory: frontend
         run: npx playwright test -c playwright.fullstack.config.ts --grep @expired
+      - name: "Phase 4: demo medication checks read each patient's saved profile"
+        working-directory: frontend
+        run: npx playwright test -c playwright.fullstack.config.ts --grep @medication-check
+      - name: Call the medication check directly while signed out
+        run: |
+          status="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/v1/me/medication-check)"
+          echo "Signed-out medication check: $status"
+          test "$status" = "401"
       - name: Check that API logs hold no credentials or profile contents
         run: |
           cat "$RUNNER_TEMP"/api-*.log | tail -n 40
-          if grep -E "MedAssist-Demo|Tarvexol|Mirelune|Sample pollen|Sample condition|Velorin|patient\.[ab]@example" "$RUNNER_TEMP"/api-*.log; then
+          if grep -E "MedAssist-Demo|Tarvexol|Mirelune|Sample pollen|Sample condition|Velorin|Brivanol|Coldaway|patient\.[ab]@example" "$RUNNER_TEMP"/api-*.log; then
             echo "A credential or profile entry appeared in the API log." >&2
             exit 1
           fi

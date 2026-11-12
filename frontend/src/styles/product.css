@@ -2328,3 +2328,80 @@
     flex: 1 1 100%;
   }
 }
+
+/* Medication check against the signed-in patient's saved profile (MA-05). */
+.med-check {
+  margin-block: var(--space-3) var(--space-4);
+}
+.med-check-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px var(--space-3);
+}
+.med-check-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+.med-check-outcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.med-check-outcome h3 {
+  font-size: var(--text-lg);
+}
+.med-check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.med-check-list > li:first-child {
+  border-top: 0;
+}
+.med-check-list h4 {
+  font-size: var(--text-md);
+}
+.med-check-gaps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: var(--text-sm);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--amber);
+  border-radius: var(--radius-sm);
+  background: var(--amber-soft);
+}
+.med-check-gaps h4 {
+  font-size: var(--text-md);
+}
+.med-check-gaps ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+}
+.med-check-none {
+  font-size: var(--text-sm);
+}
+.med-check-follow-up {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+.med-section-title {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-lg);
+}
+@media (max-width: 767px) {
+  .med-check-gaps {
+    padding-inline: 12px;
+  }
+}

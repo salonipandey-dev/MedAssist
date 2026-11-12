@@ -1,0 +1,128 @@
+{
+  "id": "medassist-fictional-medication-rules",
+  "version": "1.0.0",
+  "is_fictional": true,
+  "description": "Invented products, ingredients, allergies, conditions and rules for the MedAssist medication-check demonstration. None of it describes a real medicine or a real clinical rule.",
+  "ingredients": [
+    { "id": "ing-brivanol", "name": "brivanol" },
+    { "id": "ing-fendrazine", "name": "fendrazine" },
+    { "id": "ing-dorvamide", "name": "dorvamide" },
+    { "id": "ing-sulvaxin", "name": "sulvaxin" },
+    { "id": "ing-teromide", "name": "teromide" },
+    { "id": "ing-pexilene", "name": "pexilene" },
+    { "id": "ing-quellin", "name": "quellin" }
+  ],
+  "products": [
+    {
+      "id": "prd-brivanol-250",
+      "name": "Brivanol 250 tablets",
+      "aliases": ["Brivanol 250", "Brivanol"],
+      "ingredient_ids": ["ing-brivanol"]
+    },
+    {
+      "id": "prd-coldaway-day",
+      "name": "Coldaway Day Relief",
+      "aliases": ["Coldaway Day", "Coldaway"],
+      "ingredient_ids": ["ing-brivanol", "ing-fendrazine"]
+    },
+    {
+      "id": "prd-coldaway-night",
+      "name": "Coldaway Night Relief",
+      "aliases": ["Coldaway Night", "Coldaway"],
+      "ingredient_ids": ["ing-dorvamide", "ing-fendrazine"]
+    },
+    {
+      "id": "prd-sulvaxin",
+      "name": "Sulvaxin capsules",
+      "aliases": ["Sulvaxin"],
+      "ingredient_ids": ["ing-sulvaxin"]
+    },
+    {
+      "id": "prd-teromide",
+      "name": "Teromide tablets",
+      "aliases": ["Teromide"],
+      "ingredient_ids": ["ing-teromide"]
+    },
+    {
+      "id": "prd-pexilene",
+      "name": "Pexilene tablets",
+      "aliases": ["Pexilene"],
+      "ingredient_ids": ["ing-pexilene"]
+    },
+    {
+      "id": "prd-velorin",
+      "name": "Velorin",
+      "aliases": ["Velorin (fictional)"],
+      "ingredient_ids": ["ing-quellin"]
+    }
+  ],
+  "allergies": [
+    {
+      "id": "alg-sulvaxin-group",
+      "name": "Sulvaxin-group sensitivity",
+      "aliases": ["Sulvaxin group", "Sulvaxin sensitivity", "Sulvaxin"],
+      "ingredient_ids": ["ing-sulvaxin"]
+    },
+    {
+      "id": "alg-brivanol",
+      "name": "Brivanol sensitivity",
+      "aliases": ["Brivanol allergy", "Brivanol"],
+      "ingredient_ids": ["ing-brivanol"]
+    },
+    {
+      "id": "alg-pollen-x",
+      "name": "Sample pollen X",
+      "aliases": ["Pollen X"],
+      "ingredient_ids": []
+    }
+  ],
+  "conditions": [
+    { "id": "cnd-k", "name": "Condition K", "aliases": ["Sample condition K"] },
+    { "id": "cnd-q", "name": "Sample condition Q", "aliases": ["Condition Q"] },
+    { "id": "cnd-m", "name": "Condition M", "aliases": ["Sample condition M"] }
+  ],
+  "rules": [
+    {
+      "id": "DEMO-DUP-001",
+      "check": "duplicate_ingredient",
+      "title": "Same ingredient in two recorded medicines",
+      "explanation": "Two recorded medicines list the same invented ingredient in the demo dataset."
+    },
+    {
+      "id": "DEMO-ALG-001",
+      "check": "allergy_ingredient",
+      "title": "Ingredient listed under a recorded allergy",
+      "explanation": "A recorded medicine lists an invented ingredient that the demo dataset places under a recorded allergy."
+    },
+    {
+      "id": "DEMO-INT-001",
+      "check": "medicine_interaction",
+      "title": "Demo interaction: teromide with pexilene",
+      "explanation": "The demo dataset pairs the invented ingredients teromide and pexilene as an interaction example.",
+      "ingredient_ids": ["ing-teromide", "ing-pexilene"]
+    },
+    {
+      "id": "DEMO-INT-002",
+      "check": "medicine_interaction",
+      "title": "Demo interaction: fendrazine with quellin",
+      "explanation": "The demo dataset pairs the invented ingredients fendrazine and quellin as an interaction example.",
+      "ingredient_ids": ["ing-fendrazine", "ing-quellin"]
+    },
+    {
+      "id": "DEMO-CND-001",
+      "check": "medicine_condition",
+      "title": "Demo rule: pexilene with Condition K",
+      "explanation": "The demo dataset lists the invented ingredient pexilene against the invented Condition K.",
+      "ingredient_ids": ["ing-pexilene"],
+      "condition_id": "cnd-k"
+    },
+    {
+      "id": "DEMO-CND-002",
+      "check": "medicine_condition",
+      "title": "Demo rule: dorvamide with Condition M",
+      "explanation": "The demo dataset lists the invented ingredient dorvamide against the invented Condition M.",
+      "ingredient_ids": ["ing-dorvamide"],
+      "condition_id": "cnd-m"
+    }
+  ]
+}

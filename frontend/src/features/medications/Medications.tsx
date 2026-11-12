@@ -7,6 +7,7 @@ import {
   scenarioCoverage,
   type NoticeState,
 } from '../../data/mock/medications';
+import { ProfileCheck } from './ProfileCheck';
 
 const STATE_LABEL: Record<NoticeState, string> = {
   'possible-issue': 'Possible issue (scripted)',
@@ -32,8 +33,10 @@ export function Medications() {
       <PageHeading
         eyebrow="Patient · Medication information"
         title="Medication information demonstration"
-        description="Choose a scripted example to see how medicines, ingredients, allergies and conditions could be shown together. All names are invented."
+        description="Check the medicines, allergies and conditions in your saved Health Profile against fictional demo rules, or step through scripted examples. All names are invented."
       />
+      <ProfileCheck />
+      <h2 className="med-section-title">Scripted examples</h2>
       <Notice kind="safe">
         <strong>Scripted demonstration only.</strong> You cannot enter medicines here. Each notice
         is written in advance for an invented example. Nothing is checked, and the absence of a

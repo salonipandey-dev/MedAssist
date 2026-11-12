@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   AccountApiError,
   getHealthProfile,
+  getMedicationCheck,
   getSession,
   saveHealthProfile,
   signIn,
@@ -205,4 +206,63 @@ describe('account client', () => {
 
     expect((await failure(getSession())).kind).toBe('network');
   });
+
+  it('runs the medication check as a read-only GET with the session cookie', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+    const fetch = stubFetch(json(medicationResult));
+
+    const result = await getMedicationCheck();
+
+    expect(result.matches[0].rule_id).toBe('DEMO-DUP-001');
+    const [url, init] = fetch.mock.calls[0];
+    expect(url).toBe(`${ORIGIN}/api/v1/me/medication-check`);
+    expect(init).toMatchObject({ method: 'GET', cache: 'no-store', credentials: 'include' });
+    expect(init.body).toBeUndefined();
+    expect(init.headers['X-CSRF-Token']).toBeUndefined();
+  });
+
+  it('rejects a medication check whose outcome disagrees with its details', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+    for (const broken of [
+      { ...medicationResult, outcome: 'no_matching_rules' },
+      { ...medicationResult, complete: false },
+      { ...medicationResult, fixture: { ...medicationResult.fixture, is_fictional: false } },
+    ]) {
+      stubFetch(json(broken));
+      expect((await failure(getMedicationCheck())).kind).toBe('unexpected');
+    }
+  });
 });
+
+const medicationResult = {
+  fixture: { id: 'medassist-fictional-medication-rules', version: '1.0.0', is_fictional: true },
+  profile_version: 1,
+  outcome: 'matches_found',
+  complete: true,
+  matches: [
+    {
+      rule_id: 'DEMO-DUP-001',
+      check: 'duplicate_ingredient',
+      title: 'Same ingredient in two recorded medicines',
+      explanation: 'Two recorded medicines list the same invented ingredient in the demo dataset.',
+      entries: [
+        {
+          section: 'medicines',
+          entry: 'Brivanol 250 tablets',
+          matched_id: 'prd-brivanol-250',
+          matched_name: 'Brivanol 250 tablets',
+        },
+        {
+          section: 'medicines',
+          entry: 'Coldaway Day Relief',
+          matched_id: 'prd-coldaway-day',
+          matched_name: 'Coldaway Day Relief',
+        },
+      ],
+      ingredients: ['brivanol'],
+    },
+  ],
+  unresolved: [],
+  missing: [],
+  recognised: [],
+};
