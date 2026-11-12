@@ -557,9 +557,10 @@ class SessionEndTests(DatabaseTestCase):
         self.assertEqual(parse_set_cookie(response).value, "")
         self.assertIsNone(browser.token)
         replay = self.browser()
-        replay.token, replay.csrf = old_token, browser.csrf
         for method, path, kwargs in (("GET", PROFILE, {}), ("PUT", PROFILE, {"json": body_for(0)})):
             with self.subTest(method=method):
+                # Each refusal clears the cookie, so put the old one back every time.
+                replay.token, replay.csrf = old_token, browser.csrf
                 response = replay.request(method, path, **kwargs)
                 self.assertEqual(response.status_code, 401)
                 self.assertEqual(response.json()["code"], "session_expired")

@@ -431,10 +431,10 @@ function ProfileEditor({ session }: { session: AccountSession }) {
                         const noteId = entryId(section, entry.key, 'note');
                         return (
                           <li key={entry.key} className="profile-entry">
-                            <label className="field" htmlFor={nameId}>
-                              <span>
+                            <div className="field">
+                              <label htmlFor={nameId}>
                                 {copy.item} {index + 1}
-                              </span>
+                              </label>
                               <input
                                 id={nameId}
                                 value={entry.name}
@@ -451,9 +451,9 @@ function ProfileEditor({ session }: { session: AccountSession }) {
                                   {nameError}
                                 </span>
                               )}
-                            </label>
-                            <label className="field" htmlFor={noteId}>
-                              <span>Note (optional)</span>
+                            </div>
+                            <div className="field">
+                              <label htmlFor={noteId}>Note (optional)</label>
                               <input
                                 id={noteId}
                                 value={entry.note}
@@ -470,7 +470,7 @@ function ProfileEditor({ session }: { session: AccountSession }) {
                                   {noteError}
                                 </span>
                               )}
-                            </label>
+                            </div>
                             <Button
                               type="button"
                               variant="ghost"

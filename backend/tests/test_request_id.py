@@ -140,13 +140,15 @@ class RequestIDTests(unittest.TestCase):
         self.assertEqual(response.headers.get("Access-Control-Allow-Origin"), allowed_origin)
         self.assertIn("Origin", response.headers["Vary"])
         self.assertEqual(response.headers["Access-Control-Expose-Headers"], "X-Request-ID")
-        self.assertNotIn("Access-Control-Allow-Credentials", response.headers)
+        # Configured origins may send the session cookie, so credentials are allowed.
+        self.assertEqual(response.headers["Access-Control-Allow-Credentials"], "true")
 
         blocked = client.get(
             "/unexpected-error", headers={"Origin": "https://unlisted.example"}
         )
         self.assertEqual(blocked.status_code, 500)
         self.assertNotIn("Access-Control-Allow-Origin", blocked.headers)
+        self.assertNotIn("Access-Control-Allow-Credentials", blocked.headers)
 
     def test_caller_cannot_choose_the_server_request_id(self):
         supplied_id = "caller-controlled-value"

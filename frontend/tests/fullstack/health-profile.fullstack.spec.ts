@@ -37,13 +37,19 @@ async function addEntry(page: Page, section: string, choice: string, item: strin
 
 async function expectPatientAProfile(page: Page) {
   const medicines = region(page, 'Current medicines');
-  await expect(medicines.getByLabel('Medicine 1')).toHaveValue('Tarvexol (fictional)');
-  await expect(medicines.getByLabel('Medicine 2')).toHaveValue('Mirelune (fictional)');
-  await expect(medicines.getByLabel('Note (optional)').first()).toHaveValue('With breakfast');
-  await expect(region(page, 'Allergies').getByLabel('Allergy 1')).toHaveValue('Sample pollen X');
-  await expect(region(page, 'Health conditions').getByLabel('Condition 1')).toHaveValue(
-    'Sample condition Q',
+  await expect(medicines.getByLabel('Medicine 1', { exact: true })).toHaveValue(
+    'Tarvexol (fictional)',
   );
+  await expect(medicines.getByLabel('Medicine 2', { exact: true })).toHaveValue(
+    'Mirelune (fictional)',
+  );
+  await expect(medicines.getByLabel('Note (optional)').first()).toHaveValue('With breakfast');
+  await expect(region(page, 'Allergies').getByLabel('Allergy 1', { exact: true })).toHaveValue(
+    'Sample pollen X',
+  );
+  await expect(
+    region(page, 'Health conditions').getByLabel('Condition 1', { exact: true }),
+  ).toHaveValue('Sample condition Q');
 }
 
 /** A request made by the page itself, so it carries the page's Origin and cookie. */
@@ -139,9 +145,9 @@ test.describe('@after-restart', () => {
     const { context, page } = await newPage(browser);
     await signIn(page, B);
     await expect(page.getByText('Signed in as')).toContainText('Patient B (fictional)');
-    await expect(region(page, 'Current medicines').getByLabel('Medicine 1')).toHaveValue(
-      'Velorin (fictional)',
-    );
+    await expect(
+      region(page, 'Current medicines').getByLabel('Medicine 1', { exact: true }),
+    ).toHaveValue('Velorin (fictional)');
     await expect(
       region(page, 'Allergies').getByRole('radio', { name: 'No known allergies' }),
     ).toBeChecked();
@@ -196,24 +202,26 @@ test.describe('@after-restart', () => {
     await expectPatientAProfile(second);
 
     await region(first, 'Health conditions')
-      .getByLabel('Condition 1')
+      .getByLabel('Condition 1', { exact: true })
       .fill('Sample condition Q (edited in tab 1)');
     await first.getByRole('button', { name: 'Save health profile' }).click();
     await expect(first.getByRole('status').filter({ hasText: /^Saved / })).toBeVisible();
 
     await region(second, 'Health conditions')
-      .getByLabel('Condition 1')
+      .getByLabel('Condition 1', { exact: true })
       .fill('Sample condition Q (edited in tab 2)');
     await second.getByRole('button', { name: 'Save health profile' }).click();
     const alert = second.getByRole('alert').filter({ hasText: 'changed in another tab or device' });
     await expect(alert).toBeVisible();
 
     await alert.getByRole('button', { name: 'Load latest version' }).click();
-    await expect(region(second, 'Health conditions').getByLabel('Condition 1')).toHaveValue(
-      'Sample condition Q (edited in tab 1)',
-    );
+    await expect(
+      region(second, 'Health conditions').getByLabel('Condition 1', { exact: true }),
+    ).toHaveValue('Sample condition Q (edited in tab 1)');
     // Put A's condition back so later phases see the original values.
-    await region(second, 'Health conditions').getByLabel('Condition 1').fill('Sample condition Q');
+    await region(second, 'Health conditions')
+      .getByLabel('Condition 1', { exact: true })
+      .fill('Sample condition Q');
     await second.getByRole('button', { name: 'Save health profile' }).click();
     await expect(second.getByRole('status').filter({ hasText: /^Saved / })).toBeVisible();
     await context.close();

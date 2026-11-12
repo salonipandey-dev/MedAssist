@@ -56,8 +56,8 @@ function SignInForm({ next }: { next: string }) {
           {errors.form}
         </div>
       )}
-      <label className="field" htmlFor={`${id}-email`}>
-        <span>Email</span>
+      <div className="field">
+        <label htmlFor={`${id}-email`}>Email</label>
         <input
           id={`${id}-email`}
           type="email"
@@ -74,9 +74,9 @@ function SignInForm({ next }: { next: string }) {
             {errors.email}
           </span>
         )}
-      </label>
-      <label className="field" htmlFor={`${id}-password`}>
-        <span>Password</span>
+      </div>
+      <div className="field">
+        <label htmlFor={`${id}-password`}>Password</label>
         <input
           id={`${id}-password`}
           type="password"
@@ -93,7 +93,7 @@ function SignInForm({ next }: { next: string }) {
             {errors.password}
           </span>
         )}
-      </label>
+      </div>
       <Button type="submit" className="full-width" disabled={submitting}>
         <LockKeyhole size={15} />
         {submitting ? 'Signing in…' : 'Sign in'}

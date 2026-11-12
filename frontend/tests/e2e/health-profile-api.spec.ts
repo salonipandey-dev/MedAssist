@@ -178,10 +178,12 @@ test('signs in, saves all three sections and shows them again after a reload', a
   });
 
   await page.reload();
-  await expect(region(page, 'Current medicines').getByLabel('Medicine 1')).toHaveValue(
-    'Tarvexol (fictional)',
+  await expect(
+    region(page, 'Current medicines').getByLabel('Medicine 1', { exact: true }),
+  ).toHaveValue('Tarvexol (fictional)');
+  await expect(region(page, 'Allergies').getByLabel('Allergy 1', { exact: true })).toHaveValue(
+    'Sample pollen X',
   );
-  await expect(region(page, 'Allergies').getByLabel('Allergy 1')).toHaveValue('Sample pollen X');
   await expect(page.getByText(/Last saved/)).toBeVisible();
   expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0]);
 });
@@ -213,19 +215,19 @@ test('removing entries, choosing none and validation errors behave as labelled',
 
   await medicines.getByRole('radio', { name: 'I take medicines' }).check();
   await page.getByRole('button', { name: 'Save health profile' }).click();
-  const first = medicines.getByLabel('Medicine 1');
+  const first = medicines.getByLabel('Medicine 1', { exact: true });
   await expect(first).toHaveAttribute('aria-invalid', 'true');
   await expect(first).toBeFocused();
   await expect(page.getByRole('alert')).toContainText('Nothing has been saved yet.');
 
   await first.fill('Velorin (fictional)');
   await medicines.getByRole('button', { name: 'Add medicine' }).click();
-  await medicines.getByLabel('Medicine 2').fill('velorin (FICTIONAL)');
+  await medicines.getByLabel('Medicine 2', { exact: true }).fill('velorin (FICTIONAL)');
   await page.getByRole('button', { name: 'Save health profile' }).click();
   await expect(medicines.getByText('This name is already listed in this section.')).toBeVisible();
 
   await medicines.getByRole('button', { name: /^Remove medicine 2/ }).click();
-  await expect(medicines.getByLabel('Medicine 1')).toBeFocused();
+  await expect(medicines.getByLabel('Medicine 1', { exact: true })).toBeFocused();
   await region(page, 'Allergies').getByRole('radio', { name: 'No known allergies' }).check();
   await page.getByRole('button', { name: 'Save health profile' }).click();
   await expect(page.getByRole('status').filter({ hasText: /^Saved / })).toBeVisible();
@@ -285,9 +287,9 @@ test('signing out clears the profile from the page', async ({ page }) => {
     medicines: { state: 'recorded', entries: [{ name: 'Velorin (fictional)', note: null }] },
   };
   await page.goto(ROUTE);
-  await expect(region(page, 'Current medicines').getByLabel('Medicine 1')).toHaveValue(
-    'Velorin (fictional)',
-  );
+  await expect(
+    region(page, 'Current medicines').getByLabel('Medicine 1', { exact: true }),
+  ).toHaveValue('Velorin (fictional)');
 
   await page.getByRole('button', { name: 'Sign out' }).click();
 
@@ -309,7 +311,7 @@ test('the health profile works by keyboard', async ({ page }) => {
   await expect(medicines.getByRole('radio', { name: 'I take no medicines' })).toBeChecked();
   await page.keyboard.press('ArrowRight');
   await expect(medicines.getByRole('radio', { name: 'I take medicines' })).toBeChecked();
-  await expect(medicines.getByLabel('Medicine 1')).toBeFocused();
+  await expect(medicines.getByLabel('Medicine 1', { exact: true })).toBeFocused();
   await page.keyboard.type('Tarvexol (fictional)');
   await page.keyboard.press('Tab');
   await expect(medicines.getByLabel('Note (optional)')).toBeFocused();

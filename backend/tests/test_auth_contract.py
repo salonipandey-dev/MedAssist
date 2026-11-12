@@ -68,12 +68,14 @@ class PrivateEndpointContractTests(unittest.TestCase):
                 self.assertEqual(response.headers["pragma"], "no-cache")
 
     def test_without_a_database_private_routes_report_unavailable(self):
+        # A session cookie makes the routes look the session up in PostgreSQL.
+        cookie = {"Cookie": "medassist_session=fictional-session-token"}
         for database_url in ("", UNREACHABLE_URL):
             client = self.make_client(database_url)
             with self.subTest(database_url=bool(database_url)):
                 for method, path, kwargs in (
-                    ("GET", PROFILE, {}),
-                    ("GET", "/api/v1/auth/session", {}),
+                    ("GET", PROFILE, {"headers": cookie}),
+                    ("GET", "/api/v1/auth/session", {"headers": cookie}),
                     (
                         "POST",
                         SIGN_IN,
@@ -137,6 +139,14 @@ class PrivateEndpointContractTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 403, response.text)
                     self.assertEqual(response.json()["code"], "origin_not_allowed")
                     self.assertNotIn("access-control-allow-origin", response.headers)
+
+    def test_without_a_cookie_no_database_lookup_is_needed(self):
+        client = self.make_client(UNREACHABLE_URL)
+        for path in (PROFILE, "/api/v1/auth/session"):
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(response.status_code, 401)
+                self.assertEqual(response.json()["code"], "not_signed_in")
 
     def test_allowed_and_same_origin_writes_reach_the_database_step(self):
         client = self.make_client()
