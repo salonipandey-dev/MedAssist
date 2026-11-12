@@ -8,6 +8,7 @@ Every person and entry here is fictional.
 """
 
 import hashlib
+import json
 import logging
 import os
 import unittest
@@ -682,3 +683,110 @@ class DemoSeedTests(DatabaseTestCase):
         fresh = self.browser()
         fresh.sign_in(PATIENT_A)
         self.assertEqual(fresh.profile()["version"], 0)
+
+
+CHECK = "/api/v1/me/medication-check"
+
+
+class MedicationCheckTests(DatabaseTestCase):
+    """The demo medication check reads each patient's own saved profile."""
+
+    def check(self, browser):
+        response = browser.request("GET", CHECK)
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.headers["cache-control"], "no-store")
+        return response.json()
+
+    def test_signed_out_and_ended_sessions_are_refused(self):
+        anonymous = self.browser()
+        response = anonymous.request("GET", CHECK)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["code"], "not_signed_in")
+
+        browser = self.browser()
+        browser.sign_in(PATIENT_A)
+        digest = hashlib.sha256(browser.token.encode()).hexdigest()
+        self.sql(
+            "UPDATE auth_sessions SET idle_expires_at = now() - interval '1 minute'"
+            " WHERE token_hash = :h",
+            h=digest,
+        )
+        response = browser.request("GET", CHECK)
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["code"], "session_expired")
+
+    def test_each_account_gets_results_from_its_own_profile(self):
+        a, b = self.browser(), self.browser()
+        a.sign_in(PATIENT_A)
+        b.sign_in(PATIENT_B)
+        a.save(
+            body_for(
+                0,
+                medicines=section("recorded", "Brivanol 250 tablets", "Coldaway Day Relief"),
+                allergies=section("none"),
+                conditions=section("none"),
+            )
+        )
+
+        a_result, b_result = self.check(a), self.check(b)
+
+        self.assertEqual(a_result["outcome"], "matches_found")
+        self.assertEqual([m["rule_id"] for m in a_result["matches"]], ["DEMO-DUP-001"])
+        self.assertEqual(a_result["profile_version"], 1)
+        # B's seeded profile: Velorin, allergies none, conditions not recorded.
+        self.assertEqual(b_result["outcome"], "more_information_needed")
+        self.assertEqual(b_result["matches"], [])
+        self.assertEqual([m["section"] for m in b_result["missing"]], ["conditions"])
+        self.assertEqual(
+            [e["matched_id"] for e in b_result["recognised"]], ["prd-velorin"]
+        )
+        self.assertNotIn("Brivanol", json.dumps(b_result))
+        self.assertEqual(b_result["fixture"]["version"], "1.0.0")
+
+    def test_the_owner_cannot_be_chosen_by_the_request(self):
+        browser = self.browser()
+        browser.sign_in(PATIENT_B)
+        a_id = self.account_id(PATIENT_A)
+        for query in (f"account_id={a_id}", f"profile_id={a_id}"):
+            with self.subTest(query=query):
+                response = browser.request("GET", f"{CHECK}?{query}")
+                self.assertEqual(response.status_code, 400)
+        self.assertEqual(browser.request("GET", f"{CHECK}/{a_id}").status_code, 404)
+        self.assertEqual(browser.request("POST", CHECK, json={}).status_code, 405)
+
+    def test_removing_a_medicine_clears_the_duplicate_warning(self):
+        browser = self.browser()
+        browser.sign_in(PATIENT_A)
+        browser.save(
+            body_for(
+                0,
+                medicines=section("recorded", "Coldaway Day Relief", "Brivanol 250 tablets"),
+                allergies=section("none"),
+                conditions=section("none"),
+            )
+        )
+        self.assertEqual([m["rule_id"] for m in self.check(browser)["matches"]], ["DEMO-DUP-001"])
+
+        browser.save(
+            body_for(
+                1,
+                medicines=section("recorded", "Coldaway Day Relief"),
+                allergies=section("none"),
+                conditions=section("none"),
+            )
+        )
+        result = self.check(browser)
+
+        self.assertEqual(result["matches"], [])
+        self.assertEqual(result["outcome"], "no_matching_rules")
+        self.assertEqual(result["profile_version"], 2)
+
+    def test_the_check_changes_nothing(self):
+        browser = self.browser()
+        browser.sign_in(PATIENT_B)
+        before = self.sql("SELECT version, updated_at FROM health_profiles").all()
+
+        self.check(browser)
+        self.check(browser)
+
+        self.assertEqual(self.sql("SELECT version, updated_at FROM health_profiles").all(), before)

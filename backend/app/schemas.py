@@ -7,7 +7,7 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.models import ENTRIES_PER_SECTION_MAX, ENTRY_NAME_MAX, ENTRY_NOTE_MAX
+from app.limits import ENTRIES_PER_SECTION_MAX, ENTRY_NAME_MAX, ENTRY_NOTE_MAX
 
 
 class WelcomeResponse(BaseModel):
@@ -268,3 +268,79 @@ class HealthProfileResponse(BaseModel):
     medicines: ProfileSection
     allergies: ProfileSection
     conditions: ProfileSection
+
+
+# --- Medication checks against the fictional demo rules (MA-05) --------------
+
+
+class CheckKind(str, Enum):
+    duplicate_ingredient = "duplicate_ingredient"
+    allergy_ingredient = "allergy_ingredient"
+    medicine_interaction = "medicine_interaction"
+    medicine_condition = "medicine_condition"
+
+
+ProfileSectionName = Literal["medicines", "allergies", "conditions"]
+
+
+class CheckedEntry(BaseModel):
+    """A saved profile entry and the demo dataset record it was matched to."""
+
+    section: ProfileSectionName
+    entry: str = Field(description="The entry name exactly as saved in the profile.")
+    matched_id: str = Field(description="Stable fixture ID, for example `prd-velorin`.")
+    matched_name: str
+
+
+class RuleMatch(BaseModel):
+    rule_id: str = Field(description="Stable fixture rule ID, for example `DEMO-DUP-001`.")
+    check: CheckKind
+    title: str
+    explanation: str
+    entries: List[CheckedEntry] = Field(description="The saved entries the rule matched.")
+    ingredients: List[str] = Field(description="Invented ingredient names involved.")
+
+
+class UnresolvedEntry(BaseModel):
+    section: ProfileSectionName
+    entry: str
+    reason: Literal["unknown", "ambiguous"] = Field(
+        description=(
+            "`unknown`: no demo record has this name, alias or ID. `ambiguous`: "
+            "more than one demo record does, so it needs a more specific name."
+        )
+    )
+    candidates: List[str] = Field(description="Demo record names it could mean; empty if unknown.")
+
+
+class MissingInformation(BaseModel):
+    section: ProfileSectionName
+    reason: Literal["not_recorded"]
+    affected_checks: List[CheckKind]
+
+
+class MedicationFixtureInfo(BaseModel):
+    id: str
+    version: str
+    is_fictional: Literal[True]
+
+
+class MedicationCheckResponse(BaseModel):
+    """What the fictional demo rules found for the signed-in patient's saved profile.
+
+    `matches_found` can come with `complete: false`: some rules matched while
+    other entries or sections could not be checked. `no_matching_rules` is only
+    returned when every input was covered."""
+
+    fixture: MedicationFixtureInfo
+    profile_version: int
+    outcome: Literal["matches_found", "no_matching_rules", "more_information_needed"]
+    complete: bool = Field(
+        description="True when every saved section is recorded and every entry was recognised."
+    )
+    matches: List[RuleMatch]
+    unresolved: List[UnresolvedEntry]
+    missing: List[MissingInformation]
+    recognised: List[CheckedEntry] = Field(
+        description="Saved entries the demo dataset recognised, in section order."
+    )

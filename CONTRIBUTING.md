@@ -79,8 +79,9 @@ The browser suite serves the compiled build, so rebuild after source changes.
 Keep mock workflow rules in `src/data/mock/service.ts`, records in `seed.ts`,
 and chart aggregates in `analytics.ts`. Use shared typed records across views.
 Only `src/services/api/system.ts` (liveness), `src/services/api/consultations.ts`
-(read-only directory search) and `src/services/api/account.ts` (sign-in and the
-signed-in patient's own health profile) may contact the API, all through the origin
+(read-only directory search) and `src/services/api/account.ts` (sign-in, the
+signed-in patient's own health profile and its demo medication check) may contact
+the API, all through the origin
 check in `src/services/api/origin.ts`. Only the account client sends the session
 cookie, and it keeps the CSRF token in memory.
 Health inputs and credentials belong only on the sign-in and Health Profile screens,

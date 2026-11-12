@@ -302,3 +302,109 @@ test.describe('@expired', () => {
     await ui.context.close();
   });
 });
+
+// MA-05: the demo medication check reads each patient's saved profile on the server.
+const MEDICATIONS = '/app/patient/medications';
+const checkPanel = (page: Page) => page.getByRole('region', { name: 'Check my saved profile' });
+
+/** Replace every entry in a section with `names` (recorded), then leave it unsaved. */
+async function replaceEntries(
+  page: Page,
+  section: string,
+  choice: string,
+  item: string,
+  names: string[],
+) {
+  const area = region(page, section);
+  await area.getByRole('radio', { name: choice }).check();
+  const remove = area.getByRole('button', { name: /^Remove / });
+  while ((await remove.count()) > 0) await remove.first().click();
+  for (const name of names) {
+    await area.getByRole('button', { name: /^Add / }).click();
+    await area
+      .getByLabel(new RegExp(`^${item} \\d+$`))
+      .last()
+      .fill(name);
+  }
+}
+
+async function saveProfile(page: Page) {
+  await page.getByRole('button', { name: 'Save health profile' }).click();
+  await expect(page.getByRole('status').filter({ hasText: /^Saved / })).toBeVisible();
+}
+
+async function runCheck(page: Page) {
+  await page.goto(MEDICATIONS);
+  const panel = checkPanel(page);
+  await panel.getByRole('button', { name: 'Check my saved profile' }).click();
+  await expect(panel.getByRole('heading', { level: 3 })).toBeVisible();
+  return panel;
+}
+
+test.describe('@medication-check', () => {
+  test('a shared ingredient is flagged, and the warning clears when one medicine is removed', async ({
+    browser,
+  }) => {
+    const { context, page } = await newPage(browser, 'patient-a');
+    await page.goto(ROUTE);
+    await expect(region(page, 'Current medicines')).toBeVisible();
+    await replaceEntries(page, 'Current medicines', 'I take medicines', 'Medicine', [
+      'Brivanol 250 tablets',
+      'Coldaway Day Relief',
+    ]);
+    await region(page, 'Allergies').getByRole('radio', { name: 'No known allergies' }).check();
+    await region(page, 'Health conditions')
+      .getByRole('radio', { name: 'No conditions to list' })
+      .check();
+    await saveProfile(page);
+
+    let panel = await runCheck(page);
+    await expect(panel.getByRole('heading', { name: '1 demo rule matched' })).toBeVisible();
+    const warning = panel.getByRole('list', { name: 'Matched demo rules' }).getByRole('listitem');
+    await expect(warning).toHaveCount(1);
+    await expect(warning).toContainText('Same ingredient in two recorded medicines');
+    await expect(warning).toContainText('Brivanol 250 tablets (medicine)');
+    await expect(warning).toContainText('Coldaway Day Relief (medicine)');
+    await expect(warning).toContainText('brivanol');
+    await expect(warning).toContainText('DEMO-DUP-001');
+    await expect(panel.getByText('More information needed')).toHaveCount(0);
+
+    await panel.getByRole('link', { name: 'Open Health Profile' }).click();
+    await expect(page).toHaveURL(new RegExp(`${ROUTE}$`));
+    await region(page, 'Current medicines')
+      .getByRole('button', { name: /^Remove medicine 2/ })
+      .click();
+    await saveProfile(page);
+
+    panel = await runCheck(page);
+    await expect(panel.getByRole('heading', { name: 'No matching demo rules' })).toBeVisible();
+    await expect(panel.getByRole('list', { name: 'Matched demo rules' })).toHaveCount(0);
+    await context.close();
+  });
+
+  test('each account gets results from its own saved profile; signed-out requests are refused', async ({
+    browser,
+  }) => {
+    const b = await newPage(browser);
+    await signIn(b.page, B);
+    const panel = await runCheck(b.page);
+    // B's seeded profile: Velorin, allergies none, conditions not recorded.
+    await expect(panel.getByRole('heading', { name: 'More information needed' })).toBeVisible();
+    await expect(panel).toContainText('Velorin (fictional) → Velorin');
+    await expect(panel).toContainText('Conditions: not recorded');
+    await expect(panel).not.toContainText('Brivanol');
+    const result = await apiFromPage(b.page, 'GET', '/api/v1/me/medication-check');
+    expect(result.status).toBe(200);
+    expect(result.cacheControl).toBe('no-store');
+    expect(JSON.parse(result.text).fixture.version).toBe('1.0.0');
+    await b.context.close();
+
+    const anonymous = await newPage(browser);
+    await anonymous.page.goto('/');
+    const refused = await apiFromPage(anonymous.page, 'GET', '/api/v1/me/medication-check');
+    expect(refused.status).toBe(401);
+    await anonymous.page.goto(MEDICATIONS);
+    await expect(checkPanel(anonymous.page).getByRole('link', { name: 'Sign in' })).toBeVisible();
+    await anonymous.context.close();
+  });
+});
