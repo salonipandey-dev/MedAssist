@@ -253,11 +253,13 @@ export function Home() {
           <ul className="boundary-list">
             <li>
               <ShieldCheck size={18} />
-              No sign-in or server-side permissions. Demo roles are switched in the browser.
+              Demo roles are switched in the browser, without sign-in. Only the private Health
+              Profile signs in, with fictional demo accounts, when the API is connected.
             </li>
             <li>
               <ShieldCheck size={18} />
-              No stored patient data. Records are fictional and reset when the page reloads.
+              Role-demo records are fictional and reset when the page reloads. Only Health Profile
+              entries are saved, to a fictional account.
             </li>
             <li>
               <ShieldCheck size={18} />
@@ -406,8 +408,9 @@ export function PlatformPage({
         <div className="mt-6">
           <Notice>
             <strong>What you can explore today:</strong> an interactive frontend with fictional
-            records. Secure sign-in, persistent patient management, real scheduling, private file
-            storage and AI inference still require backend implementation.
+            records, and, with the API connected, sign-in to a private Health Profile for fictional
+            accounts. Production-grade authentication, wider patient record storage, real
+            scheduling, private file storage and AI inference still require further work.
           </Notice>
         </div>
       </section>
@@ -475,16 +478,19 @@ export function SecurityPage() {
       <section className="container security-content">
         <Notice kind="safe">
           <strong>Use fictional data only.</strong> This demonstration does not provide medical
-          advice, emergency handling, secure patient storage or real authentication. Do not enter
-          personal health information.
+          advice, emergency handling or production-grade authentication and storage. The Health
+          Profile sign-in is a prototype for fictional accounts. Do not enter personal health
+          information.
         </Notice>
         <div className="grid-2 mt-6">
           <Panel title="Built into this frontend" action={<Badge tone="teal">Implemented</Badge>}>
             <ul className="security-list">
               {[
                 'Fictional records and fixed sample assessments',
-                'No editable clinical inputs or real report uploads',
+                'No clinical assessment inputs or real report uploads',
                 'In-memory demo changes, cleared on page reload',
+                'Health Profile: Argon2id passwords, server-side sessions, owner-only access',
+                'Health Profile entries are stored, never analysed or checked',
                 'Separate mock workflows and system API client',
                 'Unavailable AI outputs are explicitly labeled',
                 'Human-review records separate from future predictions',
@@ -499,9 +505,9 @@ export function SecurityPage() {
           <Panel title="Required before real use" action={<Badge>Planned</Badge>}>
             <ul className="security-list">
               {[
-                'Authentication with secure credential handling',
-                'Server-enforced roles and record ownership',
-                'Persistent data model and database migrations',
+                'Production authentication: rate limits, account recovery, review',
+                'Server-enforced roles for doctors and administrators',
+                'Persistent storage for cases, appointments and reviews',
                 'Private report storage and authorized access',
                 'Production audit logging and operational controls',
                 'Formal clinical and security evaluation',
@@ -604,7 +610,7 @@ export function AboutPage() {
               {
                 icon: Database,
                 title: 'Future work',
-                copy: 'Authentication, authorized persistence and validated research integration.',
+                copy: 'Production-grade authentication, wider authorized persistence and validated research integration.',
               },
             ].map((m, i) => (
               <div className="principle-row" key={m.title}>

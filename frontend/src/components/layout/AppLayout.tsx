@@ -9,6 +9,7 @@ import {
   HeartPulse,
   History,
   LayoutDashboard,
+  LockKeyhole,
   LogOut,
   Menu,
   PanelLeftClose,
@@ -34,6 +35,7 @@ export const NAV: Record<Role, { path: string; label: string; icon: typeof Activ
   patient: [
     { path: '', label: 'Overview', icon: LayoutDashboard },
     { path: 'profile', label: 'My Profile', icon: UserRound },
+    { path: 'health-profile', label: 'Health Profile', icon: LockKeyhole },
     { path: 'history', label: 'Health History', icon: History },
     { path: 'assessments', label: 'Assessments', icon: ClipboardList },
     { path: 'cases', label: 'My Cases', icon: HeartPulse },
@@ -254,7 +256,11 @@ export function AppLayout() {
         </header>
         <div className="demo-ribbon">
           <ShieldCheck size={14} />
-          <span>Academic prototype · Fictional records only · Changes reset on reload</span>
+          <span>
+            {pathname.endsWith('/health-profile')
+              ? 'Academic prototype · Fictional accounts only · Saved to your signed-in account'
+              : 'Academic prototype · Fictional records only · Changes reset on reload'}
+          </span>
           <Link to="/security">
             About privacy <ArrowUpRight size={12} />
           </Link>

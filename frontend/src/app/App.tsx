@@ -21,6 +21,12 @@ const AboutPage = lazy(() =>
 const DemoAccess = lazy(() =>
   import('../features/auth/DemoAccess').then((m) => ({ default: m.DemoAccess })),
 );
+const SignIn = lazy(() =>
+  import('../features/account/SignIn').then((m) => ({ default: m.SignIn })),
+);
+const HealthProfilePage = lazy(() =>
+  import('../features/account/HealthProfile').then((m) => ({ default: m.HealthProfilePage })),
+);
 const Consultations = lazy(() =>
   import('../features/consultations/Consultations').then((m) => ({ default: m.Consultations })),
 );
@@ -142,12 +148,13 @@ export function App() {
                 <Route path="security" element={<SecurityPage />} />
                 <Route path="about" element={<AboutPage />} />
                 <Route path="demo" element={<DemoAccess />} />
-                <Route path="sign-in" element={<Navigate to="/demo" replace />} />
+                <Route path="sign-in" element={<SignIn />} />
               </Route>
               <Route path="/app" element={<Navigate to="/demo" replace />} />
               <Route path="/app/patient" element={<AppLayout />}>
                 <Route index element={<PatientOverview />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="health-profile" element={<HealthProfilePage />} />
                 <Route path="history" element={<PatientHistory />} />
                 <Route path="notifications" element={<ActivityView role="patient" />} />
                 <Route path="assessments" element={<Assessment />} />

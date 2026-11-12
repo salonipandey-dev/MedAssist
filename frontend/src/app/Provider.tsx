@@ -2,6 +2,7 @@ import { MotionConfig } from 'motion/react';
 import { createContext, useContext, useEffect, useReducer, useState, type ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import { createSeed } from '../data/mock/seed';
+import { AccountProvider } from '../features/account/AccountProvider';
 import { demoReducer, type DemoAction } from '../data/mock/service';
 import type { DemoState } from '../types';
 interface Context {
@@ -30,7 +31,7 @@ export function Provider({ children }: { children: ReactNode }) {
       }}
     >
       <MotionConfig reducedMotion="user">
-        {children}
+        <AccountProvider>{children}</AccountProvider>
         <Toaster position="bottom-right" theme={theme} richColors closeButton />
       </MotionConfig>
     </DemoContext.Provider>

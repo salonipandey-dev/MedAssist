@@ -11,10 +11,13 @@ def create_database_engine(url: URL) -> Engine:
     """Build a small pool that fails fast when PostgreSQL is unreachable.
 
     Connections are opened only when a route asks for one, so the system
-    endpoints keep responding while the database is down.
+    endpoints keep responding while the database is down. Bound values (such
+    as profile entries or password hashes) are left out of SQLAlchemy's log
+    lines and error messages.
     """
     return create_engine(
         url,
+        hide_parameters=True,
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=5,

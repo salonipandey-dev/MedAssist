@@ -54,8 +54,8 @@ The header role selector changes perspective without discarding in-memory change
 | Experience | Routes |
 | --- | --- |
 | Public | `/`, `/platform`, `/how-it-works`, `/patients`, `/professionals`, `/security`, `/about`, `/demo` |
-| Access aliases | `/sign-in` and `/app` redirect to `/demo` |
-| Patient | `/app/patient`, `/profile`, `/history`, `/assessments`, `/cases`, `/cases/:caseId`, `/appointments`, `/consultations`, `/medications`, `/reports`, `/notifications`, `/settings` (suffixes relative to `/app/patient`) |
+| Sign-in | `/sign-in` (fictional accounts; needs `VITE_API_BASE_URL`). `/app` redirects to `/demo` |
+| Patient | `/app/patient`, `/profile`, `/health-profile`, `/history`, `/assessments`, `/cases`, `/cases/:caseId`, `/appointments`, `/consultations`, `/medications`, `/reports`, `/notifications`, `/settings` (suffixes relative to `/app/patient`) |
 | Doctor | `/app/doctor`, `/cases`, `/cases/:caseId`, `/patients`, `/reviews`, `/reviews/:caseId`, `/appointments`, `/schedule`, `/activity`, `/settings` (suffixes relative to `/app/doctor`) |
 | Administrator | `/app/admin`, `/users`, `/doctors`, `/cases`, `/cases/:caseId`, `/appointments`, `/reports`, `/analytics`, `/audit`, `/settings` (suffixes relative to `/app/admin`) |
 | Preserved prototype | `/legacy/index.html` |
@@ -75,6 +75,7 @@ frontend/
       charts/               Recharts trends/distributions and accessible data tables
     features/
       auth/                 Fictional role access and settings (no authentication)
+      account/              Sign-in, session context and the private Health Profile
       patient/              Overview, history, notifications and validated profile preferences
       doctor/               Review queue, split-panel review, patient context and schedule
       admin/                User directory, analytics and sample audit viewer
@@ -84,7 +85,7 @@ frontend/
       reports/              Safe document previews and unavailable-upload explanation
     pages/public/           Public content, coded UI previews and SVG artwork
     data/mock/              Typed seed, pure reducer and derived analytics
-    services/api/           Existing read-only FastAPI liveness client only
+    services/api/           FastAPI clients: liveness, directory search, sign-in and health profile
     hooks/                  Responsive media-query hook
     types/                  Shared domain contracts
     styles/                 Tokens, light/dark themes, responsive compositions
@@ -113,19 +114,22 @@ The React context owns temporary state. The pure reducer centralizes mutation ru
 | Analytics | Date-filtered charts, tooltips, accessible summaries and synthetic CSV export | Sample Data only; no real hospital metrics |
 | Audit activity | Searchable chronological sample and session events | Not a secure, immutable production audit trail |
 | System API | Optional GET `/health` with no-store, timeout, response validation and request ID | Liveness only, not database readiness |
-| Authentication / storage | Explicit unavailable states | No credentials, sessions, JWT, database or private file storage |
+| Sign-in / health profile | `/sign-in` and `/app/patient/health-profile`: Argon2id passwords, server-side sessions in an HttpOnly SameSite=Strict cookie, CSRF token held in memory, owner-only GET/PUT of medicines, allergies and conditions with "not recorded", "none" and "recorded" states, validation, save confirmation, version conflicts, ended sessions and sign-out clearing (`features/account`, `services/api/account.ts`) | Two fictional accounts from an explicit dev seed; no registration, recovery, attempt limits or doctor/admin roles; entries are stored, never analysed or checked; role demos still have no authentication or private file storage |
 | Consultation comparison | Directory API view with server-side search and specialty/mode/fee filters, loading, empty, not-connected and error states with Retry, details dialog and comparison of up to three listings kept by ID; separate offline demo at `?source=offline` (`features/consultations`, `services/api/consultations.ts`, `data/mock/consultations.ts`) | Every seeded record is fictional with illustrative fees; no real listings, verified free services, availability, contact or booking. Specialty choices are a fixed list and only the first 50 matches are shown |
 | Medication information | Six scripted examples with invented medicine, ingredient, allergy and condition names; possible issues shown separately from missing information (`features/medications`, `data/mock/medications.ts`) | Demonstration only: no input, no medicine reference source and no checking; no notice is not a safety statement |
 | AI / SHAP | Nonfunctional conceptual panel, proposed labels and unavailable provenance | Dataset permission, training, evaluation, integration and appropriate validation required |
 
 ## Optional connection to the actual FastAPI service
 
-Two read-only endpoints are wired: liveness and the consultation directory. Mock profiles, appointments, cases and reviews never call the backend.
+Three areas are wired: liveness, the consultation directory, and sign-in with the private health profile. Mock profiles, appointments, cases and reviews never call the backend.
 
 1. In `frontend`, copy `.env.example` to `.env.local` (`Copy-Item` in PowerShell, `cp` in Unix). Set `VITE_API_BASE_URL=http://127.0.0.1:8000`. Vite must be restarted after configuration changes; rebuild for production preview.
 2. Start the existing backend from `backend`, following the root README. Set `MEDASSIST_CORS_ORIGINS` to the exact browser origin, e.g. `http://127.0.0.1:5173` for Vite or `http://127.0.0.1:4173` for preview.
 3. In Administrator → System Settings, select **Check API liveness**. Errors explain missing configuration or an unavailable service. Success displays the service version and exposed `X-Request-ID`.
 4. For Find Consultations, also set up PostgreSQL as described in the root README (migrate, seed, `MEDASSIST_DATABASE_URL`). Open `/app/patient/consultations`: the nine seeded fictional listings load from `GET /api/v1/consultations`. Stop PostgreSQL to see the error state with its request ID, start it again and select **Retry**.
+5. For the Health Profile, run `python -m app.seed_demo_accounts` with `MEDASSIST_ALLOW_DEMO_ACCOUNTS=1`, then open `/sign-in`. Serve the frontend and API on the same host name (both `127.0.0.1`), because the session cookie is `SameSite=Strict`. [Sign-in and private health profiles](HEALTH_PROFILE_API.md) has the contract and a two-account walkthrough.
+
+The account client (`services/api/account.ts`) is the only one that sends the session cookie (`credentials: 'include'`). It validates every response with Zod, sends `X-CSRF-Token` on writes, keeps nothing in browser storage, and maps `401`, `403`, `409`, `422` and `503` to distinct states. The session is checked only when the sign-in or Health Profile screen opens, so other pages send no account request.
 
 The client rejects invalid origins and credential-bearing URLs. It sends a credential-free GET to `/health`, with `cache: no-store` and a five-second timeout. It validates `{ status: 'ok', service: 'medassist-api', version: string }`. There are no invented patient, JWT, Express or ML endpoints.
 
@@ -146,7 +150,9 @@ npm run format:check
 npm run screenshots:report   # after a committed build; writes docs/screenshots/report/ and docs/SCREENSHOT_MANIFEST.md
 ```
 
-`npm run test:e2e` also builds a second copy of the app with a placeholder API origin (`dist-e2e-api`) and answers its directory requests inside the tests, so the browser suite needs no backend or database.
+`npm run test:e2e` also builds a second copy of the app with a placeholder API origin (`dist-e2e-api`) and answers its directory, sign-in and health profile requests inside the tests, so the browser suite needs no backend or database.
+
+`playwright.fullstack.config.ts` runs `tests/fullstack/` against a real FastAPI server and PostgreSQL. It is meant for the [Health profile (full stack) workflow](../.github/workflows/health-profile-fullstack.yml), which starts the API, restarts it between phases and expires a session in the database.
 
 On Linux CI or a minimal container, use `npx playwright install --with-deps chromium` to install required browser system libraries as well. Playwright is pinned and its core dependency is aligned to keep browser tooling reproducible.
 
