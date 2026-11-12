@@ -159,8 +159,8 @@ export function Settings({ role }: { role: Role }) {
             <div className="padded" style={{ paddingTop: 0 }}>
               <ul className="settings-boundaries">
                 {[
-                  'No real authentication or patient accounts',
-                  'No persistent health information',
+                  'Sign-in only for fictional Health Profile accounts',
+                  'Only fictional Health Profile entries are saved',
                   'No trained or integrated clinical model',
                   'No real report upload or storage',
                   'No regulatory or clinical certification claimed',

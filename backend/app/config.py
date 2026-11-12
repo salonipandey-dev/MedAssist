@@ -1,8 +1,9 @@
-"""Environment settings for the browser frontend and the database."""
+"""Environment settings for the browser frontend, the database and sign-in sessions."""
 
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 from urllib.parse import urlsplit
 
 from sqlalchemy.engine import URL, make_url
@@ -71,3 +72,46 @@ def get_database_url(variable: str = DATABASE_URL_ENV) -> URL | None:
             "Example: postgresql://USER:PASSWORD@localhost:5432/medassist"
         )
     return url.set(drivername="postgresql+psycopg")
+
+
+SESSION_IDLE_MINUTES_ENV = "MEDASSIST_SESSION_IDLE_MINUTES"
+SESSION_MAX_HOURS_ENV = "MEDASSIST_SESSION_MAX_HOURS"
+COOKIE_SECURE_ENV = "MEDASSIST_COOKIE_SECURE"
+
+
+@dataclass(frozen=True)
+class SessionSettings:
+    """How long a sign-in lasts and how its cookie is sent.
+
+    A session ends after `idle_minutes` without a request, or `max_hours` after
+    sign-in, whichever comes first. `always_secure` forces the Secure cookie
+    attribute when TLS ends at a proxy and the API itself sees plain HTTP;
+    otherwise the attribute follows the request scheme.
+    """
+
+    idle_minutes: int = 30
+    max_hours: int = 8
+    always_secure: bool = False
+
+
+def _bounded_int(variable: str, default: int, low: int, high: int) -> int:
+    value = os.getenv(variable, "").strip()
+    if not value:
+        return default
+    if not value.isdigit() or not low <= int(value) <= high:
+        raise ValueError(f"{variable} must be a whole number from {low} to {high}.")
+    return int(value)
+
+
+def get_session_settings() -> SessionSettings:
+    secure = os.getenv(COOKIE_SECURE_ENV, "").strip().lower()
+    if secure not in {"", "auto", "true"}:
+        raise ValueError(
+            f"{COOKIE_SECURE_ENV} must be 'auto' (Secure on HTTPS requests) or 'true' "
+            "(always Secure, for an API behind a TLS-terminating proxy)."
+        )
+    return SessionSettings(
+        idle_minutes=_bounded_int(SESSION_IDLE_MINUTES_ENV, 30, 1, 24 * 60),
+        max_hours=_bounded_int(SESSION_MAX_HOURS_ENV, 8, 1, 7 * 24),
+        always_secure=secure == "true",
+    )

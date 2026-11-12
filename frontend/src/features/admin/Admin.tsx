@@ -408,7 +408,7 @@ export function UserManagement({ doctorsOnly = false }: { doctorsOnly?: boolean 
               </div>
               <div>
                 <dt>Real authentication</dt>
-                <dd>Not implemented</dd>
+                <dd>Prototype sign-in for fictional patients only</dd>
               </div>
             </dl>
             <div className="mt-6">

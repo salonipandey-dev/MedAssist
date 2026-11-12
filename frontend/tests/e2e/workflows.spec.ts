@@ -10,11 +10,13 @@ const publicRoutes = [
   '/security',
   '/about',
   '/demo',
+  '/sign-in',
 ];
 const roleRoutes = {
   patient: [
     '',
     'profile',
+    'health-profile',
     'history',
     'assessments',
     'cases',
@@ -296,8 +298,10 @@ for (const dark of [false, true])
     for (const path of [
       '/',
       '/demo',
+      '/sign-in',
       '/app/patient',
       '/app/patient/profile',
+      '/app/patient/health-profile',
       '/app/patient/appointments',
       '/app/doctor/reviews',
       '/app/admin',

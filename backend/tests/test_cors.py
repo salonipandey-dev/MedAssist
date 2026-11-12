@@ -35,14 +35,16 @@ class CorsTests(unittest.TestCase):
                 self.assertEqual(response.json()["status"], "ok")
                 self.assertEqual(response.headers["access-control-allow-origin"], origin)
                 self.assertIn("Origin", response.headers["vary"])
-                self.assertNotIn("access-control-allow-credentials", response.headers)
+                # Credentials (the session cookie) are allowed for exact listed
+                # origins only; the wildcard origin is never accepted.
+                self.assertEqual(response.headers["access-control-allow-credentials"], "true")
 
         response = client.get("/health", headers={"Origin": "https://unlisted.example"})
         self.assertNotIn("access-control-allow-origin", response.headers)
 
-    def test_preflight_allows_get_and_head_from_a_configured_origin(self):
+    def test_preflight_allows_reads_and_account_writes_from_a_configured_origin(self):
         client = self.make_client("http://localhost:5173")
-        for method in ("GET", "HEAD"):
+        for method in ("GET", "HEAD", "POST", "PUT"):
             with self.subTest(method=method):
                 response = client.options(
                     "/health",
@@ -54,7 +56,7 @@ class CorsTests(unittest.TestCase):
 
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(
-                    response.headers["access-control-allow-methods"], "GET, HEAD"
+                    response.headers["access-control-allow-methods"], "GET, HEAD, POST, PUT"
                 )
                 self.assertEqual(
                     response.headers["access-control-allow-origin"], "http://localhost:5173"
@@ -72,11 +74,13 @@ class CorsTests(unittest.TestCase):
             response.headers["access-control-allow-origin"], "http://localhost:5173"
         )
 
-    def test_preflight_rejects_unlisted_origins_and_write_methods(self):
+    def test_preflight_rejects_unlisted_origins_and_unused_write_methods(self):
         client = self.make_client("http://localhost:5173")
         for origin, method in (
             ("https://unlisted.example", "GET"),
-            ("http://localhost:5173", "POST"),
+            ("https://unlisted.example", "PUT"),
+            ("http://localhost:5173", "DELETE"),
+            ("http://localhost:5173", "PATCH"),
         ):
             with self.subTest(origin=origin, method=method):
                 response = client.options(

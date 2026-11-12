@@ -14,8 +14,8 @@
     "preview:e2e-api": "vite build --outDir dist-e2e-api --logLevel warn && vite preview --host 127.0.0.1 --outDir dist-e2e-api --port 4176 --strictPort",
     "test": "node --test tests/nonclinical-demo.test.cjs tests/modern-safeguards.test.cjs && vitest run",
     "test:e2e": "playwright test",
-    "format": "prettier --write src vite.config.ts playwright.config.ts tests/e2e components.json scripts",
-    "format:check": "prettier --check src vite.config.ts playwright.config.ts tests/e2e components.json scripts",
+    "format": "prettier --write src vite.config.ts playwright.config.ts playwright.fullstack.config.ts tests/e2e tests/fullstack components.json scripts",
+    "format:check": "prettier --check src vite.config.ts playwright.config.ts playwright.fullstack.config.ts tests/e2e tests/fullstack components.json scripts",
     "screenshots": "node scripts/capture-screenshots.mjs",
     "screenshots:report": "node scripts/capture-report-screenshots.mjs"
   },

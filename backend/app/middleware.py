@@ -1,4 +1,5 @@
-"""HTTP request tracing without recording request bodies or patient data."""
+"""HTTP request tracing and private-response caching rules. Neither records
+request bodies or patient data."""
 
 from uuid import uuid4
 
@@ -27,3 +28,26 @@ class RequestIDMiddleware:
             await send(message)
 
         await self.app(scope, receive, send_with_request_id)
+
+
+class PrivateNoStoreMiddleware:
+    """Mark every response under the private prefixes as not to be stored by
+    browsers or proxies, including error and preflight responses."""
+
+    def __init__(self, app: ASGIApp, prefixes: tuple[str, ...]) -> None:
+        self.app = app
+        self.prefixes = prefixes
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http" or not scope["path"].startswith(self.prefixes):
+            await self.app(scope, receive, send)
+            return
+
+        async def send_no_store(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                headers = MutableHeaders(scope=message)
+                headers["Cache-Control"] = "no-store"
+                headers["Pragma"] = "no-cache"
+            await send(message)
+
+        await self.app(scope, receive, send_no_store)

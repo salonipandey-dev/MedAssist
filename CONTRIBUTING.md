@@ -54,9 +54,13 @@ welcome, health, schema, and error responses against the running server. Its
 Check the expected status in each request's title and inspect `X-Request-ID` in
 the response headers when investigating a problem.
 
-Use synthetic examples for project work. The database holds only the
-fictional consultation directory. Authentication and patient storage remain
-future work; real patient data should not be used in this prototype.
+Use synthetic examples for project work. The database holds the fictional
+consultation directory and, after `python -m app.seed_demo_accounts`, two fictional
+patient accounts with their health profiles. Real patient data and real passwords
+must not be used in this prototype. Private routes derive the owner from the
+session and never take an account or profile ID; keep it that way, and keep request
+bodies, tokens and profile contents out of logs. See
+[Sign-in and private health profiles](docs/HEALTH_PROFILE_API.md).
 
 Tests that need PostgreSQL read `MEDASSIST_TEST_DATABASE_URL` and skip when it
 is unset, so the suite stays runnable without a database. See the README's
@@ -74,12 +78,16 @@ The browser suite serves the compiled build, so rebuild after source changes.
 
 Keep mock workflow rules in `src/data/mock/service.ts`, records in `seed.ts`,
 and chart aggregates in `analytics.ts`. Use shared typed records across views.
-Only `src/services/api/system.ts` (liveness) and `src/services/api/consultations.ts`
-(read-only directory search) may contact the API, both through the origin check in
-`src/services/api/origin.ts`.
-Do not add a real health-input control, upload picker, credentials or prediction
-until the required backend and appropriate verification exist. Do not use browser
-storage for sample records or quietly redirect mock actions to real services.
+Only `src/services/api/system.ts` (liveness), `src/services/api/consultations.ts`
+(read-only directory search) and `src/services/api/account.ts` (sign-in and the
+signed-in patient's own health profile) may contact the API, all through the origin
+check in `src/services/api/origin.ts`. Only the account client sends the session
+cookie, and it keeps the CSRF token in memory.
+Health inputs and credentials belong only on the sign-in and Health Profile screens,
+which are backed by server-side sessions and owner-scoped storage. Do not add other
+real health-input controls, upload pickers or predictions until the required backend
+and appropriate verification exist. Do not use browser storage for records, tokens
+or profile data, or quietly redirect mock actions to real services.
 
 See [the frontend guide](docs/FRONTEND_GUIDE.md) for route architecture,
 service boundaries and the backend integration sequence. Screenshots can be

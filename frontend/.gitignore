@@ -1,2 +1,5 @@
 # Second build used only by the directory-api browser tests.
 dist-e2e-api/
+# Build and saved browser sessions used only by the full-stack health profile checks.
+dist-fullstack/
+fullstack-state/

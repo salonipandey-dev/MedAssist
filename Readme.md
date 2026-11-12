@@ -16,14 +16,20 @@ demonstration data; this is not a clinically deployed healthcare service.
   seeded with nine fictional listings. Find Consultations reads from it when
   `VITE_API_BASE_URL` is set; otherwise it sends no request and offers a
   built-in offline demo.
+- Implemented: sign-in and a private health profile for two fictional patient
+  accounts (MA-04). Passwords use Argon2id, sessions are server-side and revocable,
+  and each patient can read and change only their own medicines, allergies and
+  conditions, which persist in PostgreSQL. See
+  [Sign-in and private health profiles](docs/HEALTH_PROFILE_API.md).
 - Frontend: public product website and distinct patient, doctor and administrator
   workspaces, with light/dark themes, case/review workflows, fictional appointments,
   safe document previews, searchable tables and derived sample analytics. Changes
   stay in memory and reset on reload. No real clinical input or scoring is available.
 - Preserved: original HTML/CSS/JavaScript demo at `frontend/public/legacy/`,
   with all original nonclinical safeguards retained.
-- Planned: persistent patient management, authentication, and triage
-  assistance. These features are not implemented yet.
+- Planned: production-grade authentication (rate limits, registration, recovery),
+  persistent cases and appointments, and triage assistance. These are not
+  implemented yet.
 - The prototype does not provide medical advice or clinical decision support.
 
 ## Explore the product frontend
@@ -188,6 +194,22 @@ The [consultation directory contract](docs/CONSULTATION_DIRECTORY_API.md)
 describes the filters, fee states, error responses and how the Find
 Consultations screen maps to the query parameters.
 
+### Add the fictional patient accounts
+
+The same migration creates the sign-in and health profile tables. To create the two
+fictional patients for local development, confirm with an environment variable and
+run the seed (PowerShell, from `backend`):
+
+```powershell
+$env:MEDASSIST_ALLOW_DEMO_ACCOUNTS = "1"
+.\.venv\Scripts\python.exe -m app.seed_demo_accounts
+```
+
+The emails and passwords it prints are public and fictional; never run it against a
+database real people use. [Sign-in and private health profiles](docs/HEALTH_PROFILE_API.md)
+describes the security model, the endpoints and a Windows walkthrough with both
+accounts.
+
 ## Available endpoints
 
 | Method | Path | Purpose |
@@ -199,6 +221,10 @@ Consultations screen maps to the query parameters.
 | GET | `/redoc` | Open ReDoc documentation |
 | GET | `/openapi.json` | Retrieve the OpenAPI schema |
 | GET | `/api/v1/consultations` | Search and filter the fictional consultation directory (needs PostgreSQL) |
+| POST | `/api/v1/auth/sign-in` | Sign in with a fictional account; sets the session cookie |
+| GET | `/api/v1/auth/session` | Read the signed-in account and its CSRF token |
+| POST | `/api/v1/auth/sign-out` | End the session |
+| GET, PUT | `/api/v1/me/health-profile` | Read or replace your own health profile |
 
 Example response from `/health`:
 
@@ -260,16 +286,19 @@ macOS or Linux, from `backend` with the virtual environment activated:
 MEDASSIST_CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173" python -m uvicorn app.main:app --reload
 ```
 
-Only the configured origins and GET/HEAD requests are permitted by the browser CORS
-policy. Credentialed browser requests are disabled. Invalid origins (including
-wildcards and URLs with paths) stop startup with a configuration error.
+Only the configured origins are permitted by the browser CORS policy. They may send
+GET, HEAD, POST and PUT requests, with the session cookie, for sign-in and the health
+profile. Invalid origins (including wildcards and URLs with paths) stop startup with a
+configuration error. The session cookie is `SameSite=Strict`, so serve the frontend
+and the API from the same host name (both `127.0.0.1`, for example).
 Settings are read when the app is created, so restart the server after changes.
 `.env` files are not loaded automatically.
 
 To disable this setting in PowerShell, run
 `Remove-Item Env:MEDASSIST_CORS_ORIGINS` and restart the server. In a Unix shell,
-use `unset MEDASSIST_CORS_ORIGINS` if you previously exported it. CORS does not
-replace the authentication and access controls planned for patient workflows.
+use `unset MEDASSIST_CORS_ORIGINS` if you previously exported it. CORS is not an
+access control: the health profile routes also check the session, the CSRF token
+and the request origin.
 
 ## Run the tests
 
@@ -310,7 +339,12 @@ generation, unexpected server failures, and browser access to response IDs.
 For the directory they cover query validation, the 503 contract, database
 settings, fee-state rules and the seed records, plus (with a test database)
 migration, repeatable seeding, search, filters, the maximum-fee boundary,
-ordering, paging and the table constraints.
+ordering, paging and the table constraints. For sign-in and health profiles they
+cover Argon2id hashing, cookie attributes, CSRF and origin checks, refusal of owner
+IDs, no-store responses and session settings, plus (with a test database) both
+migration paths, persistence across app instances, two-account isolation, tampered
+requests, sign-out, idle and absolute expiry, version conflicts, transaction
+rollback and log contents.
 
 The [Backend tests workflow](.github/workflows/backend-tests.yml) runs the suite
 and checks installed dependency compatibility on Ubuntu and Windows with Python
@@ -318,6 +352,13 @@ and checks installed dependency compatibility on Ubuntu and Windows with Python
 and seeds a clean database twice, and runs the suite with the database tests
 enabled. Both run for backend or workflow changes pushed to `main`, for
 matching pull requests, and on manual dispatch from the Actions tab.
+
+The [Health profile (full stack) workflow](.github/workflows/health-profile-fullstack.yml)
+runs the real API, PostgreSQL and the compiled frontend in Chromium. It migrates a
+database that already holds the directory and a fresh one, saves Patient A's profile,
+restarts FastAPI, checks persistence, Patient B's isolation, tampered requests,
+sign-out, a two-tab conflict and an expired session, and confirms that `/health` and
+consultation search still work without signing in.
 
 ## Repository layout
 
@@ -327,10 +368,15 @@ matching pull requests, and on manual dispatch from the Actions tab.
 - `frontend/tests/`: nonclinical boundary checks and compiled-browser workflows.
 - `docs/FRONTEND_GUIDE.md`: frontend setup, architecture, feature matrix and integration plan.
 - `backend/app/main.py`: application factory, system routes, and Uvicorn app.
-- `backend/app/config.py`: environment configuration for frontend origins and
-  the database URL.
-- `backend/app/middleware.py`: server-generated HTTP request IDs.
-- `backend/app/schemas.py`: public response models.
+- `backend/app/config.py`: environment configuration for frontend origins, the
+  database URL and session lifetimes.
+- `backend/app/middleware.py`: server-generated HTTP request IDs and `no-store` on
+  private responses.
+- `backend/app/schemas.py`: request and response models.
+- `backend/app/auth.py`, `backend/app/security.py`: sign-in, sessions, password
+  hashing, CSRF and origin checks.
+- `backend/app/health_profile.py`: the signed-in patient's own health profile.
+- `backend/app/seed_demo_accounts.py`: explicit seed for two fictional patients.
 - `backend/app/consultations.py`: consultation directory route and query.
 - `backend/app/models.py`, `backend/app/db.py`: database tables and engine settings.
 - `backend/app/seed.py`: repeatable fictional seed command.
@@ -368,6 +414,7 @@ Git. Keep credentials and real patient information out of the repository.
 
 ## Next development steps
 
-1. Add authentication and access controls before storing patient information.
-2. Build and validate the patient management workflow.
+1. Harden sign-in for real use (attempt limits, registration, recovery) and add
+   server-enforced doctor and administrator roles.
+2. Build and validate the patient management workflow on the same ownership rules.
 3. Explore triage assistance after the core workflow is working.

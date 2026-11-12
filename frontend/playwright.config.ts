@@ -2,7 +2,9 @@ import { defineConfig } from '@playwright/test';
 
 // The "directory-api" project serves a second build with an API origin compiled in.
 // The origin never resolves, and its tests answer every request to it themselves, so
-// the browser suite needs no backend and cannot reach a real one by accident.
+// the browser suite needs no backend and cannot reach a real one by accident. It runs
+// the consultation directory and the sign-in / health profile specs. The full-stack
+// checks against a real FastAPI and PostgreSQL use playwright.fullstack.config.ts.
 const E2E_API_ORIGIN = 'http://medassist-api.test';
 
 export default defineConfig({
@@ -29,7 +31,7 @@ export default defineConfig({
     },
     {
       name: 'directory-api',
-      testMatch: 'consultations-api.spec.ts',
+      testMatch: /(consultations|health-profile)-api\.spec\.ts$/,
       use: { baseURL: 'http://127.0.0.1:4176' },
     },
   ],

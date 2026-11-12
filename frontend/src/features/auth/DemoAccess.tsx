@@ -62,8 +62,11 @@ export function DemoAccess() {
         <Notice kind="safe">
           <strong>This is demonstration access, not authentication.</strong> All records are
           fictional. Changes stay in memory and reset on reload. Do not enter real health
-          information. Clinical triage, real report uploads and secure patient storage are
-          unavailable.
+          information. Clinical triage and real report uploads are unavailable. The separate{' '}
+          <Link className="text-link-inline" to="/sign-in">
+            Health Profile sign-in
+          </Link>{' '}
+          saves entries to a fictional demo account when the API is connected.
         </Notice>
       </div>
     </section>
