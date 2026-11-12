@@ -136,7 +136,7 @@ test.describe('@after-restart', () => {
   test('Patient A’s session and saved profile survive the FastAPI restart', async ({ browser }) => {
     const { context, page } = await newPage(browser, 'patient-a');
     await page.goto(ROUTE);
-    await expect(page.getByText('Signed in as')).toContainText('Patient A (fictional)');
+    await expect(page.locator('.profile-account')).toContainText('Patient A (fictional)');
     await expectPatientAProfile(page);
     await context.close();
   });
@@ -144,7 +144,7 @@ test.describe('@after-restart', () => {
   test('Patient B sees only B’s profile and cannot read or change A’s', async ({ browser }) => {
     const { context, page } = await newPage(browser);
     await signIn(page, B);
-    await expect(page.getByText('Signed in as')).toContainText('Patient B (fictional)');
+    await expect(page.locator('.profile-account')).toContainText('Patient B (fictional)');
     await expect(
       region(page, 'Current medicines').getByLabel('Medicine 1', { exact: true }),
     ).toHaveValue('Velorin (fictional)');
