@@ -44,7 +44,13 @@ migration_log = {}
 
 def _listings():
     with engine.connect() as connection:
-        return connection.execute(text("SELECT * FROM consultation_listings ORDER BY id")).all()
+        # Columns added by later migrations (0003's source_url) are left out, so
+        # this compares every value that existed before the upgrade.
+        return connection.execute(
+            text(
+                "SELECT to_jsonb(t) - 'source_url' FROM consultation_listings t ORDER BY id"
+            )
+        ).all()
 
 
 def _tables():

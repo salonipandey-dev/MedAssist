@@ -35,6 +35,17 @@ FICTIONAL_SOURCE = {
     "version": "1.0.0",
     "url": None,
     "last_checked_on": None,
+    "listing_url": None,
+    "publisher": None,
+    "locality": None,
+    "reuse_basis": None,
+    "reuse_basis_url": None,
+}
+FICTIONAL_VERIFICATION = {
+    "status": "fictional_demo",
+    "checked_on": None,
+    "recheck_due_on": None,
+    "free_label_suppressed": False,
 }
 LISTING_COLUMNS = (
     "id, provider_name, provider_type, specialty, area, modes, fee_state,"
@@ -262,9 +273,10 @@ class DirectoryQueryTests(DatabaseTestCase):
         response = self.client.get(PATH, params={"q": "no-such-provider"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json(), {"items": [], "total": 0, "limit": 20, "offset": 0}
-        )
+        body = response.json()
+        self.assertEqual(body["dataset"]["mode"], "demo")
+        del body["dataset"]
+        self.assertEqual(body, {"items": [], "total": 0, "limit": 20, "offset": 0})
 
     def test_repeated_requests_return_identical_bodies(self):
         params = {"q": "sample", "max_fee_minor": 50000}
@@ -303,6 +315,7 @@ class DirectoryPayloadTests(DatabaseTestCase):
                 "notes": "Illustrative fee for a first consultation.",
                 "is_fictional": True,
                 "source": FICTIONAL_SOURCE,
+                "verification": FICTIONAL_VERIFICATION,
             },
         )
 
@@ -332,6 +345,7 @@ class DirectoryPayloadTests(DatabaseTestCase):
             with self.subTest(listing=item["id"]):
                 self.assertIs(item["is_fictional"], True)
                 self.assertEqual(item["source"], FICTIONAL_SOURCE)
+                self.assertEqual(item["verification"], FICTIONAL_VERIFICATION)
 
     def test_modes_and_languages_keep_their_order(self):
         self.assertEqual(self.item("c-02")["modes"], ["video", "phone"])

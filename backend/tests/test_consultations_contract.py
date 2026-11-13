@@ -145,7 +145,16 @@ class ConsultationContractTests(unittest.TestCase):
 
         self.assertEqual(
             set(parameters),
-            {"q", "specialty", "mode", "fee_state", "max_fee_minor", "limit", "offset"},
+            {
+                "q",
+                "specialty",
+                "mode",
+                "fee_state",
+                "max_fee_minor",
+                "limit",
+                "offset",
+                "dataset",
+            },
         )
         self.assertFalse(any(item["required"] for item in parameters.values()))
         self.assertEqual(set(operation["responses"]), {"200", "404", "422", "503"})

@@ -157,9 +157,8 @@ export function fromOfflineOption(option: ConsultationOption): ConsultationListi
       Object.keys(PROVIDER_TYPE_LABELS) as ConsultationListing['provider_type'][]
     ).find((key) => PROVIDER_TYPE_LABELS[key] === option.providerType)!,
     specialty: option.specialty,
-    modes: option.modes.map(
-      (label) =>
-        (Object.keys(MODE_LABELS) as ConsultationMode[]).find((key) => MODE_LABELS[key] === label)!,
+    modes: option.modes.map((label) =>
+      (Object.keys(MODE_LABELS) as ConsultationMode[]).find((key) => MODE_LABELS[key] === label)!,
     ),
     area: option.area,
     fee,
