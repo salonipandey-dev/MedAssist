@@ -1,4 +1,4 @@
-import { MapPin, Search, TriangleAlert, Unplug, X } from 'lucide-react';
+import { ExternalLink, MapPin, Search, TriangleAlert, Unplug, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -23,12 +23,15 @@ import {
 import {
   ConsultationApiError,
   listConsultations,
+  type ConsultationDataset,
   type ConsultationListing,
   type ConsultationPage,
 } from '../../services/api/consultations';
 import { readApiOrigin } from '../../services/api/origin';
 import {
+  checkedLabel,
   feeLabel,
+  formatDate,
   fromOfflineOption,
   LISTING_ROWS,
   MODE_LABELS,
@@ -38,6 +41,33 @@ import {
 } from './listing';
 
 const FEE_FILTERS: FeeFilter[] = ['Any', 'Free (illustrative)', 'Up to ₹300', 'Fee not listed'];
+/** The Free filter keeps its value; pilot data shows only current, sourced free listings. */
+const PILOT_FREE_LABEL = 'Free (current source)';
+
+const DEMO_NOTICE = (
+  <Notice>
+    Every provider, place and fee here is invented. A fee marked illustrative is an example, “free”
+    is not a verified free service, and no option shows real availability or accepts a booking.
+  </Notice>
+);
+
+function PilotNotice({ dataset }: { dataset: ConsultationDataset }) {
+  const fixture = dataset.sources.some((source) => source.kind === 'pilot_fixture');
+  return (
+    <Notice kind={fixture ? undefined : 'safe'}>
+      {fixture && (
+        <>
+          <strong>Fictional pilot fixture.</strong> These listings, fees, conditions and source
+          pages are invented test data that only show how pilot listings work.{' '}
+        </>
+      )}
+      Each listing shows what its source said on the date it was last checked. Check the fee,
+      eligibility and source page before contacting a provider. Listings checked more than{' '}
+      {dataset.freshness_days} days ago show <strong>Needs recheck</strong> and never show Free.
+      MedAssist cannot book appointments or show availability.
+    </Notice>
+  );
+}
 const COMPARE_LIMIT_MESSAGE = `You can compare up to ${COMPARE_LIMIT} options. Remove one to add another.`;
 const SEARCH_DEBOUNCE_MS = 300;
 const OFFLINE_LISTINGS = CONSULTATION_OPTIONS.map(fromOfflineOption);
@@ -50,20 +80,13 @@ export function Consultations() {
       <PageHeading
         eyebrow="Patient · Consultations"
         title="Find and compare consultations"
-        description="Search the fictional consultation directory and compare up to three options. Providers, places and fees are invented, and nothing here can be booked."
+        description="Search consultation listings and compare up to three options side by side. Check the fee, eligibility and source before contacting a provider; nothing here can be booked."
       />
       {offline ? (
         <OfflineDirectory onUseApi={() => setParams({})} />
       ) : (
         <ApiDirectory onOpenOffline={() => setParams({ source: 'offline' })} />
       )}
-      <div className="mt-6">
-        <Notice>
-          Every provider, place and fee here is invented. A fee marked illustrative is an example,
-          “free” is not a verified free service, and no option shows real availability or accepts a
-          booking.
-        </Notice>
-      </div>
     </>
   );
 }
@@ -120,18 +143,40 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
     return () => controller.abort();
   }, [api.ok, queryKey, attempt]);
 
+  const dataset = loaded.status === 'error' ? null : (loaded.page?.dataset ?? null);
+  const pilotSource = dataset?.mode === 'pilot' ? dataset.sources[0] : undefined;
+  // Any fixture source means the pilot page is fictional, whatever else it holds.
+  const pilotFixture = dataset?.sources.some((s) => s.kind === 'pilot_fixture') ?? false;
   const source = (
     <SourceBar
-      badge={<Badge tone="indigo">Directory API</Badge>}
+      badge={
+        <>
+          <Badge tone="indigo">Directory API</Badge>
+          {dataset?.mode === 'demo' && <Badge tone="amber">Fictional demo</Badge>}
+          {dataset?.mode === 'pilot' && (
+            <Badge tone={pilotFixture ? 'amber' : 'teal'}>
+              {pilotFixture ? 'Pilot · fictional fixture' : 'Pilot'}
+            </Badge>
+          )}
+        </>
+      }
       action="Open offline demo"
       onAction={onOpenOffline}
     >
-      {api.ok ? (
+      {!api.ok ? (
+        'Not connected in this build.'
+      ) : dataset?.mode === 'pilot' ? (
         <>
-          Listings are read from <code>{api.origin}</code>.
+          Pilot listings{pilotSource?.locality ? ` for ${pilotSource.locality}` : ''}
+          {pilotSource ? ` from ${pilotSource.name}, version ${pilotSource.version}` : ''}. Read
+          from <code>{api.origin}</code> · freshness judged on {formatDate(dataset.as_of)}.
         </>
       ) : (
-        'Not connected in this build.'
+        <>
+          Listings are read from <code>{api.origin}</code>.
+          {dataset?.mode === 'demo' &&
+            ' The consultation pilot is off, so this is the fictional demo.'}
+        </>
       )}
     </SourceBar>
   );
@@ -224,6 +269,13 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
       body={body}
       emptyTitle="No listings match"
       emptyDescription="The directory has no listing for these filters. Change or clear them to see more."
+      specialties={dataset?.specialties}
+      freeFilterLabel={dataset?.mode === 'pilot' ? PILOT_FREE_LABEL : undefined}
+      fictional={dataset?.mode !== 'pilot' || pilotFixture}
+      notice={
+        // Wait for the server to say which data it serves before describing it.
+        !dataset ? null : dataset.mode === 'pilot' ? <PilotNotice dataset={dataset} /> : DEMO_NOTICE
+      }
     />
   );
 }
@@ -254,6 +306,7 @@ function OfflineDirectory({ onUseApi }: { onUseApi: () => void }) {
       body={null}
       emptyTitle="No sample options match"
       emptyDescription="Change or clear the filters to see more fictional options."
+      notice={DEMO_NOTICE}
     />
   );
 }
@@ -317,6 +370,10 @@ function DirectoryBrowser({
   body,
   emptyTitle = '',
   emptyDescription = '',
+  specialties = CONSULTATION_SPECIALTIES,
+  freeFilterLabel = 'Free (illustrative)',
+  fictional = true,
+  notice = null,
 }: {
   title: string;
   description: string;
@@ -331,6 +388,13 @@ function DirectoryBrowser({
   body: ReactNode;
   emptyTitle?: string;
   emptyDescription?: string;
+  /** Specialties in the served data; the built-in list when unknown. */
+  specialties?: readonly string[];
+  /** Visible label of the Free fee filter (its value never changes). */
+  freeFilterLabel?: string;
+  /** Whether the listings are fictional, for the comparison wording. */
+  fictional?: boolean;
+  notice?: ReactNode;
 }) {
   const searchInput = useRef<HTMLInputElement>(null);
   // Selections hold the listing itself, keyed by its stable ID, so they stay in the
@@ -396,7 +460,7 @@ function DirectoryBrowser({
                   onChange={(e) => set('specialty', e.target.value)}
                 >
                   <option>All specialties</option>
-                  {CONSULTATION_SPECIALTIES.map((s) => (
+                  {specialties.map((s) => (
                     <option key={s}>{s}</option>
                   ))}
                 </select>
@@ -417,7 +481,9 @@ function DirectoryBrowser({
                   onChange={(e) => set('fee', e.target.value as FeeFilter)}
                 >
                   {FEE_FILTERS.map((f) => (
-                    <option key={f}>{f}</option>
+                    <option key={f} value={f}>
+                      {f === 'Free (illustrative)' ? freeFilterLabel : f}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -447,10 +513,28 @@ function DirectoryBrowser({
                       </div>
                       <div className="consult-meta">
                         <span className="consult-fee">{feeLabel(o)}</span>
+                        {o.access_conditions && (
+                          <span className="consult-eligibility">
+                            Eligibility: {o.access_conditions}
+                          </span>
+                        )}
                         <span className="consult-modes">
                           {o.modes.map((mode) => MODE_LABELS[mode]).join(' · ')}
                         </span>
-                        {o.is_fictional && <span className="consult-flag">Fictional record</span>}
+                        {o.verification.status === 'needs_recheck' && (
+                          <span className="consult-recheck">Needs recheck</span>
+                        )}
+                        {o.source.kind === 'fictional_seed' && (
+                          <span className="consult-flag">Fictional record</span>
+                        )}
+                        {o.source.kind === 'pilot_fixture' && (
+                          <span className="consult-flag">Fictional test fixture</span>
+                        )}
+                        {o.verification.checked_on && (
+                          <span className="consult-checked">
+                            Checked {formatDate(o.verification.checked_on)}
+                          </span>
+                        )}
                       </div>
                       <div className="consult-actions">
                         <Button variant="ghost" size="sm" onClick={() => showDetail(o)}>
@@ -479,7 +563,7 @@ function DirectoryBrowser({
         </Panel>
         <Panel
           title="Comparison"
-          description={`${compared.length} of ${COMPARE_LIMIT} selected · illustrative values`}
+          description={`${compared.length} of ${COMPARE_LIMIT} selected · ${fictional ? 'illustrative values' : 'as last checked'}`}
           className="consult-compare"
         >
           {compared.length ? (
@@ -520,19 +604,22 @@ function DirectoryBrowser({
           ) : (
             <EmptyState
               title="Nothing to compare yet"
-              description="Select Compare on up to three fictional options to see them side by side."
+              description={`Select Compare on up to three ${fictional ? 'fictional ' : ''}options to see them side by side.`}
             />
           )}
         </Panel>
       </div>
+      {notice && <div className="mt-6">{notice}</div>}
       <DialogPanel
         open={!!shown}
         onOpenChange={(open) => !open && showDetail(null)}
         title={shown?.provider_name ?? 'Listing'}
         description={
-          shown?.is_fictional === false
-            ? 'Directory listing'
-            : 'Fictional provider · illustrative details'
+          shown?.source.kind === 'reviewed_external'
+            ? 'Pilot listing · as the source stated it when last checked'
+            : shown?.source.kind === 'pilot_fixture'
+              ? 'Fictional pilot fixture · invented test values'
+              : 'Fictional provider · illustrative details'
         }
       >
         {shown && (
@@ -548,9 +635,17 @@ function DirectoryBrowser({
             {shown.notes && shown.notes !== shown.fee.basis && (
               <p className="muted mt-4">{shown.notes}</p>
             )}
-            <p className="muted text-small mt-4">Source: {sourceLabel(shown)}</p>
+            {shown.source.kind === 'fictional_seed' ? (
+              <p className="muted text-small mt-4">Source: {sourceLabel(shown)}</p>
+            ) : (
+              <SourceDetails listing={shown} />
+            )}
             <div className="mt-4">
-              <Badge>No contact details or booking in this demonstration</Badge>
+              <Badge>
+                {shown.source.kind === 'fictional_seed'
+                  ? 'No contact details or booking in this demonstration'
+                  : 'No booking through MedAssist · confirm with the provider'}
+              </Badge>
             </div>
             <div className="form-actions">
               <p className="consult-message" role="status">
@@ -567,5 +662,44 @@ function DirectoryBrowser({
         )}
       </DialogPanel>
     </>
+  );
+}
+
+/** Where a pilot listing came from and how current it is. */
+function SourceDetails({ listing }: { listing: ConsultationListing }) {
+  const { source, verification } = listing;
+  return (
+    <section className="consult-source-detail" aria-label="Source and verification">
+      <h3>Source</h3>
+      <p>
+        {source.name}
+        {source.publisher ? ` · ${source.publisher}` : ''} · version {source.version}
+      </p>
+      {source.listing_url && (
+        <p>
+          <a
+            className="text-link-inline"
+            href={source.listing_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open the source page
+            <ExternalLink size={13} aria-hidden="true" />
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </p>
+      )}
+      <p className={verification.status === 'needs_recheck' ? 'consult-recheck-text' : undefined}>
+        {checkedLabel(listing)}
+      </p>
+      {verification.free_label_suppressed && verification.checked_on && (
+        <p>
+          The source listed this consultation as free when it was checked on{' '}
+          {formatDate(verification.checked_on)}. MedAssist hides the Free label until the listing is
+          rechecked.
+        </p>
+      )}
+      {source.reuse_basis && <p className="muted text-small">Reuse basis: {source.reuse_basis}</p>}
+    </section>
   );
 }

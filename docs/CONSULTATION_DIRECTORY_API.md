@@ -8,8 +8,10 @@ provider, price or free service.
 Find Consultations (`/app/patient/consultations`) reads from this endpoint when
 the frontend is built with `VITE_API_BASE_URL` (batch MA-03). The mapping below
 is what `frontend/src/features/consultations/listing.ts` implements.
-This batch is engineering evidence toward FR12 / VT13. Validation against real
-sources belongs to MA-06.
+This batch is engineering evidence toward FR12 / VT13. MA-06 adds an optional
+pilot of verified listings that is off by default. See
+[Consultation pilot](CONSULTATION_PILOT.md) for the import, settings and freshness
+window. While the pilot is off, the endpoint serves only the fictional demo.
 
 ## Request
 
@@ -24,13 +26,14 @@ All parameters are optional and combine with AND.
 | `max_fee_minor` | integer, 0–100000000 | Inclusive maximum in paise. Matches `free` listings and `known` amounts up to the limit. `unknown` fees never match. |
 | `limit` | 1–50, default 20 | Page size. |
 | `offset` | 0–10000, default 0 | Rows to skip. |
+| `dataset` | `demo`, `pilot` | Omit it to get the server's default: the pilot when `MEDASSIST_CONSULTATION_PILOT=on`, otherwise the demo. `demo` always returns the fictional seed. `pilot` returns `404` while the pilot is off. |
 
 Results are ordered by listing ID, so the same request returns the same body.
 
 ## Response
 
-`200 OK` with a page. A valid search with no matches returns
-`{"items": [], "total": 0, "limit": 20, "offset": 0}`.
+`200 OK` with a page. A valid search with no matches returns empty `items`,
+`total: 0` and the same `dataset` block.
 
 ```json
 {
@@ -59,15 +62,54 @@ Results are ordered by listing ID, so the same request returns the same body.
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     }
   ],
   "total": 1,
   "limit": 20,
-  "offset": 0
+  "offset": 0,
+  "dataset": {
+    "mode": "demo",
+    "pilot_enabled": false,
+    "freshness_days": 90,
+    "as_of": "2026-11-13",
+    "specialties": ["Dermatology", "ENT", "General practice", "Internal medicine", "Paediatrics"],
+    "sources": [
+      {
+        "id": "medassist-fictional-seed",
+        "kind": "fictional_seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null,
+        "imported_at": null,
+        "listing_count": null
+      }
+    ]
+  }
 }
 ```
+
+`dataset` describes what the server is serving: `mode` (`demo` or `pilot`), whether
+the pilot is enabled, the freshness window, the date that freshness is judged on,
+every specialty in the served data (the screen's Specialty choices) and the sources,
+each with its last successful import. For the pilot, `frontend/tests/e2e/fixtures/consultations-pilot.json`
+is a complete example built from the fictional fixture.
 
 Every field is always present; optional values are `null`, never omitted.
 
@@ -85,10 +127,22 @@ exist without a basis and an unknown fee cannot carry an amount.
 
 ### Source and verification
 
-`is_fictional` is `true` and `source.kind` is `fictional_seed` for every seeded
-record. For those records `source.url` and `source.last_checked_on` are always
-`null`; the database refuses a check date on a fictional listing. The
-`reviewed_external` kind is reserved for MA-06 and no record uses it yet.
+| `source.kind` | `is_fictional` | Meaning |
+| --- | --- | --- |
+| `fictional_seed` | `true` | The nine demo records. Every source and verification field is `null`, and `verification.status` is `fictional_demo`. The database refuses a check date or source URL on them. |
+| `pilot_fixture` | `true` | Invented test records shaped like pilot data. Their URLs are on `example.org`/`.com`/`.net`, and their names say "(fictional)". |
+| `reviewed_external` | `false` | A listing checked by hand against an approved source. It may not use `example.*` URLs. No such record exists in this repository yet. |
+
+Every pilot listing (reviewed or fixture) has `source.listing_url` (the page it was
+checked against), `source.last_checked_on`, and the source's `publisher`,
+`locality` and `reuse_basis`. `verification` reports freshness:
+
+| Field | Meaning |
+| --- | --- |
+| `status` | `current` through `recheck_due_on`, then `needs_recheck`. `fictional_demo` for the seed. |
+| `checked_on` | Same as `source.last_checked_on`. |
+| `recheck_due_on` | The last day the check counts as current (`checked_on` + freshness days). |
+| `free_label_suppressed` | `true` when the source said free but the check is stale. The fee is then returned as `unknown`, and the `fee_state=free` and `max_fee_minor` filters leave the listing out. |
 
 `hours` is `null` for the two fixtures whose text was "Not listed in this
 sample" (`c-06`, `c-09`). `access_conditions` is `null` when none are recorded.
@@ -97,6 +151,7 @@ sample" (`c-06`, `c-09`). `access_conditions` is `null` when none are recorded.
 
 | Status | When | Body |
 | --- | --- | --- |
+| `404` | `dataset=pilot` while the pilot is off. | `{"detail": "The consultation pilot is not enabled on this server."}` |
 | `422` | A parameter is out of range or not an allowed value. | FastAPI validation body: `{"detail": [{"loc": ["query", "mode"], "msg": "...", "type": "..."}]}` |
 | `503` | PostgreSQL is unreachable, not migrated, or `MEDASSIST_DATABASE_URL` is unset. | `{"detail": "The consultation directory is temporarily unavailable. Please try again later.", "request_id": "<uuid>"}` with `Cache-Control: no-store` |
 
@@ -115,7 +170,7 @@ database and keep responding during an outage.
 | Mode | All modes | omit `mode` |
 | Mode | In person / Video / Phone | `mode=in_person` / `mode=video` / `mode=phone` |
 | Fee | Any | omit both fee parameters |
-| Fee | Free (illustrative) | `fee_state=free` |
+| Fee | Free (illustrative), labelled "Free (current source)" for pilot data | `fee_state=free` |
 | Fee | Up to ₹300 | `max_fee_minor=30000` |
 | Fee | Fee not listed | `fee_state=unknown` |
 

@@ -1,7 +1,8 @@
 """Database tables for the consultation directory, accounts and health profiles.
 
 The constraints here mirror the migrations in migrations/versions/: 0001 for the
-directory, 0002 for accounts, sessions and health profiles. Change the schema
+directory, 0002 for accounts, sessions and health profiles, 0003 for the
+consultation pilot's sources. Change the schema
 with a new migration, then update these models to match.
 """
 
@@ -32,7 +33,11 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 PROVIDER_TYPES = ("clinic", "hospital_outpatient", "teleconsultation", "community_camp")
 CONSULTATION_MODES = ("in_person", "video", "phone")
 FEE_STATES = ("known", "free", "unknown")
-SOURCE_KINDS = ("fictional_seed", "reviewed_external")
+SOURCE_KINDS = ("fictional_seed", "reviewed_external", "pilot_fixture")
+# Records invented for demonstrations or tests; never presented as real.
+FICTIONAL_SOURCE_KINDS = ("fictional_seed", "pilot_fixture")
+PILOT_SOURCE_KINDS = ("reviewed_external", "pilot_fixture")
+EXAMPLE_URL = r"'^https://([a-z0-9-]+\.)*example\.(org|com|net)(/|$)'"
 
 # One row is exactly one of: a known positive amount, an explicit free listing
 # with a stated basis, or unknown with no amount at all. The IS NOT NULL tests
@@ -74,6 +79,18 @@ class ConsultationSource(Base):
             "kind <> 'fictional_seed' OR url IS NULL",
             name="ck_consultation_sources_fictional_has_no_url",
         ),
+        CheckConstraint(
+            "kind NOT IN ('reviewed_external', 'pilot_fixture') OR (url IS NOT NULL"
+            " AND url ~ '^https://' AND publisher IS NOT NULL AND btrim(publisher) <> ''"
+            " AND locality IS NOT NULL AND btrim(locality) <> ''"
+            " AND reuse_basis IS NOT NULL AND btrim(reuse_basis) <> '')",
+            name="ck_consultation_sources_pilot_provenance",
+        ),
+        CheckConstraint(
+            f"(kind = 'pilot_fixture') = (url IS NOT NULL AND url ~ {EXAMPLE_URL})"
+            " OR kind = 'fictional_seed'",
+            name="ck_consultation_sources_fixture_urls",
+        ),
         UniqueConstraint("id", "kind", name="uq_consultation_sources_id_kind"),
     )
 
@@ -82,6 +99,15 @@ class ConsultationSource(Base):
     name: Mapped[str] = mapped_column(Text)
     version: Mapped[str] = mapped_column(Text)
     url: Mapped[Optional[str]] = mapped_column(Text)
+    # Pilot provenance (migration 0003); null for the fictional seed.
+    publisher: Mapped[Optional[str]] = mapped_column(Text)
+    locality: Mapped[Optional[str]] = mapped_column(Text)
+    reuse_basis: Mapped[Optional[str]] = mapped_column(Text)
+    reuse_basis_url: Mapped[Optional[str]] = mapped_column(Text)
+    # Written only by a successful import, in the same transaction as its rows.
+    dataset_sha256: Mapped[Optional[str]] = mapped_column(Text)
+    imported_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    listing_count: Mapped[Optional[int]] = mapped_column(Integer)
 
 
 class ConsultationListing(Base):
@@ -109,6 +135,18 @@ class ConsultationListing(Base):
             "source_kind <> 'fictional_seed' OR last_checked_on IS NULL",
             name="ck_consultation_listings_fictional_not_verified",
         ),
+        CheckConstraint(
+            "(source_kind = 'fictional_seed' AND source_url IS NULL)"
+            " OR (source_kind <> 'fictional_seed' AND source_url IS NOT NULL"
+            " AND source_url ~ '^https://' AND last_checked_on IS NOT NULL)",
+            name="ck_consultation_listings_pilot_verified",
+        ),
+        CheckConstraint(
+            "source_kind = 'fictional_seed'"
+            f" OR (source_kind = 'pilot_fixture') = (source_url ~ {EXAMPLE_URL})",
+            name="ck_consultation_listings_fixture_urls",
+        ),
+        Index("ix_consultation_listings_source", "source_id", "source_kind"),
         # Carrying the kind through the key lets the check above see it.
         ForeignKeyConstraint(
             ["source_id", "source_kind"],
@@ -136,6 +174,8 @@ class ConsultationListing(Base):
     source_id: Mapped[str] = mapped_column(Text)
     source_kind: Mapped[str] = mapped_column(Text)
     last_checked_on: Mapped[Optional[date]] = mapped_column(Date)
+    # The page this listing was checked against (pilot listings only).
+    source_url: Mapped[Optional[str]] = mapped_column(Text)
 
     source: Mapped[ConsultationSource] = relationship(lazy="joined", innerjoin=True)
 

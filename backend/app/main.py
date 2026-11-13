@@ -14,6 +14,7 @@ from app.config import (
     SessionSettings,
     get_cors_origins,
     get_database_url,
+    get_pilot_settings,
     get_session_settings,
 )
 from app.consultations import (
@@ -90,6 +91,8 @@ def create_app() -> FastAPI:
     application = MedAssistAPI(
         get_cors_origins(), get_database_url(), get_session_settings()
     )
+    # Read at startup: changing the pilot setting needs a restart.
+    application.state.pilot_settings = get_pilot_settings()
 
     @application.get("/", tags=["System"], summary="Check the API welcome message")
     def home() -> WelcomeResponse:

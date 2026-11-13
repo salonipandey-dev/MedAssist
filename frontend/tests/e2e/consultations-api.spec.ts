@@ -27,7 +27,7 @@ function search(items: Listing[], params: URLSearchParams) {
       (maxFee === null || (item.fee.amount_minor !== null && item.fee.amount_minor <= +maxFee))
     );
   });
-  return { items: matches, total: matches.length, limit: 50, offset: 0 };
+  return { items: matches, total: matches.length, limit: 50, offset: 0, dataset: fixture.dataset };
 }
 
 async function mockDirectory(page: Page) {

@@ -45,22 +45,55 @@ function rupees(amountMinor: number): string {
   }).format(amountMinor / 100);
 }
 
-/** Label the fee from its state; an unknown fee is never shown as free or zero. */
+/**
+ * Label the fee from its state; an unknown fee is never shown as free or zero.
+ * The demo seed keeps its illustrative wording. Pilot listings show "Free" only when
+ * the server says the check is current; a stale free listing reads "Needs recheck".
+ * Fixture records add "(fixture)" so a fictional test value never looks real.
+ */
 export function feeLabel(listing: ConsultationListing): string {
-  const { fee, is_fictional: fictional } = listing;
-  if (fee.state === 'known')
-    return `₹${rupees(fee.amount_minor)}${fictional ? ' (illustrative)' : ''}`;
-  if (fee.state === 'free') return fictional ? 'Free (illustrative, not verified)' : 'Free';
-  return fictional ? 'Not listed in sample' : 'Not listed';
+  const { fee, source, verification } = listing;
+  if (source.kind === 'fictional_seed') {
+    if (fee.state === 'known') return `₹${rupees(fee.amount_minor)} (illustrative)`;
+    if (fee.state === 'free') return 'Free (illustrative, not verified)';
+    return 'Not listed in sample';
+  }
+  const suffix = source.kind === 'pilot_fixture' ? ' (fixture)' : '';
+  if (verification.free_label_suppressed) return `Needs recheck${suffix}`;
+  if (fee.state === 'known') return `₹${rupees(fee.amount_minor)}${suffix}`;
+  if (fee.state === 'free') return `Free${suffix}`;
+  return `Fee not listed${suffix}`;
+}
+
+/** "Checked 2 Nov 2026 · current" style, from the server's verification. */
+export function checkedLabel(listing: ConsultationListing): string {
+  const { verification } = listing;
+  if (verification.status === 'fictional_demo' || !verification.checked_on)
+    return 'Fictional record, never checked against a source';
+  const checked = `Last checked ${formatDate(verification.checked_on)}`;
+  return verification.status === 'current'
+    ? `${checked} · current until ${formatDate(verification.recheck_due_on!)}`
+    : `${checked} · Needs recheck`;
+}
+
+export function formatDate(iso: string): string {
+  const [year, month, day] = iso.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
 }
 
 export function sourceLabel(listing: ConsultationListing): string {
   const { source } = listing;
-  const checked = listing.is_fictional
-    ? 'fictional record, not externally verified'
-    : source.last_checked_on
-      ? `last checked ${source.last_checked_on}`
-      : 'no check date recorded';
+  const checked =
+    source.kind === 'fictional_seed'
+      ? 'fictional record, not externally verified'
+      : source.last_checked_on
+        ? `last checked ${source.last_checked_on}`
+        : 'no check date recorded';
   return `${source.name} · version ${source.version} · ${checked}`;
 }
 
@@ -70,10 +103,18 @@ export const LISTING_ROWS: { label: string; value: (listing: ConsultationListing
   { label: 'Mode', value: (l) => l.modes.map((mode) => MODE_LABELS[mode]).join(', ') },
   { label: 'Location', value: (l) => l.area },
   { label: 'Fee', value: feeLabel },
-  { label: 'Fee basis', value: (l) => l.fee.basis ?? 'No fee information recorded' },
-  { label: 'Access conditions', value: (l) => l.access_conditions ?? 'None recorded' },
+  // Eligibility sits right beside the fee: a free or low fee may only apply to some people.
+  { label: 'Eligibility and access', value: (l) => l.access_conditions ?? 'None recorded' },
+  {
+    label: 'Fee basis',
+    value: (l) =>
+      l.verification.free_label_suppressed
+        ? 'Listed as free when last checked; hidden until the listing is rechecked'
+        : (l.fee.basis ?? 'No fee information recorded'),
+  },
   { label: 'Languages', value: (l) => l.languages.join(', ') || 'Not listed' },
   { label: 'Hours', value: (l) => l.hours ?? 'Not listed' },
+  { label: 'Last checked', value: checkedLabel },
 ];
 
 const OFFLINE_SOURCE: ConsultationListing['source'] = {
@@ -83,6 +124,17 @@ const OFFLINE_SOURCE: ConsultationListing['source'] = {
   version: '1',
   url: null,
   last_checked_on: null,
+  listing_url: null,
+  publisher: null,
+  locality: null,
+  reuse_basis: null,
+  reuse_basis_url: null,
+};
+const OFFLINE_VERIFICATION: ConsultationListing['verification'] = {
+  status: 'fictional_demo',
+  checked_on: null,
+  recheck_due_on: null,
+  free_label_suppressed: false,
 };
 
 /** Present a built-in demo fixture in the same shape as an API listing. */
@@ -116,5 +168,6 @@ export function fromOfflineOption(option: ConsultationOption): ConsultationListi
     notes: option.note,
     is_fictional: true,
     source: OFFLINE_SOURCE,
+    verification: OFFLINE_VERIFICATION,
   };
 }

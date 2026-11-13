@@ -62,6 +62,13 @@ session and never take an account or profile ID; keep it that way, and keep requ
 bodies, tokens and profile contents out of logs. See
 [Sign-in and private health profiles](docs/HEALTH_PROFILE_API.md).
 
+Consultation pilot data enters only through `python -m app.import_consultations`.
+Test data uses `kind: "pilot_fixture"`, `example.org` URLs and "(fictional)" names;
+the validator and database constraints refuse anything else for that kind. A
+`reviewed_external` file must come from an approved source with its reuse basis
+recorded, and a fee is free only when that source says so. See
+[Consultation pilot](docs/CONSULTATION_PILOT.md).
+
 Tests that need PostgreSQL read `MEDASSIST_TEST_DATABASE_URL` and skip when it
 is unset, so the suite stays runnable without a database. See the README's
 [directory setup](Readme.md#set-up-the-consultation-directory).

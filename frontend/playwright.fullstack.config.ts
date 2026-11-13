@@ -11,6 +11,10 @@ import { defineConfig } from '@playwright/test';
 //   (expire Patient B's sessions in PostgreSQL)
 //   npx playwright test -c playwright.fullstack.config.ts --grep @expired
 //   npx playwright test -c playwright.fullstack.config.ts --grep @medication-check
+//   (import the fictional pilot fixture twice, then a failing file)
+//   npx playwright test -c playwright.fullstack.config.ts --grep @consultation-demo
+//   (restart FastAPI with MEDASSIST_CONSULTATION_PILOT=on)
+//   npx playwright test -c playwright.fullstack.config.ts --grep @consultation-pilot
 export default defineConfig({
   testDir: './tests/fullstack',
   fullyParallel: false,

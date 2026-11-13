@@ -42,6 +42,7 @@ class FeeState(str, Enum):
 class SourceKind(str, Enum):
     fictional_seed = "fictional_seed"
     reviewed_external = "reviewed_external"
+    pilot_fixture = "pilot_fixture"
 
 
 class ConsultationFee(BaseModel):
@@ -83,7 +84,11 @@ class ConsultationFee(BaseModel):
 
 class ConsultationSourceInfo(BaseModel):
     kind: SourceKind = Field(
-        description="`fictional_seed` records are invented demonstration data."
+        description=(
+            "`fictional_seed`: invented demonstration data. `pilot_fixture`: invented "
+            "test records shaped like pilot data. `reviewed_external`: checked by hand "
+            "against an approved source."
+        )
     )
     id: str = Field(description="Stable identifier of the source.")
     name: str = Field(description="Human-readable source name.")
@@ -95,6 +100,43 @@ class ConsultationSourceInfo(BaseModel):
         description=(
             "Date the listing was last checked against its source; null when it "
             "has never been externally verified, as for all fictional data."
+        )
+    )
+    listing_url: Optional[str] = Field(
+        description="The page this listing was checked against; null for the fictional seed."
+    )
+    publisher: Optional[str] = Field(description="Who publishes the source data.")
+    locality: Optional[str] = Field(description="The locality the source covers.")
+    reuse_basis: Optional[str] = Field(
+        description="The licence or permission MedAssist relies on to reuse the data."
+    )
+    reuse_basis_url: Optional[str]
+
+
+class VerificationStatus(str, Enum):
+    fictional_demo = "fictional_demo"
+    current = "current"
+    needs_recheck = "needs_recheck"
+
+
+class ListingVerification(BaseModel):
+    """How recently a pilot listing was checked, judged against the server's
+    freshness window."""
+
+    status: VerificationStatus = Field(
+        description=(
+            "`fictional_demo` for seeded demo records; `current` while the last check "
+            "is inside the freshness window; `needs_recheck` after it."
+        )
+    )
+    checked_on: Optional[date]
+    recheck_due_on: Optional[date] = Field(
+        description="Last day the check counts as current; null for the fictional demo."
+    )
+    free_label_suppressed: bool = Field(
+        description=(
+            "True when the source listed the consultation as free but the check is "
+            "stale. The fee is then returned as unknown until it is rechecked."
         )
     )
 
@@ -117,6 +159,34 @@ class ConsultationListing(BaseModel):
         description="True when the record is invented and must not be presented as real."
     )
     source: ConsultationSourceInfo
+    verification: ListingVerification
+
+
+class DatasetSource(BaseModel):
+    id: str
+    kind: SourceKind
+    name: str
+    version: str
+    url: Optional[str]
+    publisher: Optional[str]
+    locality: Optional[str]
+    reuse_basis: Optional[str]
+    reuse_basis_url: Optional[str]
+    imported_at: Optional[datetime] = Field(description="Last successful import; null for the seed.")
+    listing_count: Optional[int]
+
+
+class ConsultationDataset(BaseModel):
+    """Which data this server is serving and how freshness is judged."""
+
+    mode: Literal["demo", "pilot"] = Field(
+        description="`demo`: the fictional seed. `pilot`: imported pilot listings."
+    )
+    pilot_enabled: bool = Field(description="Whether MEDASSIST_CONSULTATION_PILOT is on.")
+    freshness_days: int = Field(description="Days a check stays current.")
+    as_of: date = Field(description="The date freshness is judged on (India time).")
+    specialties: List[str] = Field(description="Every specialty in the served data, sorted.")
+    sources: List[DatasetSource]
 
 
 class ConsultationPage(BaseModel):
@@ -126,6 +196,7 @@ class ConsultationPage(BaseModel):
     total: int = Field(description="Number of listings matching the filters.")
     limit: int
     offset: int
+    dataset: ConsultationDataset
 
 
 class ServiceErrorResponse(BaseModel):

@@ -2,8 +2,10 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import fixture from '../../../tests/e2e/fixtures/consultations.json';
+import pilotFixture from '../../../tests/e2e/fixtures/consultations-pilot.json';
 import {
   ConsultationApiError,
+  type ConsultationDataset,
   type ConsultationListing,
   type ConsultationPage,
   type ConsultationQuery,
@@ -22,8 +24,10 @@ const pageOf = (...ids: string[]): ConsultationPage => ({
   total: ids.length,
   limit: 50,
   offset: 0,
+  dataset: fixture.dataset as ConsultationDataset,
   requestId: null,
 });
+const pilotPage = { ...pilotFixture, requestId: null } as ConsultationPage;
 const everything = pageOf(...all.map((item) => item.id));
 
 /** A request the test settles by hand, to control the order responses arrive in. */
@@ -299,5 +303,104 @@ describe('Find Consultations without the directory API', () => {
     await flush();
 
     expect(screen.getByRole('alert')).toHaveTextContent('Directory temporarily unavailable');
+  });
+});
+
+describe('Find Consultations with pilot data (fictional fixture)', () => {
+  const row = (name: string) =>
+    within(screen.getByRole('list', { name: 'Consultation listings' }))
+      .getByText(name, { selector: 'strong' })
+      .closest('li')!;
+
+  beforeEach(() => listConsultations.mockResolvedValue(pilotPage));
+
+  it('labels the source, the fees, eligibility and stale listings', async () => {
+    renderScreen();
+    await flush();
+
+    expect(names()).toHaveLength(6);
+    expect(screen.getByText('Pilot · fictional fixture')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Pilot listings for Sample District \(fictional\)/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Fictional record')).toBeNull();
+    expect(screen.getAllByText('Fictional test fixture')).toHaveLength(6);
+
+    const civil = row('Fixture Civil Hospital OPD (fictional)');
+    expect(civil).toHaveTextContent('₹10 (fixture)');
+    expect(civil).toHaveTextContent('Checked 2 Nov 2026');
+    const free = row('Fixture Health and Wellness Centre (fictional)');
+    expect(free).toHaveTextContent('Free (fixture)');
+    expect(free).toHaveTextContent('Eligibility: Free for residents of Ward 4');
+    expect(row('Fixture Teleconsultation Service (fictional)')).toHaveTextContent(
+      'Fee not listed (fixture)',
+    );
+    const camp = row('Fixture Child Health Camp (fictional)');
+    expect(camp).toHaveTextContent('Needs recheck (fixture)');
+    expect(camp).not.toHaveTextContent(/Free/);
+    expect(within(camp).getByText('Needs recheck')).toBeInTheDocument();
+    const list = screen.getByRole('list', { name: 'Consultation listings' });
+    expect(within(list).getAllByText('Needs recheck')).toHaveLength(2);
+  });
+
+  it('uses the served specialties and names the Free filter for current sources', async () => {
+    renderScreen();
+    await flush();
+
+    const specialties = within(screen.getByLabelText('Specialty'))
+      .getAllByRole('option')
+      .map((option) => option.textContent);
+    expect(specialties).toEqual([
+      'All specialties',
+      'Dermatology',
+      'ENT',
+      'General practice',
+      'Paediatrics',
+    ]);
+    const free = within(screen.getByLabelText('Fee')).getByRole('option', {
+      name: 'Free (current source)',
+    });
+    expect(free).toHaveAttribute('value', 'Free (illustrative)');
+    fireEvent.change(screen.getByLabelText('Fee'), { target: { value: 'Free (illustrative)' } });
+    await flush();
+    expect(queries().at(-1)).toEqual({ feeState: 'free' });
+  });
+
+  it('shows the source link and check date in the details', async () => {
+    renderScreen();
+    await flush();
+
+    fireEvent.click(
+      within(row('Fixture Child Health Camp (fictional)')).getByRole('button', { name: 'Details' }),
+    );
+    const dialog = screen.getByRole('dialog', { name: /Fixture Child Health Camp/ });
+    const link = within(dialog).getByRole('link', { name: /Open the source page/ });
+    expect(link).toHaveAttribute('href', 'https://pilot-source.example.org/facilities/child-camp');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(dialog).toHaveTextContent('Last checked 1 Jun 2026 · Needs recheck');
+    expect(dialog).toHaveTextContent(
+      'MedAssist hides the Free label until the listing is rechecked',
+    );
+    expect(dialog).toHaveTextContent('Children under 12 only (fixture condition).');
+    expect(dialog).toHaveTextContent('Reuse basis: FICTIONAL TEST DATA');
+    expect(dialog).toHaveTextContent('Fictional pilot fixture');
+  });
+
+  it('compares up to three pilot options', async () => {
+    renderScreen();
+    await flush();
+    for (const name of ['Fixture Civil', 'Fixture Health and Wellness', 'Fixture Child Health'])
+      fireEvent.click(screen.getByRole('button', { name: new RegExp(`^Compare\\s*${name}`) }));
+
+    const table = screen.getByRole('table', { name: 'consultation comparison' });
+    expect(within(table).getAllByRole('columnheader')).toHaveLength(4);
+    expect(table).toHaveTextContent('Free (fixture)');
+    expect(table).toHaveTextContent('Needs recheck (fixture)');
+    expect(table).toHaveTextContent('Last checked 2 Nov 2026 · current until 31 Jan 2027');
+    const fourth = screen.getByRole('button', { name: /^Compare\s*Fixture Skin Clinic/ });
+    fireEvent.click(fourth);
+    expect(within(fourth.closest('li')!).getByRole('status')).toHaveTextContent(
+      'You can compare up to 3 options',
+    );
   });
 });

@@ -145,10 +145,19 @@ class ConsultationContractTests(unittest.TestCase):
 
         self.assertEqual(
             set(parameters),
-            {"q", "specialty", "mode", "fee_state", "max_fee_minor", "limit", "offset"},
+            {
+                "q",
+                "specialty",
+                "mode",
+                "fee_state",
+                "max_fee_minor",
+                "limit",
+                "offset",
+                "dataset",
+            },
         )
         self.assertFalse(any(item["required"] for item in parameters.values()))
-        self.assertEqual(set(operation["responses"]), {"200", "422", "503"})
+        self.assertEqual(set(operation["responses"]), {"200", "404", "422", "503"})
         for status, model in (("200", "ConsultationPage"), ("503", "ServiceErrorResponse")):
             reference = operation["responses"][status]["content"]["application/json"][
                 "schema"
@@ -279,3 +288,58 @@ class SeedRecordTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PilotSettingTests(unittest.TestCase):
+    """MEDASSIST_CONSULTATION_PILOT is off by default and read at startup."""
+
+    def make_client(self, **environment):
+        settings = {
+            "MEDASSIST_DATABASE_URL": "",
+            "MEDASSIST_CORS_ORIGINS": "",
+            "MEDASSIST_CONSULTATION_PILOT": "",
+            "MEDASSIST_PILOT_FRESHNESS_DAYS": "",
+            "MEDASSIST_PILOT_AS_OF": "",
+            **environment,
+        }
+        with patch.dict("os.environ", settings):
+            application = create_app()
+        client = TestClient(application)
+        client.__enter__()
+        self.addCleanup(client.__exit__, None, None, None)
+        return client, application
+
+    def test_the_pilot_is_off_by_default(self):
+        client, application = self.make_client()
+        settings = application.state.pilot_settings
+
+        self.assertFalse(settings.enabled)
+        self.assertEqual(settings.freshness_days, 90)
+        refused = client.get(PATH, params={"dataset": "pilot"})
+        self.assertEqual(refused.status_code, 404)
+        self.assertIn("not enabled", refused.json()["detail"])
+        self.assertEqual(client.get(PATH, params={"dataset": "other"}).status_code, 422)
+
+    def test_pilot_settings_are_read_at_startup(self):
+        _, application = self.make_client(
+            MEDASSIST_CONSULTATION_PILOT="ON",
+            MEDASSIST_PILOT_FRESHNESS_DAYS="30",
+            MEDASSIST_PILOT_AS_OF="2026-11-13",
+        )
+        settings = application.state.pilot_settings
+
+        self.assertTrue(settings.enabled)
+        self.assertEqual(settings.freshness_days, 30)
+        self.assertEqual(settings.as_of().isoformat(), "2026-11-13")
+
+    def test_invalid_pilot_settings_stop_startup(self):
+        for name, value in (
+            ("MEDASSIST_CONSULTATION_PILOT", "yes"),
+            ("MEDASSIST_PILOT_FRESHNESS_DAYS", "0"),
+            ("MEDASSIST_PILOT_FRESHNESS_DAYS", "400"),
+            ("MEDASSIST_PILOT_AS_OF", "13/11/2026"),
+        ):
+            with self.subTest(name=name, value=value):
+                with patch.dict("os.environ", {name: value, "MEDASSIST_CORS_ORIGINS": ""}):
+                    with self.assertRaisesRegex(ValueError, name):
+                        create_app()

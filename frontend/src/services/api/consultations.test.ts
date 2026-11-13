@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import page from '../../../tests/e2e/fixtures/consultations.json';
+import pilotPage from '../../../tests/e2e/fixtures/consultations-pilot.json';
 import { ConsultationApiError, listConsultations } from './consultations';
 
 const ORIGIN = 'http://127.0.0.1:8000';
@@ -9,6 +10,7 @@ const json = (body: unknown, init: ResponseInit = {}) =>
     headers: { 'Content-Type': 'application/json', ...init.headers },
   });
 const clone = () => structuredClone(page);
+const clonePilot = () => structuredClone(pilotPage);
 
 function stubFetch(...responses: (Response | Error)[]) {
   const fetch = vi.fn();
@@ -81,7 +83,7 @@ describe('consultation directory client', () => {
 
   it('accepts an empty page', async () => {
     vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
-    stubFetch(json({ items: [], total: 0, limit: 50, offset: 0 }));
+    stubFetch(json({ items: [], total: 0, limit: 50, offset: 0, dataset: page.dataset }));
 
     await expect(listConsultations({ q: 'nothing' })).resolves.toMatchObject({
       items: [],
@@ -115,6 +117,52 @@ describe('consultation directory client', () => {
       const error = await failure(listConsultations());
       expect(error.kind, `case ${index}`).toBe('unexpected');
       expect(error.requestId).toBe(`id-${index}`);
+    }
+  });
+
+  it('accepts the pilot page and its dataset description', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+    stubFetch(json(pilotPage));
+
+    const result = await listConsultations();
+
+    expect(result.dataset).toMatchObject({
+      mode: 'pilot',
+      pilot_enabled: true,
+      freshness_days: 90,
+    });
+    expect(result.items.map((item) => item.verification.status)).toEqual([
+      'needs_recheck',
+      'current',
+      'needs_recheck',
+      'current',
+      'current',
+      'current',
+    ]);
+  });
+
+  it('rejects pilot listings that could pass for verified or show a stale Free', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+    // items: 0 fx-child-camp (stale, free suppressed), 1 fx-civil-opd, 5 fx-wellness-free
+    const broken: ((body: ReturnType<typeof clonePilot>) => void)[] = [
+      (body) => delete (body as { dataset?: unknown }).dataset,
+      (body) => (body.items[1].source.listing_url = null as never), // no source page
+      (body) => (body.items[1].source.listing_url = 'http://pilot-source.example.org/a'),
+      (body) => (body.items[1].source.last_checked_on = null as never), // no check date
+      (body) => (body.items[1].verification.checked_on = '2026-11-01'), // dates disagree
+      (body) => (body.items[1].verification.status = 'fictional_demo'),
+      (body) => (body.items[1].is_fictional = false), // fixture presented as real
+      (body) => (body.items[5].verification.status = 'needs_recheck'), // stale yet Free
+      (body) => (body.items[1].verification.free_label_suppressed = true), // not stale
+      (body) => (body.items[0].verification.status = 'current'), // suppressed yet current
+      (body) => (body.dataset.mode = 'live'),
+    ];
+    for (const [index, change] of broken.entries()) {
+      const body = clonePilot();
+      change(body);
+      stubFetch(json(body));
+
+      expect((await failure(listConsultations())).kind, `case ${index}`).toBe('unexpected');
     }
   });
 

@@ -2405,3 +2405,48 @@
     padding-inline: 12px;
   }
 }
+/* Pilot listings: eligibility beside the fee, freshness and provenance. */
+.consult-eligibility {
+  max-width: 28ch;
+  font-size: var(--text-xs);
+  color: var(--text);
+}
+.consult-recheck,
+.consult-recheck-text {
+  font-weight: 600;
+  color: var(--amber);
+}
+.consult-recheck {
+  border-radius: 999px;
+  padding: 0 8px;
+  font-size: var(--text-xs);
+  background: var(--amber-soft);
+}
+.consult-checked {
+  font-size: var(--text-xs);
+}
+.consult-source-detail {
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+.consult-source-detail h3 {
+  margin: 0 0 4px;
+  font-size: var(--text-sm);
+}
+.consult-source-detail p + p {
+  margin-top: 4px;
+}
+.consult-source-detail a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .consult-eligibility {
+    max-width: none;
+  }
+}

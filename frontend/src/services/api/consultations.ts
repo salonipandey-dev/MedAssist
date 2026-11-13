@@ -32,16 +32,30 @@ const feeSchema = z.discriminatedUnion('state', [
   }),
 ]);
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const httpsUrl = z.string().regex(/^https:\/\/[^\s/?#@]+(?:[/?#][^\s]*)?$/);
+const sourceKindSchema = z.enum(['fictional_seed', 'reviewed_external', 'pilot_fixture']);
+
 const sourceSchema = z.object({
-  kind: z.enum(['fictional_seed', 'reviewed_external']),
+  kind: sourceKindSchema,
   id: text,
   name: text,
   version: text,
-  url: z.string().nullable(),
-  last_checked_on: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/)
-    .nullable(),
+  url: httpsUrl.nullable(),
+  last_checked_on: isoDate.nullable(),
+  /** The page this listing was checked against (pilot listings). */
+  listing_url: httpsUrl.nullable(),
+  publisher: z.string().nullable(),
+  locality: z.string().nullable(),
+  reuse_basis: z.string().nullable(),
+  reuse_basis_url: httpsUrl.nullable(),
+});
+
+const verificationSchema = z.object({
+  status: z.enum(['fictional_demo', 'current', 'needs_recheck']),
+  checked_on: isoDate.nullable(),
+  recheck_due_on: isoDate.nullable(),
+  free_label_suppressed: z.boolean(),
 });
 
 const listingSchema = z
@@ -59,26 +73,71 @@ const listingSchema = z
     notes: z.string().nullable(),
     is_fictional: z.boolean(),
     source: sourceSchema,
+    verification: verificationSchema,
   })
-  // A fictional record must never look externally verified.
   .refine(
-    (listing) =>
-      listing.is_fictional === (listing.source.kind === 'fictional_seed') &&
-      (!listing.is_fictional ||
-        (listing.source.url === null && listing.source.last_checked_on === null)),
-    { message: 'fictional flag and source verification fields disagree' },
+    ({ is_fictional, source, verification, fee }) => {
+      // Only reviewed listings are real; seed and fixture records are fictional.
+      if (is_fictional !== (source.kind !== 'reviewed_external')) return false;
+      // The demo seed must never look externally verified.
+      if (source.kind === 'fictional_seed')
+        return (
+          source.url === null &&
+          source.last_checked_on === null &&
+          source.listing_url === null &&
+          verification.status === 'fictional_demo' &&
+          !verification.free_label_suppressed
+        );
+      // Pilot listings always carry the page and date they were checked against,
+      // and "Free" is only possible while that check is current.
+      return (
+        source.listing_url !== null &&
+        source.last_checked_on !== null &&
+        verification.checked_on === source.last_checked_on &&
+        verification.status !== 'fictional_demo' &&
+        !(fee.state === 'free' && verification.status !== 'current') &&
+        (!verification.free_label_suppressed ||
+          (verification.status === 'needs_recheck' && fee.state === 'unknown'))
+      );
+    },
+    { message: 'fictional flag, source and verification fields disagree' },
   );
+
+const datasetSchema = z.object({
+  mode: z.enum(['demo', 'pilot']),
+  pilot_enabled: z.boolean(),
+  freshness_days: z.number().int().positive(),
+  as_of: isoDate,
+  specialties: z.array(text),
+  sources: z.array(
+    z.object({
+      id: text,
+      kind: sourceKindSchema,
+      name: text,
+      version: text,
+      url: httpsUrl.nullable(),
+      publisher: z.string().nullable(),
+      locality: z.string().nullable(),
+      reuse_basis: z.string().nullable(),
+      reuse_basis_url: httpsUrl.nullable(),
+      imported_at: z.string().nullable(),
+      listing_count: z.number().int().nonnegative().nullable(),
+    }),
+  ),
+});
 
 const pageSchema = z.object({
   items: z.array(listingSchema),
   total: z.number().int().nonnegative(),
   limit: z.number().int().positive(),
   offset: z.number().int().nonnegative(),
+  dataset: datasetSchema,
 });
 
 export type ConsultationMode = z.infer<typeof modeSchema>;
 export type ConsultationFeeState = z.infer<typeof feeStateSchema>;
 export type ConsultationListing = z.infer<typeof listingSchema>;
+export type ConsultationDataset = z.infer<typeof datasetSchema>;
 export type ConsultationPage = z.infer<typeof pageSchema> & { requestId: string | null };
 
 export interface ConsultationQuery {

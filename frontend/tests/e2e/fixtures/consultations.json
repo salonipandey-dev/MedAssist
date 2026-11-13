@@ -24,7 +24,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -51,7 +62,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -78,7 +100,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -105,7 +138,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -132,7 +176,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -159,7 +214,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -186,7 +252,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -213,7 +290,18 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     },
     {
@@ -240,11 +328,44 @@
         "name": "MedAssist fictional demonstration directory",
         "version": "1.0.0",
         "url": null,
-        "last_checked_on": null
+        "last_checked_on": null,
+        "listing_url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "fictional_demo",
+        "checked_on": null,
+        "recheck_due_on": null,
+        "free_label_suppressed": false
       }
     }
   ],
   "total": 9,
   "limit": 20,
-  "offset": 0
+  "offset": 0,
+  "dataset": {
+    "mode": "demo",
+    "pilot_enabled": false,
+    "freshness_days": 90,
+    "as_of": "2026-11-13",
+    "specialties": ["Dermatology", "ENT", "General practice", "Internal medicine", "Paediatrics"],
+    "sources": [
+      {
+        "id": "medassist-fictional-seed",
+        "kind": "fictional_seed",
+        "name": "MedAssist fictional demonstration directory",
+        "version": "1.0.0",
+        "url": null,
+        "publisher": null,
+        "locality": null,
+        "reuse_basis": null,
+        "reuse_basis_url": null,
+        "imported_at": null,
+        "listing_count": null
+      }
+    ]
+  }
 }

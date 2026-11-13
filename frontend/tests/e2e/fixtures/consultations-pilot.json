@@ -1,0 +1,257 @@
+{
+  "items": [
+    {
+      "id": "fx-child-camp",
+      "provider_name": "Fixture Child Health Camp (fictional)",
+      "provider_type": "community_camp",
+      "specialty": "Paediatrics",
+      "modes": ["in_person"],
+      "area": "Old Market, Sample District (fictional)",
+      "fee": {
+        "state": "unknown",
+        "amount_minor": null,
+        "currency": null,
+        "basis": null
+      },
+      "access_conditions": "Children under 12 only (fixture condition).",
+      "languages": ["Hindi"],
+      "hours": "First Saturday of the month (fixture)",
+      "notes": "Checked long ago so it shows Needs recheck.",
+      "is_fictional": true,
+      "source": {
+        "kind": "pilot_fixture",
+        "id": "pilot-fixture-sample-district",
+        "name": "Pilot test fixture (fictional)",
+        "version": "2026.11-fixture-1",
+        "url": "https://pilot-source.example.org/health-facilities",
+        "last_checked_on": "2026-06-01",
+        "listing_url": "https://pilot-source.example.org/facilities/child-camp",
+        "publisher": "Fictional district health office (test fixture)",
+        "locality": "Sample District (fictional)",
+        "reuse_basis": "FICTIONAL TEST DATA written for MedAssist to exercise the pilot import. No real provider, source or licence is involved.",
+        "reuse_basis_url": "https://pilot-source.example.org/terms"
+      },
+      "verification": {
+        "status": "needs_recheck",
+        "checked_on": "2026-06-01",
+        "recheck_due_on": "2026-08-30",
+        "free_label_suppressed": true
+      }
+    },
+    {
+      "id": "fx-civil-opd",
+      "provider_name": "Fixture Civil Hospital OPD (fictional)",
+      "provider_type": "hospital_outpatient",
+      "specialty": "General practice",
+      "modes": ["in_person"],
+      "area": "Civil Lines, Sample District (fictional)",
+      "fee": {
+        "state": "known",
+        "amount_minor": 1000,
+        "currency": "INR",
+        "basis": "Fixture source lists an OPD registration fee of ₹10 per visit."
+      },
+      "access_conditions": "Bring an identity document to the registration counter (fixture condition).",
+      "languages": ["Hindi", "English"],
+      "hours": "Mon–Sat 08:00–14:00 (fixture)",
+      "notes": "Fictional test record.",
+      "is_fictional": true,
+      "source": {
+        "kind": "pilot_fixture",
+        "id": "pilot-fixture-sample-district",
+        "name": "Pilot test fixture (fictional)",
+        "version": "2026.11-fixture-1",
+        "url": "https://pilot-source.example.org/health-facilities",
+        "last_checked_on": "2026-11-02",
+        "listing_url": "https://pilot-source.example.org/facilities/civil-opd",
+        "publisher": "Fictional district health office (test fixture)",
+        "locality": "Sample District (fictional)",
+        "reuse_basis": "FICTIONAL TEST DATA written for MedAssist to exercise the pilot import. No real provider, source or licence is involved.",
+        "reuse_basis_url": "https://pilot-source.example.org/terms"
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-02",
+        "recheck_due_on": "2027-01-31",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "fx-ent-opd",
+      "provider_name": "Fixture ENT Outpatient (fictional)",
+      "provider_type": "hospital_outpatient",
+      "specialty": "ENT",
+      "modes": ["in_person"],
+      "area": "Civil Lines, Sample District (fictional)",
+      "fee": {
+        "state": "known",
+        "amount_minor": 5000,
+        "currency": "INR",
+        "basis": "Fixture source listed ₹50 per visit when it was checked."
+      },
+      "access_conditions": null,
+      "languages": ["Hindi"],
+      "hours": "Mon–Fri 09:00–13:00 (fixture)",
+      "notes": "Checked long ago so it shows Needs recheck.",
+      "is_fictional": true,
+      "source": {
+        "kind": "pilot_fixture",
+        "id": "pilot-fixture-sample-district",
+        "name": "Pilot test fixture (fictional)",
+        "version": "2026.11-fixture-1",
+        "url": "https://pilot-source.example.org/health-facilities",
+        "last_checked_on": "2026-07-01",
+        "listing_url": "https://pilot-source.example.org/facilities/ent-opd",
+        "publisher": "Fictional district health office (test fixture)",
+        "locality": "Sample District (fictional)",
+        "reuse_basis": "FICTIONAL TEST DATA written for MedAssist to exercise the pilot import. No real provider, source or licence is involved.",
+        "reuse_basis_url": "https://pilot-source.example.org/terms"
+      },
+      "verification": {
+        "status": "needs_recheck",
+        "checked_on": "2026-07-01",
+        "recheck_due_on": "2026-09-29",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "fx-skin-clinic",
+      "provider_name": "Fixture Skin Clinic (fictional)",
+      "provider_type": "clinic",
+      "specialty": "Dermatology",
+      "modes": ["in_person", "video"],
+      "area": "Station Road, Sample District (fictional)",
+      "fee": {
+        "state": "known",
+        "amount_minor": 25000,
+        "currency": "INR",
+        "basis": "Fixture source lists ₹250 for a first consultation."
+      },
+      "access_conditions": null,
+      "languages": ["Hindi", "English"],
+      "hours": "Tue–Sun 10:00–18:00 (fixture)",
+      "notes": "Fictional test record.",
+      "is_fictional": true,
+      "source": {
+        "kind": "pilot_fixture",
+        "id": "pilot-fixture-sample-district",
+        "name": "Pilot test fixture (fictional)",
+        "version": "2026.11-fixture-1",
+        "url": "https://pilot-source.example.org/health-facilities",
+        "last_checked_on": "2026-10-28",
+        "listing_url": "https://pilot-source.example.org/facilities/skin-clinic",
+        "publisher": "Fictional district health office (test fixture)",
+        "locality": "Sample District (fictional)",
+        "reuse_basis": "FICTIONAL TEST DATA written for MedAssist to exercise the pilot import. No real provider, source or licence is involved.",
+        "reuse_basis_url": "https://pilot-source.example.org/terms"
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-10-28",
+        "recheck_due_on": "2027-01-26",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "fx-tele-unknown",
+      "provider_name": "Fixture Teleconsultation Service (fictional)",
+      "provider_type": "teleconsultation",
+      "specialty": "General practice",
+      "modes": ["video", "phone"],
+      "area": "Remote, Sample District (fictional)",
+      "fee": {
+        "state": "unknown",
+        "amount_minor": null,
+        "currency": null,
+        "basis": null
+      },
+      "access_conditions": "Needs a registered mobile number (fixture condition).",
+      "languages": ["Hindi", "English"],
+      "hours": null,
+      "notes": "The fixture source gives no price for this service.",
+      "is_fictional": true,
+      "source": {
+        "kind": "pilot_fixture",
+        "id": "pilot-fixture-sample-district",
+        "name": "Pilot test fixture (fictional)",
+        "version": "2026.11-fixture-1",
+        "url": "https://pilot-source.example.org/health-facilities",
+        "last_checked_on": "2026-10-20",
+        "listing_url": "https://pilot-source.example.org/facilities/teleconsultation",
+        "publisher": "Fictional district health office (test fixture)",
+        "locality": "Sample District (fictional)",
+        "reuse_basis": "FICTIONAL TEST DATA written for MedAssist to exercise the pilot import. No real provider, source or licence is involved.",
+        "reuse_basis_url": "https://pilot-source.example.org/terms"
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-10-20",
+        "recheck_due_on": "2027-01-18",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "fx-wellness-free",
+      "provider_name": "Fixture Health and Wellness Centre (fictional)",
+      "provider_type": "clinic",
+      "specialty": "General practice",
+      "modes": ["in_person"],
+      "area": "Ward 4, Sample District (fictional)",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "Fixture source states that consultations at this centre are free of charge."
+      },
+      "access_conditions": "Free for residents of Ward 4 who register with an identity document (fixture condition).",
+      "languages": ["Hindi"],
+      "hours": "Mon–Sat 09:00–16:00 (fixture)",
+      "notes": "Fictional test record.",
+      "is_fictional": true,
+      "source": {
+        "kind": "pilot_fixture",
+        "id": "pilot-fixture-sample-district",
+        "name": "Pilot test fixture (fictional)",
+        "version": "2026.11-fixture-1",
+        "url": "https://pilot-source.example.org/health-facilities",
+        "last_checked_on": "2026-11-02",
+        "listing_url": "https://pilot-source.example.org/facilities/wellness-ward-4",
+        "publisher": "Fictional district health office (test fixture)",
+        "locality": "Sample District (fictional)",
+        "reuse_basis": "FICTIONAL TEST DATA written for MedAssist to exercise the pilot import. No real provider, source or licence is involved.",
+        "reuse_basis_url": "https://pilot-source.example.org/terms"
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-02",
+        "recheck_due_on": "2027-01-31",
+        "free_label_suppressed": false
+      }
+    }
+  ],
+  "total": 6,
+  "limit": 20,
+  "offset": 0,
+  "dataset": {
+    "mode": "pilot",
+    "pilot_enabled": true,
+    "freshness_days": 90,
+    "as_of": "2026-11-13",
+    "specialties": ["Dermatology", "ENT", "General practice", "Paediatrics"],
+    "sources": [
+      {
+        "id": "pilot-fixture-sample-district",
+        "kind": "pilot_fixture",
+        "name": "Pilot test fixture (fictional)",
+        "version": "2026.11-fixture-1",
+        "url": "https://pilot-source.example.org/health-facilities",
+        "publisher": "Fictional district health office (test fixture)",
+        "locality": "Sample District (fictional)",
+        "reuse_basis": "FICTIONAL TEST DATA written for MedAssist to exercise the pilot import. No real provider, source or licence is involved.",
+        "reuse_basis_url": "https://pilot-source.example.org/terms",
+        "imported_at": "2026-11-13T04:30:00Z",
+        "listing_count": 6
+      }
+    ]
+  }
+}

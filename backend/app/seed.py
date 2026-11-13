@@ -201,10 +201,12 @@ FICTIONAL_LISTINGS = [
 
 def _upsert(connection, table, rows: list[dict]) -> None:
     statement = insert(table).values(rows)
+    # Only the columns the seed writes: the seed also runs on a database at
+    # revision 0001, before later migrations add columns (such as the pilot's).
     updates = {
-        column.name: statement.excluded[column.name]
-        for column in table.columns
-        if not column.primary_key
+        name: statement.excluded[name]
+        for name in rows[0]
+        if not table.columns[name].primary_key
     }
     connection.execute(
         statement.on_conflict_do_update(index_elements=["id"], set_=updates)
