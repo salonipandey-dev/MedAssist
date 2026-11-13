@@ -1,0 +1,259 @@
+[
+  {
+    "id": "SS01",
+    "file": "ss01-home.png",
+    "route": "/",
+    "state": "Initial viewport",
+    "caption": "Public homepage of the MedAssist academic prototype.",
+    "status": "Implemented interface",
+    "limitation": "Interface only; not a deployed clinical service.",
+    "files": [
+      "ss01-home.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:14.881Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS02",
+    "file": "ss02-demo-access.png",
+    "route": "/demo",
+    "state": "Initial viewport",
+    "caption": "Demo access page for choosing a fictional patient, doctor or administrator view.",
+    "status": "Demonstration only",
+    "limitation": "Role choice is not registration, login or authentication.",
+    "files": [
+      "ss02-demo-access.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:15.585Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS03",
+    "file": "ss03-patient-overview.png",
+    "route": "/app/patient",
+    "state": "Fresh seeded state",
+    "caption": "Patient overview summarising fictional cases, an appointment and documents.",
+    "status": "Demonstration only",
+    "limitation": "Records are fictional and held in page memory; they reset on reload.",
+    "files": [
+      "ss03-patient-overview.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:16.359Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS04",
+    "file": "ss04-profile.png",
+    "route": "/app/patient/profile",
+    "state": "Edit profile opened",
+    "caption": "Profile editor: only a fictional display alias and a language-preference label can be changed.",
+    "status": "Demonstration only",
+    "limitation": "No personal, contact or medical details are collected; the language label does not translate the interface.",
+    "files": [
+      "ss04-profile.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:17.105Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS05",
+    "file": "ss05-assessment.png",
+    "route": "/app/patient/assessments",
+    "state": "Step 5 of 6, “Review the predefined sample.”",
+    "caption": "Review step of the fixed assessment walkthrough with predefined content.",
+    "status": "Demonstration only",
+    "limitation": "No symptom analysis, urgency classification or advice is produced.",
+    "files": [
+      "ss05-assessment.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:18.023Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS06",
+    "file": "ss06-cases.png",
+    "route": "/app/patient/cases",
+    "state": "Fresh seeded state",
+    "caption": "Case tracking with temporary sample records and workflow statuses.",
+    "status": "Demonstration only",
+    "limitation": "Status is coordination progress, not medical urgency; changes reset on reload.",
+    "files": [
+      "ss06-cases.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:18.755Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS07",
+    "file": "ss07-doctor-review.png",
+    "route": "/app/doctor/reviews/MA-2402",
+    "state": "Confirmation ticked and sample review recorded",
+    "crop": ".review-right",
+    "caption": "Demonstration review recorded for fictional case MA-2402 with a predefined note.",
+    "status": "Demonstration only",
+    "limitation": "No authenticated clinician and no clinical conclusion; AI assistance is not available.",
+    "files": [
+      "ss07-doctor-review.png",
+      "ss07-doctor-review-crop.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:20.233Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS08",
+    "file": "ss08-appointments.png",
+    "route": "/app/patient/appointments",
+    "state": "Monday 2 November 2026, 09:00 selected; request confirmation dialog open",
+    "caption": "Confirmation step for a fictional appointment request.",
+    "status": "Demonstration only",
+    "limitation": "Fictional availability; nothing is booked and no message is sent.",
+    "files": [
+      "ss08-appointments.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:21.497Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS09",
+    "file": "ss09-admin-analytics.png",
+    "route": "/app/admin/analytics",
+    "state": "All months",
+    "crop": ".admin-chart-grid",
+    "caption": "Administrator analytics calculated from synthetic sample records.",
+    "status": "Demonstration only",
+    "limitation": "Figures are not real patient or hospital statistics.",
+    "files": [
+      "ss09-admin-analytics.png",
+      "ss09-admin-analytics-crop.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:22.561Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS10",
+    "file": "ss10-consultation-comparison.png",
+    "route": "/app/patient/consultations?source=offline",
+    "state": "First three fictional options added to the comparison",
+    "crop": ".consult-compare",
+    "caption": "Comparison of three fictional consultation options with illustrative fees.",
+    "status": "Demonstration only",
+    "limitation": "Providers and fees are invented; no verified free service, real availability or booking.",
+    "files": [
+      "ss10-consultation-comparison.png",
+      "ss10-consultation-comparison-crop.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:23.690Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS11",
+    "file": "ss11-medication-information.png",
+    "route": "/app/patient/medications",
+    "state": "Scripted example “Same ingredient in two products”",
+    "crop": ".med-layout",
+    "caption": "Scripted medication-information example with invented medicine names.",
+    "status": "Demonstration only",
+    "limitation": "Notices are written in advance; nothing is checked and no notice does not mean a combination is safe.",
+    "files": [
+      "ss11-medication-information.png",
+      "ss11-medication-information-crop.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:24.635Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS11b",
+    "file": "ss11b-medication-incomplete.png",
+    "route": "/app/patient/medications",
+    "state": "Scripted example “Incomplete information”",
+    "crop": ".med-layout",
+    "caption": "Scripted example showing missing information kept separate from possible issues.",
+    "status": "Demonstration only",
+    "limitation": "“Not recorded” is shown as different from “none”; no assessment is performed.",
+    "files": [
+      "ss11b-medication-incomplete.png",
+      "ss11b-medication-incomplete-crop.png"
+    ],
+    "viewport": "1440 × 900 (device scale factor 2)",
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:25.662Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  },
+  {
+    "id": "SS12",
+    "file": "ss12-patient-overview-mobile.png",
+    "route": "/app/patient",
+    "viewport": "390 × 844 (device scale factor 2)",
+    "state": "Fresh seeded state, 390 × 844",
+    "caption": "Patient overview at a mobile viewport, showing the responsive layout.",
+    "status": "Demonstration only",
+    "limitation": "Chromium emulation, not a physical-device test.",
+    "files": [
+      "ss12-patient-overview-mobile.png"
+    ],
+    "theme": "light",
+    "capturedAt": "2026-11-13T14:26:26.257Z",
+    "timeZone": "Asia/Calcutta",
+    "commit": "f0718de53898501a4f3bbe0534c6fe70a9db70b4",
+    "dirty": false,
+    "browser": "Chromium 141.0.7390.37"
+  }
+]
