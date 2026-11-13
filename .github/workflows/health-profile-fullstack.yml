@@ -1,10 +1,11 @@
 name: Health profile (full stack)
 
-# Proves sign-in, private health profiles (MA-04) and the demo medication check (MA-05)
-# end to end with nothing mocked: a real PostgreSQL service, the FastAPI app under
-# uvicorn and the compiled React build in Chromium. FastAPI is stopped and started
-# again between the browser phases, and Patient B's sessions are expired directly in
-# PostgreSQL before phase 3. All accounts and entries are fictional.
+# Proves sign-in, private health profiles (MA-04), the demo medication check (MA-05)
+# and the consultation pilot (MA-06) end to end with nothing mocked: a real PostgreSQL
+# service, the FastAPI app under uvicorn and the compiled React build in Chromium.
+# FastAPI is stopped and started again between the browser phases, and Patient B's
+# sessions are expired directly in PostgreSQL before phase 3. All accounts, entries and
+# pilot listings are fictional; the pilot data is the labelled test fixture.
 on:
   push:
     branches: [main]
@@ -72,10 +73,11 @@ jobs:
         run: |
           python -m alembic upgrade 0001
           python -m app.seed
-          before="$(psql -d medassist_test -Atc 'SELECT md5(string_agg(t::text, $$|$$ ORDER BY id)) FROM consultation_listings t')"
+          before="$(psql -d medassist_test -Atc 'SELECT md5(string_agg(to_jsonb(t)::text, $$|$$ ORDER BY id)) FROM consultation_listings t')"
           python -m alembic upgrade head
-          python -m alembic current | tee /dev/stderr | grep -q "0002 (head)"
-          after="$(psql -d medassist_test -Atc 'SELECT md5(string_agg(t::text, $$|$$ ORDER BY id)) FROM consultation_listings t')"
+          python -m alembic current | tee /dev/stderr | grep -q "0003 (head)"
+          # 0003 adds an empty source_url column; every existing value must be unchanged.
+          after="$(psql -d medassist_test -Atc 'SELECT md5(string_agg((to_jsonb(t) - $$source_url$$)::text, $$|$$ ORDER BY id)) FROM consultation_listings t')"
           test "$before" = "$after"
           echo "Consultation listings unchanged by the upgrade ($after)."
           psql -d medassist_test -Atc "SELECT string_agg(tablename, ', ' ORDER BY tablename) FROM pg_tables WHERE schemaname = 'public'"
@@ -155,6 +157,77 @@ jobs:
           status="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8000/api/v1/me/medication-check)"
           echo "Signed-out medication check: $status"
           test "$status" = "401"
+      - name: Import the fictional pilot fixture twice, then a failing file
+        working-directory: backend
+        env:
+          MEDASSIST_PILOT_AS_OF: "2026-11-13"
+        run: |
+          snapshot() {
+            psql -d medassist_test -Atc "SELECT count(*) || ' ' || md5(string_agg(id, ',' ORDER BY id)) FROM consultation_listings WHERE source_kind = 'pilot_fixture'"
+          }
+          rows() {
+            psql -d medassist_test -Atc "SELECT md5(string_agg(to_jsonb(l)::text, '|' ORDER BY id)) FROM consultation_listings l"
+          }
+          everything() {
+            psql -d medassist_test -Atc "SELECT md5((SELECT string_agg(to_jsonb(l)::text, '|' ORDER BY id) FROM consultation_listings l) || (SELECT string_agg(to_jsonb(s)::text, '|' ORDER BY id) FROM consultation_sources s))"
+          }
+          python -m app.import_consultations app/fixtures/consultation_pilot_fixture.json
+          first="$(snapshot)"
+          first_rows="$(rows)"
+          python -m app.import_consultations app/fixtures/consultation_pilot_fixture.json
+          second="$(snapshot)"
+          echo "After import 1 (count, ID md5): $first"
+          echo "After import 2 (count, ID md5): $second"
+          test "$first" = "$second"
+          test "${first%% *}" = "6"
+          # The second import writes the same values: every listing row is identical.
+          test "$first_rows" = "$(rows)"
+          before_failure="$(everything)"
+          if python -m app.import_consultations tests/fixtures/consultation_pilot_id_clash.json; then
+            echo "The failing import unexpectedly succeeded." >&2
+            exit 1
+          fi
+          after_failure="$(everything)"
+          echo "Before the failed import: $before_failure"
+          echo "After the failed import:  $after_failure"
+          test "$before_failure" = "$after_failure"
+          psql -d medassist_test -c "SELECT id, version, listing_count, dataset_sha256 IS NOT NULL AS recorded FROM consultation_sources ORDER BY id"
+          psql -d medassist_test -c "SELECT id, fee_state, last_checked_on FROM consultation_listings WHERE source_kind = 'pilot_fixture' ORDER BY id"
+      - name: With the pilot off, the API serves only the fictional demo
+        run: |
+          curl -fsS http://127.0.0.1:8000/api/v1/consultations > "$RUNNER_TEMP/demo.json"
+          python - "$RUNNER_TEMP/demo.json" <<'PY'
+          import json, sys
+          page = json.load(open(sys.argv[1]))
+          ids = [item["id"] for item in page["items"]]
+          print("mode:", page["dataset"]["mode"], "ids:", ids)
+          assert page["dataset"]["mode"] == "demo" and not page["dataset"]["pilot_enabled"]
+          assert ids == [f"c-0{n}" for n in range(1, 10)], ids
+          assert all(item["source"]["kind"] == "fictional_seed" for item in page["items"])
+          PY
+          status="$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8000/api/v1/consultations?dataset=pilot')"
+          echo "dataset=pilot while off: $status"
+          test "$status" = "404"
+      - name: "Phase 5: the browser shows the fictional demo while the pilot is off"
+        working-directory: frontend
+        run: npx playwright test -c playwright.fullstack.config.ts --grep @consultation-demo
+      - name: Restart FastAPI with the consultation pilot on
+        working-directory: backend
+        env:
+          MEDASSIST_CONSULTATION_PILOT: "on"
+          MEDASSIST_PILOT_AS_OF: "2026-11-13"
+        run: |
+          old="$(cat "$RUNNER_TEMP/api.pid")"
+          kill "$old"
+          for attempt in $(seq 1 30); do kill -0 "$old" 2>/dev/null || break; sleep 1; done
+          if kill -0 "$old" 2>/dev/null; then echo "The old FastAPI process is still running." >&2; exit 1; fi
+          nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > "$RUNNER_TEMP/api-pilot.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/api.pid"
+          for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 1; done
+          curl -fsS 'http://127.0.0.1:8000/api/v1/consultations?fee_state=free' | python -c "import json,sys; p=json.load(sys.stdin); print(p['dataset']['mode'], [i['id'] for i in p['items']]); assert [i['id'] for i in p['items']] == ['fx-wellness-free']"
+      - name: "Phase 6: the browser loads pilot listings from PostgreSQL through FastAPI"
+        working-directory: frontend
+        run: npx playwright test -c playwright.fullstack.config.ts --grep @consultation-pilot
       - name: Check that API logs hold no credentials or profile contents
         run: |
           cat "$RUNNER_TEMP"/api-*.log | tail -n 40

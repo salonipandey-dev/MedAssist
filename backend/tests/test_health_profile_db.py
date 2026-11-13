@@ -210,7 +210,7 @@ class DatabaseTestCase(unittest.TestCase):
 class MigrationTests(DatabaseTestCase):
     def test_migration_is_at_head(self):
         version = self.sql("SELECT version_num FROM alembic_version").scalar_one()
-        self.assertEqual(version, "0002")
+        self.assertEqual(version, "0003")
 
     def test_fresh_database_migrates_to_every_table(self):
         self.assertEqual(migration_log["empty_tables"], set())

@@ -118,3 +118,40 @@ seed with `--reset-profiles` for a clean start). Then:
 5. In an InPrivate window, sign in as Patient B and run the check. B's own profile
    (Velorin, no known allergies, conditions not recorded) gives **More information
    needed**, with nothing from A's profile.
+
+## Before a medication pilot
+
+MA-06 pilots consultation listings only. Medication checks stay in **demo mode** on
+the fictional dataset above. No setting in this repository can switch them to real
+products. A separate medication pilot would need the following before release.
+None of it exists yet.
+
+1. **An appropriately licensed reference.** This means a drug and interaction
+   knowledge base licensed for this use: displaying results to patients inside
+   MedAssist, in India. Its licence terms, attribution, update schedule and
+   withdrawal process need to be recorded the way `reuse_basis` is recorded for
+   consultation sources. The fictional rules cannot be extended toward real
+   products by hand.
+2. **Documented coverage.** Record which products (Indian brand names and
+   generics), ingredients, strengths, allergy classes and conditions the
+   reference covers, which interaction and contraindication types the checks use,
+   and how an entry the reference cannot match is reported. "More information
+   needed" must stay distinct from "no matching rules", and neither may read as "safe".
+3. **Clinical review.** A licensed pharmacist or clinician needs to sign off the
+   rule selection, severity wording, patient-facing text and the instruction to
+   consult a professional. They also need to agree a process for reporting and
+   correcting errors. Results must still not be presented as diagnosis or
+   prescription.
+4. **Privacy review.** Medicines, allergies and conditions are sensitive health data.
+   The review should cover the lawful basis and consent under India's Digital
+   Personal Data Protection Act 2023, data minimisation, retention, access logging,
+   and whether any profile data would reach the reference provider (it should not
+   leave MedAssist).
+5. **Security review.** This covers threat modelling of the check endpoint and the
+   reference update path, the integrity of the imported reference (signed or hashed
+   versions, as the consultation importer records SHA-256), production-grade
+   sign-in hardening (rate limits, recovery), and log checks like the ones in the
+   full-stack workflow.
+6. **Its own switch and fixture.** Like the consultation pilot, a medication pilot
+   would need a server-side setting that is off by default, a fictional fixture for
+   CI, and a visible label that says which data is in use.

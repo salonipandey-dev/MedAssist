@@ -26,6 +26,12 @@ demonstration data; this is not a clinically deployed healthcare service.
   medicine–condition) from a versioned fictional dataset against the signed-in
   patient's saved profile, and reports unrecognised or unrecorded inputs. See
   [Medication checks with fictional data](docs/MEDICATION_CHECK_API.md).
+- Implemented: a consultation pilot with verified listings (MA-06), off by default.
+  A transactional importer loads one source's listings by stable ID. Each listing
+  records its source page, check date, fee basis and eligibility. Listings older
+  than the 90-day freshness window show **Needs recheck** and never show Free. No
+  approved source has been supplied yet, so only a clearly labelled fictional
+  fixture is included. See [Consultation pilot](docs/CONSULTATION_PILOT.md).
 - Frontend: public product website and distinct patient, doctor and administrator
   workspaces, with light/dark themes, case/review workflows, fictional appointments,
   safe document previews, searchable tables and derived sample analytics. Changes
@@ -197,7 +203,10 @@ as `@`, `:` or `/`, percent-encode them in the URL.
 
 The [consultation directory contract](docs/CONSULTATION_DIRECTORY_API.md)
 describes the filters, fee states, error responses and how the Find
-Consultations screen maps to the query parameters.
+Consultations screen maps to the query parameters. The optional
+[consultation pilot](docs/CONSULTATION_PILOT.md) (`MEDASSIST_CONSULTATION_PILOT=on`)
+adds imported, dated listings. It describes the import command, the settings and a
+Windows walkthrough.
 
 ### Add the fictional patient accounts
 
@@ -364,7 +373,10 @@ runs the real API, PostgreSQL and the compiled frontend in Chromium. It migrates
 database that already holds the directory and a fresh one, saves Patient A's profile,
 restarts FastAPI, checks persistence, Patient B's isolation, tampered requests,
 sign-out, a two-tab conflict and an expired session, and confirms that `/health` and
-consultation search still work without signing in.
+consultation search still work without signing in. It then imports the fictional
+pilot fixture twice (same count and IDs), runs a failing import (previous data
+unchanged), checks that the disabled pilot serves only the demo, restarts FastAPI
+with the pilot on and checks the pilot listings in Chromium.
 
 ## Repository layout
 
@@ -387,6 +399,9 @@ consultation search still work without signing in.
   the fictional demo dataset and the four checks; `backend/app/medication_check.py`
   is its read-only endpoint.
 - `backend/app/consultations.py`: consultation directory route and query.
+- `backend/app/consultation_pilot.py`, `backend/app/import_consultations.py`: the
+  pilot dataset format, freshness rules and the transactional import command.
+- `docs/CONSULTATION_PILOT.md`: pilot settings, import, candidate source and file map.
 - `backend/app/models.py`, `backend/app/db.py`: database tables and engine settings.
 - `backend/app/seed.py`: repeatable fictional seed command.
 - `backend/alembic.ini`, `backend/migrations/`: database migrations.

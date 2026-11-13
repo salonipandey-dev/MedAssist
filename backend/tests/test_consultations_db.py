@@ -133,7 +133,7 @@ class MigrationAndSeedTests(DatabaseTestCase):
         with engine.connect() as connection:
             version = connection.scalar(text("SELECT version_num FROM alembic_version"))
 
-        self.assertEqual(version, "0002")
+        self.assertEqual(version, "0003")
 
     def test_repeated_seed_keeps_ids_rows_and_count(self):
         listings, sources = first_seed_rows

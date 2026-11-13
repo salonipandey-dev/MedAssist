@@ -1,9 +1,13 @@
-"""Environment settings for the browser frontend, the database and sign-in sessions."""
+"""Environment settings for the browser frontend, the database, sign-in sessions
+and the consultation pilot."""
 
 from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from datetime import date, datetime
+from typing import Optional
+from zoneinfo import ZoneInfo
 from urllib.parse import urlsplit
 
 from sqlalchemy.engine import URL, make_url
@@ -114,4 +118,45 @@ def get_session_settings() -> SessionSettings:
         idle_minutes=_bounded_int(SESSION_IDLE_MINUTES_ENV, 30, 1, 24 * 60),
         max_hours=_bounded_int(SESSION_MAX_HOURS_ENV, 8, 1, 7 * 24),
         always_secure=secure == "true",
+    )
+
+
+CONSULTATION_PILOT_ENV = "MEDASSIST_CONSULTATION_PILOT"
+PILOT_FRESHNESS_DAYS_ENV = "MEDASSIST_PILOT_FRESHNESS_DAYS"
+PILOT_AS_OF_ENV = "MEDASSIST_PILOT_AS_OF"
+# Dates are judged in India, where the pilot locality is.
+PILOT_TIME_ZONE = ZoneInfo("Asia/Kolkata")
+
+
+@dataclass(frozen=True)
+class PilotSettings:
+    """Whether the consultation directory serves pilot listings, and how old a
+    listing's last check may be before it shows "Needs recheck".
+
+    The pilot is off unless MEDASSIST_CONSULTATION_PILOT=on; then only the
+    fictional demo is served. MEDASSIST_PILOT_AS_OF pins "today" for tests and
+    demonstrations so a fixed fixture keeps the same freshness.
+    """
+
+    enabled: bool = False
+    freshness_days: int = 90
+    as_of_override: Optional[date] = None
+
+    def as_of(self) -> date:
+        return self.as_of_override or datetime.now(PILOT_TIME_ZONE).date()
+
+
+def get_pilot_settings() -> PilotSettings:
+    flag = os.getenv(CONSULTATION_PILOT_ENV, "").strip().lower()
+    if flag not in {"", "off", "on"}:
+        raise ValueError(f"{CONSULTATION_PILOT_ENV} must be 'on' or 'off' (the default).")
+    as_of_text = os.getenv(PILOT_AS_OF_ENV, "").strip()
+    try:
+        as_of = date.fromisoformat(as_of_text) if as_of_text else None
+    except ValueError:
+        raise ValueError(f"{PILOT_AS_OF_ENV} must be a date like 2026-11-13.") from None
+    return PilotSettings(
+        enabled=flag == "on",
+        freshness_days=_bounded_int(PILOT_FRESHNESS_DAYS_ENV, 90, 1, 365),
+        as_of_override=as_of,
     )
