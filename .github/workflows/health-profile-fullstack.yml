@@ -81,6 +81,19 @@ jobs:
           test "$before" = "$after"
           echo "Consultation listings unchanged by the upgrade ($after)."
           psql -d medassist_test -Atc "SELECT string_agg(tablename, ', ' ORDER BY tablename) FROM pg_tables WHERE schemaname = 'public'"
+      - name: Run the fictional seed again and check that nothing is duplicated
+        working-directory: backend
+        run: |
+          counts() {
+            psql -d medassist_test -Atc "SELECT (SELECT count(*) FROM consultation_listings) || ' listings, ' || (SELECT count(*) FROM consultation_sources) || ' source, rows ' || (SELECT md5(string_agg(to_jsonb(t)::text, '|' ORDER BY id)) FROM consultation_listings t)"
+          }
+          before="$(counts)"
+          python -m app.seed
+          after="$(counts)"
+          echo "Before the second seed: $before"
+          echo "After the second seed:  $after"
+          test "$before" = "$after"
+          case "$after" in "9 listings, 1 source,"*) ;; *) exit 1 ;; esac
       - name: Migrate a fresh, empty database
         working-directory: backend
         env:
@@ -106,6 +119,16 @@ jobs:
           echo $! > "$RUNNER_TEMP/api.pid"
           for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 1; done
           curl -fsS http://127.0.0.1:8000/health
+      - name: GET and HEAD /health
+        run: |
+          body="$(curl -fsS http://127.0.0.1:8000/health)"
+          echo "GET /health -> $body"
+          test "$body" = '{"status":"ok","service":"medassist-api","version":"0.1.0"}'
+          curl -fsS -I http://127.0.0.1:8000/health | tr -d '\r' > "$RUNNER_TEMP/head.txt"
+          cat "$RUNNER_TEMP/head.txt"
+          grep -q "^HTTP/1.1 200" "$RUNNER_TEMP/head.txt"
+          grep -qi "^cache-control: no-store" "$RUNNER_TEMP/head.txt"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:8000/health)" = "405"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -211,6 +234,15 @@ jobs:
       - name: "Phase 5: the browser shows the fictional demo while the pilot is off"
         working-directory: frontend
         run: npx playwright test -c playwright.fullstack.config.ts --grep @consultation-demo
+      - name: "Release candidate: consultation journey at 375px, API outage and retry"
+        working-directory: frontend
+        env:
+          RC_API_PID_FILE: ${{ runner.temp }}/api.pid
+          RC_BACKEND_DIR: ${{ github.workspace }}/backend
+          RC_API_LOG: ${{ runner.temp }}/api-rc-restart.log
+        run: |
+          npx playwright test -c playwright.fullstack.config.ts --grep @rc-consultations
+          curl -fsS http://127.0.0.1:8000/health
       - name: Restart FastAPI with the consultation pilot on
         working-directory: backend
         env:
