@@ -109,7 +109,7 @@ test.describe('@rc-consultations', () => {
     await expect.poll(apiAnswers, { timeout: 30000 }).toBe(false);
 
     await search(page).fill('skin');
-    const error = page.getByText('Could not reach the directory API');
+    const error = page.getByRole('heading', { name: 'Could not reach the directory API' });
     await expect(error).toBeVisible();
     await expect(
       page.getByText('No listings are shown until the directory responds.'),
