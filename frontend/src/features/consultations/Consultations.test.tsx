@@ -86,9 +86,26 @@ describe('Find Consultations with the directory API', () => {
 
     expect(names()).toHaveLength(9);
     expect(screen.getByRole('heading', { name: 'Consultation directory' })).toBeInTheDocument();
-    expect(screen.getAllByText('Showing 9 of 12 listings')).not.toHaveLength(0);
+    expect(screen.getAllByText('Showing 1–9 of 12 listings')).not.toHaveLength(0);
     expect(screen.getAllByText('Fictional record')).toHaveLength(9);
     expect(screen.getByText('http://127.0.0.1:8000')).toBeInTheDocument();
+  });
+
+  it('returns to the first page if a directory update removes the requested page', async () => {
+    const first = { ...pageOf('c-01'), limit: 1 };
+    listConsultations
+      .mockResolvedValueOnce({ ...first, total: 2 })
+      .mockResolvedValueOnce({ ...first, items: [], offset: 1 })
+      .mockResolvedValueOnce(first);
+    renderScreen();
+    await flush();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    await flush();
+
+    expect(queries()).toEqual([{}, { offset: 1 }, {}]);
+    expect(names()).toEqual(['Riverside Family Clinic (fictional)']);
+    expect(screen.queryByRole('navigation', { name: 'Consultation result pages' })).toBeNull();
   });
 
   it('sends each filter to the server and uses its total', async () => {

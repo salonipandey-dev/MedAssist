@@ -133,11 +133,15 @@ const datasetSchema = z.object({
   ),
 });
 
+/** Pagination limits documented by the directory API. */
+export const CONSULTATION_PAGE_LIMIT = 50;
+export const CONSULTATION_MAX_OFFSET = 10_000;
+
 const pageSchema = z.object({
   items: z.array(listingSchema),
   total: z.number().int().nonnegative(),
-  limit: z.number().int().positive(),
-  offset: z.number().int().nonnegative(),
+  limit: z.number().int().positive().max(CONSULTATION_PAGE_LIMIT),
+  offset: z.number().int().nonnegative().max(CONSULTATION_MAX_OFFSET),
   dataset: datasetSchema,
 });
 
@@ -154,6 +158,7 @@ export interface ConsultationQuery {
   feeState?: ConsultationFeeState;
   /** Inclusive maximum in paise; matches free and known fees, never unknown ones. */
   maxFeeMinor?: number;
+  offset?: number;
 }
 
 export type ConsultationApiErrorKind =
@@ -190,8 +195,6 @@ export class ConsultationApiError extends Error {
   }
 }
 
-/** Largest page the API allows; the seeded directory fits in one page. */
-export const CONSULTATION_PAGE_LIMIT = 50;
 const TIMEOUT_MS = 8000;
 
 function buildUrl(origin: string, query: ConsultationQuery): string {
@@ -202,6 +205,7 @@ function buildUrl(origin: string, query: ConsultationQuery): string {
   if (query.feeState) params.set('fee_state', query.feeState);
   if (query.maxFeeMinor !== undefined) params.set('max_fee_minor', String(query.maxFeeMinor));
   params.set('limit', String(CONSULTATION_PAGE_LIMIT));
+  if (query.offset) params.set('offset', String(query.offset));
   return `${origin}/api/v1/consultations?${params}`;
 }
 
@@ -250,7 +254,8 @@ export async function listConsultations(
       throw new ConsultationApiError('http', { status: response.status, requestId });
     }
     const page = pageSchema.safeParse(payload);
-    if (!page.success) throw new ConsultationApiError('unexpected', { requestId: headerId });
+    if (!page.success || page.data.offset !== (query.offset ?? 0))
+      throw new ConsultationApiError('unexpected', { requestId: headerId });
     return { ...page.data, requestId: headerId };
   } catch (error) {
     if (caller?.aborted) throw new DOMException('The request was cancelled.', 'AbortError');

@@ -189,8 +189,11 @@ examples `c-03` and `c-08`, the same four the current screen shows.
 | `hours` `'Not listed in this sample'` | `hours` `null` |
 | `note` | `notes` |
 
-The nine seeded listings fit in one default page. Read `total` for the
-"N of M" count instead of the page length.
+The screen requests up to 50 listings at a time and shows Previous and Next
+page controls when more than one page is available. Page changes send `offset`
+with the active filters. Changing a filter returns to the first page, and
+selected listings stay in the comparison across pages. `total` counts all
+listings that match the current filters.
 
 ## Examples
 

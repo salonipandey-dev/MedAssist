@@ -81,6 +81,19 @@ describe('consultation directory client', () => {
     expect(fetch.mock.calls[1][0]).toBe(`${ORIGIN}/api/v1/consultations?max_fee_minor=0&limit=50`);
   });
 
+  it('requests the next page with the same filters and checks the returned offset', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+    const fetch = stubFetch(json({ ...page, limit: 50, offset: 50, total: 59 }), json(page));
+
+    await expect(listConsultations({ mode: 'video', offset: 50 })).resolves.toMatchObject({
+      offset: 50,
+    });
+    expect(fetch.mock.calls[0][0]).toBe(
+      `${ORIGIN}/api/v1/consultations?mode=video&limit=50&offset=50`,
+    );
+    await expect(listConsultations({ offset: 50 })).rejects.toMatchObject({ kind: 'unexpected' });
+  });
+
   it('accepts an empty page', async () => {
     vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
     stubFetch(json({ items: [], total: 0, limit: 50, offset: 0, dataset: page.dataset }));

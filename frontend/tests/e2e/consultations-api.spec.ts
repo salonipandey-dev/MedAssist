@@ -17,6 +17,8 @@ function search(items: Listing[], params: URLSearchParams) {
   const mode = params.get('mode');
   const feeState = params.get('fee_state');
   const maxFee = params.get('max_fee_minor');
+  const limit = Number(params.get('limit') ?? 20);
+  const offset = Number(params.get('offset') ?? 0);
   const matches = items.filter((item) => {
     const text = `${item.provider_name} ${item.specialty} ${item.area}`.toLowerCase();
     return (
@@ -27,7 +29,13 @@ function search(items: Listing[], params: URLSearchParams) {
       (maxFee === null || (item.fee.amount_minor !== null && item.fee.amount_minor <= +maxFee))
     );
   });
-  return { items: matches, total: matches.length, limit: 50, offset: 0, dataset: fixture.dataset };
+  return {
+    items: matches.slice(offset, offset + limit),
+    total: matches.length,
+    limit,
+    offset,
+    dataset: fixture.dataset,
+  };
 }
 
 async function mockDirectory(page: Page) {
@@ -139,6 +147,47 @@ test('debounces search, shows an empty result and resets with one control', asyn
   await clear.press('Enter');
   await expect(listings(page)).toHaveCount(9);
   await expect(searchBox).toBeFocused();
+});
+
+test('browses later results, keeps comparisons and resets the page on a new search', async ({
+  page,
+}) => {
+  const directory = await mockDirectory(page);
+  directory.items.push(
+    ...Array.from({ length: 43 }, (_, index) => ({
+      ...fixture.items[0],
+      id: `extra-${index + 1}`,
+      provider_name: `Sample extension ${index + 1} (fictional)`,
+    })),
+  );
+  await page.goto(ROUTE);
+
+  const previous = page.getByRole('button', { name: 'Previous page' });
+  const next = page.getByRole('button', { name: 'Next page' });
+  await expect(listings(page)).toHaveCount(50);
+  await expect(previous).toBeDisabled();
+  await page.getByRole('button', { name: /^Compare\s*Riverside Family Clinic/ }).click();
+  await next.click();
+
+  await expect(listings(page)).toHaveCount(2);
+  await expect(page.locator('.panel-heading p').first()).toHaveText('Showing 51–52 of 52 listings');
+  await expect(next).toBeDisabled();
+  expect(directory.queries().at(-1)).toBe('?limit=50&offset=50');
+  await page.getByRole('button', { name: /^Compare\s*Sample extension 42/ }).click();
+  const comparison = page.getByRole('table', { name: 'consultation comparison' });
+  await expect(comparison.getByRole('columnheader')).toHaveCount(3);
+  await expect(comparison).toContainText('Riverside Family Clinic');
+  await expect(comparison).toContainText('Sample extension 42');
+
+  await previous.click();
+  await expect(listings(page)).toHaveCount(50);
+  await next.click();
+  await expect(listings(page)).toHaveCount(2);
+  await page.getByRole('searchbox', { name: 'Search consultations' }).fill('Harbour');
+  await expect(listings(page)).toHaveCount(1);
+  await expect(listings(page)).toContainText('Harbour ENT Centre');
+  expect(directory.queries().at(-1)).toBe('?q=Harbour&limit=50');
+  await expect(comparison.getByRole('columnheader')).toHaveCount(3);
 });
 
 test('shows a changed record after the page is refreshed', async ({ page }) => {
