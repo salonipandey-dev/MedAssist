@@ -68,17 +68,16 @@ export function feeLabel(listing: ConsultationListing): string {
 /** "Checked 2 Nov 2026 · current" style, from the server's verification. */
 export function checkedLabel(listing: ConsultationListing): string {
   const { verification } = listing;
-  if (verification.status === 'fictional_demo' || !verification.checked_on)
+  if (verification.status === 'fictional_demo')
     return 'Fictional record, never checked against a source';
   const checked = `Last checked ${formatDate(verification.checked_on)}`;
   return verification.status === 'current'
-    ? `${checked} · current until ${formatDate(verification.recheck_due_on!)}`
+    ? `${checked} · current until ${formatDate(verification.recheck_due_on)}`
     : `${checked} · Needs recheck`;
 }
 
 export function formatDate(iso: string): string {
-  const [year, month, day] = iso.split('-').map(Number);
-  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString('en-GB', {
+  return new Date(iso).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',

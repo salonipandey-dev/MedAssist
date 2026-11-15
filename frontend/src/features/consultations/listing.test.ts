@@ -85,7 +85,12 @@ describe('listing labels', () => {
         version: '3',
         last_checked_on: '2026-10-01',
       },
-      verification: { ...fixture.verification, checked_on: '2026-10-01' },
+      verification: {
+        status: 'current',
+        checked_on: '2026-10-01',
+        recheck_due_on: '2026-12-30',
+        free_label_suppressed: false,
+      },
     };
 
     expect(feeLabel(reviewed)).toBe('₹1,250.50');

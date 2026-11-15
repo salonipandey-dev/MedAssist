@@ -107,6 +107,8 @@ describe('consultation directory client', () => {
       (body) => (body.items[0].provider_type = 'pharmacy'),
       (body) => (body.items[0].source.last_checked_on = '2026-01-01' as never), // fictional yet "checked"
       (body) => (body.items[0].source.url = 'https://example.invalid' as never),
+      (body) => (body.items[0].verification.checked_on = '2026-01-01' as never),
+      (body) => (body.items[0].verification.recheck_due_on = '2026-01-02' as never),
       (body) => (body.items[0].is_fictional = false), // flag disagrees with the source kind
     ];
     for (const [index, change] of broken.entries()) {
@@ -139,6 +141,32 @@ describe('consultation directory client', () => {
       'current',
       'current',
     ]);
+  });
+
+  it.each([null, '2027-02-29', '2026-11-01'])(
+    'rejects an invalid pilot recheck date (%s)',
+    async (recheckDueOn) => {
+      vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+      const listing = pilotPage.items[1];
+      stubFetch(
+        json({
+          ...pilotPage,
+          total: 1,
+          items: [
+            { ...listing, verification: { ...listing.verification, recheck_due_on: recheckDueOn } },
+          ],
+        }),
+      );
+
+      await expect(listConsultations()).rejects.toMatchObject({ kind: 'unexpected' });
+    },
+  );
+
+  it('rejects an impossible dataset date', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+    stubFetch(json({ ...pilotPage, dataset: { ...pilotPage.dataset, as_of: '2026-11-31' } }));
+
+    await expect(listConsultations()).rejects.toMatchObject({ kind: 'unexpected' });
   });
 
   it('rejects pilot listings that could pass for verified or show a stale Free', async () => {

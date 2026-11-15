@@ -32,7 +32,7 @@ const feeSchema = z.discriminatedUnion('state', [
   }),
 ]);
 
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const isoDate = z.iso.date();
 const httpsUrl = z.string().regex(/^https:\/\/[^\s/?#@]+(?:[/?#][^\s]*)?$/);
 const sourceKindSchema = z.enum(['fictional_seed', 'reviewed_external', 'pilot_fixture']);
 
@@ -51,12 +51,20 @@ const sourceSchema = z.object({
   reuse_basis_url: httpsUrl.nullable(),
 });
 
-const verificationSchema = z.object({
-  status: z.enum(['fictional_demo', 'current', 'needs_recheck']),
-  checked_on: isoDate.nullable(),
-  recheck_due_on: isoDate.nullable(),
-  free_label_suppressed: z.boolean(),
-});
+const verificationSchema = z.discriminatedUnion('status', [
+  z.object({
+    status: z.literal('fictional_demo'),
+    checked_on: z.null(),
+    recheck_due_on: z.null(),
+    free_label_suppressed: z.literal(false),
+  }),
+  z.object({
+    status: z.enum(['current', 'needs_recheck']),
+    checked_on: isoDate,
+    recheck_due_on: isoDate,
+    free_label_suppressed: z.boolean(),
+  }),
+]);
 
 const listingSchema = z
   .object({
@@ -85,16 +93,15 @@ const listingSchema = z
           source.url === null &&
           source.last_checked_on === null &&
           source.listing_url === null &&
-          verification.status === 'fictional_demo' &&
-          !verification.free_label_suppressed
+          verification.status === 'fictional_demo'
         );
       // Pilot listings always carry the page and date they were checked against,
       // and "Free" is only possible while that check is current.
       return (
         source.listing_url !== null &&
-        source.last_checked_on !== null &&
-        verification.checked_on === source.last_checked_on &&
         verification.status !== 'fictional_demo' &&
+        verification.checked_on === source.last_checked_on &&
+        verification.recheck_due_on > verification.checked_on &&
         !(fee.state === 'free' && verification.status !== 'current') &&
         (!verification.free_label_suppressed ||
           (verification.status === 'needs_recheck' && fee.state === 'unknown'))
