@@ -9,18 +9,22 @@ diagnosis and no prescription, and nothing can be booked.
 
 - **Base:** `715706a` on `main`, which contains MA-03 (#10), MA-04 (#11), MA-05 (#12)
   and MA-06 (#13). No pull request was pending when the candidate was chosen.
-- **Release candidate:** the head of `chore/release-candidate`. It changes no
-  application code. It adds this document and release-candidate checks to the
-  full-stack workflow. The pull request lists the exact commit and its CI results.
+- **Release candidate:** MA-07 was merged into `main` in [pull request #14](https://github.com/salonipandey-dev/MedAssist/pull/14).
+  To reproduce that exact build, check out the merge commit `1891c1c`.
 
 ## Clean setup on Windows (PowerShell)
 
-You need Python 3.10 or later, Node.js 22, PostgreSQL 16 or 17 and Git. Replace
+You need Python 3.10 or later, Node.js 22.12 or newer, PostgreSQL 16 or 17 and Git. Replace
 `YOUR_PASSWORD` with your local PostgreSQL password. If it contains `@`, `:` or `/`,
 percent-encode it in the URLs. The variables last only for the terminal they are
 set in, so keep both terminals open.
 
 ### Terminal 1: database and API
+
+The commands below create a new local demo database. If `medassist_rc` already
+exists, use a fresh name in both `CREATE DATABASE` and the connection and count
+commands below. To rehearse again with an existing demo database, use the profile
+reset command under **Medication Info**.
 
 ```powershell
 cd backend
@@ -28,7 +32,6 @@ py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 
 $env:PGPASSWORD = "YOUR_PASSWORD"
-psql -U postgres -c "DROP DATABASE IF EXISTS medassist_rc"
 psql -U postgres -c "CREATE DATABASE medassist_rc"
 
 $env:MEDASSIST_DATABASE_URL = "postgresql://postgres:YOUR_PASSWORD@localhost:5432/medassist_rc"
