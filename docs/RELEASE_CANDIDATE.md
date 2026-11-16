@@ -168,9 +168,10 @@ npx.cmd playwright install chromium
 npm.cmd run test:e2e
 ```
 
-GitHub Actions runs the same checks on every pull request, plus the full-stack
-workflow (`.github/workflows/health-profile-fullstack.yml`). That workflow runs the
-journeys above in Chromium against real PostgreSQL and FastAPI with nothing mocked:
+The [full-stack workflow](../.github/workflows/health-profile-fullstack.yml) runs
+on pull requests and pushes to `main` that change `backend/`, `frontend/`, or the
+workflow file itself. It can also be started manually from the Actions tab.
+It runs the journeys above in Chromium against real PostgreSQL and FastAPI:
 
 | Journey | Where it is automated |
 | --- | --- |
