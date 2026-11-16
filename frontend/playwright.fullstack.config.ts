@@ -13,6 +13,8 @@ import { defineConfig } from '@playwright/test';
 //   npx playwright test -c playwright.fullstack.config.ts --grep @medication-check
 //   (import the fictional pilot fixture twice, then a failing file)
 //   npx playwright test -c playwright.fullstack.config.ts --grep @consultation-demo
+//   npx playwright test -c playwright.fullstack.config.ts --grep @rc-consultations
+//   (that phase stops and restarts FastAPI itself to prove the error and Retry flow)
 //   (restart FastAPI with MEDASSIST_CONSULTATION_PILOT=on)
 //   npx playwright test -c playwright.fullstack.config.ts --grep @consultation-pilot
 export default defineConfig({

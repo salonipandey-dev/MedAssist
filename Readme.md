@@ -32,6 +32,8 @@ demonstration data; this is not a clinically deployed healthcare service.
   than the 90-day freshness window show **Needs recheck** and never show Free. No
   approved source has been supplied yet, so only a clearly labelled fictional
   fixture is included. See [Consultation pilot](docs/CONSULTATION_PILOT.md).
+- Release candidate (MA-07): [clean Windows setup, journey checks and a three-minute
+  demo script](docs/RELEASE_CANDIDATE.md).
 - Frontend: public product website and distinct patient, doctor and administrator
   workspaces, with light/dark themes, case/review workflows, fictional appointments,
   safe document previews, searchable tables and derived sample analytics. Changes
