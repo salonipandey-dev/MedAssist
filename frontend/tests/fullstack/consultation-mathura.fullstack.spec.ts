@@ -69,7 +69,8 @@ test.describe('@consultation-mathura', () => {
     await expect(bar).not.toContainText('fictional');
     await expect(bar).toContainText('Pilot listings for Mathura, Uttar Pradesh from 3 sources');
     await expect(bar).toContainText(API);
-    await expect(page.getByText(/Fictional/)).toHaveCount(0);
+    // The app shell names the fictional demo patient; no listing may say fictional.
+    await expect(listings(page).filter({ hasText: /fictional/i })).toHaveCount(0);
     await expect(listings(page).locator('.consult-source-name')).toHaveCount(7);
     await expect(listings(page).locator('.consult-checked')).toHaveText(
       Array(7).fill('Checked 17 Nov 2026'),
@@ -127,7 +128,7 @@ test.describe('@consultation-mathura', () => {
     await expect(names(page)).toHaveText([ESANJEEVANI[0]]);
 
     await search(page).fill('esanjeevani');
-    await page.getByLabel('Mode').selectOption('Video');
+    await page.getByLabel('Mode', { exact: true }).selectOption('Video');
     await page.getByLabel('Fee').selectOption({ label: 'Free (current source)' });
     await expect(names(page)).toHaveText(ESANJEEVANI);
     await page.getByLabel('Specialty').selectOption('Psychiatry');
@@ -135,11 +136,11 @@ test.describe('@consultation-mathura', () => {
 
     await search(page).fill('');
     await page.getByLabel('Specialty').selectOption('All specialties');
-    await page.getByLabel('Mode').selectOption('Phone');
+    await page.getByLabel('Mode', { exact: true }).selectOption('Phone');
     await page.getByLabel('Fee').selectOption('Fee not listed');
     await expect(names(page)).toHaveText(['Tele MANAS mental health helpline']);
 
-    await page.getByLabel('Mode').selectOption('In person');
+    await page.getByLabel('Mode', { exact: true }).selectOption('In person');
     await expect(listings(page)).toHaveCount(0);
     await expect(page.getByText('No listings match')).toBeVisible();
     await page.getByLabel('Fee').selectOption('Up to ₹300');
