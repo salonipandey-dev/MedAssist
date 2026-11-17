@@ -10,12 +10,17 @@ import { expect, test, type Page } from '@playwright/test';
 const API = process.env.FULLSTACK_API_ORIGIN ?? 'http://127.0.0.1:8000';
 const ROUTE = '/app/patient/consultations';
 const DIRECTORY = `${API}/api/v1/consultations`;
+// In listing ID order, which is the order the API returns.
+const GENERAL_OPD = 'eSanjeevani OPD: Uttar Pradesh General OPD';
+const DERMATOLOGY = 'eSanjeevani OPD: Government Medical Colleges (U.P.) Dermatology';
+const PAEDIATRICS = 'eSanjeevani OPD: Government Medical Colleges (U.P.) Paediatrics';
+const PSYCHIATRY = 'eSanjeevani OPD: Government Medical Colleges (U.P.) Psychiatry';
 const ESANJEEVANI = [
-  'eSanjeevani OPD: Government Medical Colleges (U.P.) Dermatology',
+  GENERAL_OPD,
+  DERMATOLOGY,
   'eSanjeevani OPD: Government Medical Colleges (U.P.) Obstetrics and Gynaecology',
-  'eSanjeevani OPD: Government Medical Colleges (U.P.) Paediatrics',
-  'eSanjeevani OPD: Government Medical Colleges (U.P.) Psychiatry',
-  'eSanjeevani OPD: Uttar Pradesh General OPD',
+  PAEDIATRICS,
+  PSYCHIATRY,
 ];
 
 const listings = (page: Page) =>
@@ -127,14 +132,14 @@ test.describe('@consultation-mathura', () => {
     await openDirectory(page);
 
     await search(page).fill('dermatology');
-    await expect(names(page)).toHaveText([ESANJEEVANI[0]]);
+    await expect(names(page)).toHaveText([DERMATOLOGY]);
 
     await search(page).fill('esanjeevani');
     await modeFilter(page).selectOption('Video');
     await page.getByLabel('Fee').selectOption({ label: 'Free (current source)' });
     await expect(names(page)).toHaveText(ESANJEEVANI);
     await page.getByLabel('Specialty').selectOption('Psychiatry');
-    await expect(names(page)).toHaveText([ESANJEEVANI[3]]);
+    await expect(names(page)).toHaveText([PSYCHIATRY]);
 
     await search(page).fill('');
     await page.getByLabel('Specialty').selectOption('All specialties');
@@ -169,7 +174,7 @@ test.describe('@consultation-mathura', () => {
     await expect(table).toContainText('Only for people insured under the ESI scheme');
     await expect(table).toContainText('Last checked 17 Nov 2026 · current until 15 Feb 2027');
 
-    const fourth = listing(page, ESANJEEVANI[2]);
+    const fourth = listing(page, PAEDIATRICS);
     await fourth.getByRole('button', { name: /^Compare / }).click();
     await expect(fourth.getByRole('status')).toContainText('You can compare up to 3 options');
     await expect(table.getByRole('columnheader')).toHaveCount(4);
