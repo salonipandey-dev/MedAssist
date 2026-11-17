@@ -23,6 +23,8 @@ const listings = (page: Page) =>
 const listing = (page: Page, name: string) => listings(page).filter({ hasText: name });
 const names = (page: Page) => listings(page).locator('strong');
 const search = (page: Page) => page.getByRole('searchbox', { name: 'Search consultations' });
+// The label wraps its select, so its name starts with "Mode" (the theme button also says mode).
+const modeFilter = (page: Page) => page.getByRole('combobox', { name: /^Mode/ });
 
 async function openDirectory(page: Page) {
   const response = page.waitForResponse(
@@ -128,7 +130,7 @@ test.describe('@consultation-mathura', () => {
     await expect(names(page)).toHaveText([ESANJEEVANI[0]]);
 
     await search(page).fill('esanjeevani');
-    await page.getByLabel('Mode', { exact: true }).selectOption('Video');
+    await modeFilter(page).selectOption('Video');
     await page.getByLabel('Fee').selectOption({ label: 'Free (current source)' });
     await expect(names(page)).toHaveText(ESANJEEVANI);
     await page.getByLabel('Specialty').selectOption('Psychiatry');
@@ -136,11 +138,11 @@ test.describe('@consultation-mathura', () => {
 
     await search(page).fill('');
     await page.getByLabel('Specialty').selectOption('All specialties');
-    await page.getByLabel('Mode', { exact: true }).selectOption('Phone');
+    await modeFilter(page).selectOption('Phone');
     await page.getByLabel('Fee').selectOption('Fee not listed');
     await expect(names(page)).toHaveText(['Tele MANAS mental health helpline']);
 
-    await page.getByLabel('Mode', { exact: true }).selectOption('In person');
+    await modeFilter(page).selectOption('In person');
     await expect(listings(page)).toHaveCount(0);
     await expect(page.getByText('No listings match')).toBeVisible();
     await page.getByLabel('Fee').selectOption('Up to ₹300');
