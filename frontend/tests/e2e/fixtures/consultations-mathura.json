@@ -1,0 +1,329 @@
+{
+  "items": [
+    {
+      "id": "mathura-esic-dispensary-sadar",
+      "provider_name": "ESI Dispensary, Mathura",
+      "provider_type": "clinic",
+      "specialty": "Primary care (ESI dispensary)",
+      "modes": ["in_person"],
+      "area": "Badhpura, Sadar, Mathura (ESIC directory, Uttar Pradesh entry 73)",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "ESIC Benefits page (reviewed 2026-10-09) describes Medical Benefit as free medical care for Insured Persons and their family members."
+      },
+      "access_conditions": "Only for people insured under the ESI scheme and their family members, from their first day of insurable employment. Retired and permanently disabled insured persons and their spouses can use this care by paying ₹600 a year (ESIC Benefits page).",
+      "languages": [],
+      "hours": null,
+      "notes": "ESIC's directory lists this dispensary without its services or opening hours. Free care rule: https://esic.gov.in/information-benefits",
+      "is_fictional": false,
+      "source": {
+        "kind": "reviewed_external",
+        "id": "mathura-esic",
+        "name": "ESIC dispensary directory and Medical Benefit page",
+        "version": "2026-11-17",
+        "url": "https://esic.gov.in/dispensaries",
+        "last_checked_on": "2026-11-17",
+        "listing_url": "https://esic.gov.in/dispensaries",
+        "publisher": "Employees' State Insurance Corporation, Ministry of Labour and Employment, Government of India",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Reference with acknowledgement. ESIC's Copyright Policy (last reviewed 2024-07-01) says its contents may not be reproduced without ESIC's permission and that a website referring to them must acknowledge the source. MedAssist reproduces no ESIC content: it records the dispensary's name and place and the stated free-care rule in its own words, links to the ESIC pages and credits ESIC.",
+        "reuse_basis_url": "https://esic.gov.in/copyright-policy"
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-17",
+        "recheck_due_on": "2027-02-15",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "mathura-esj-up-general-opd",
+      "provider_name": "eSanjeevani OPD: Uttar Pradesh General OPD",
+      "provider_type": "teleconsultation",
+      "specialty": "General OPD",
+      "modes": ["video"],
+      "area": "Online video OPD run for Uttar Pradesh; used from home in Mathura (no clinic visit)",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 5:00 PM (Uttar Pradesh State eSanjeevaniOPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "is_fictional": false,
+      "source": {
+        "kind": "reviewed_external",
+        "id": "mathura-esanjeevani-up",
+        "name": "eSanjeevani National Telemedicine Service (Uttar Pradesh OPDs)",
+        "version": "2026-11-17",
+        "url": "https://esanjeevani.mohfw.gov.in/",
+        "last_checked_on": "2026-11-17",
+        "listing_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+        "publisher": "Ministry of Health and Family Welfare, Government of India (platform run by C-DAC)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The site footer says \"© 2026 eSanjeevani. All rights reserved.\", and its Website Policy file could not be opened on 2026-11-17. MedAssist copies no text, images or logos: it records the service name, the published OPD days and hours and the FAQ answer on payment in its own words, links to the page each fact came from and credits eSanjeevani, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-17",
+        "recheck_due_on": "2027-02-15",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "mathura-esj-up-gmc-dermatology",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Dermatology",
+      "provider_type": "teleconsultation",
+      "specialty": "Dermatology",
+      "modes": ["video"],
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "is_fictional": false,
+      "source": {
+        "kind": "reviewed_external",
+        "id": "mathura-esanjeevani-up",
+        "name": "eSanjeevani National Telemedicine Service (Uttar Pradesh OPDs)",
+        "version": "2026-11-17",
+        "url": "https://esanjeevani.mohfw.gov.in/",
+        "last_checked_on": "2026-11-17",
+        "listing_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+        "publisher": "Ministry of Health and Family Welfare, Government of India (platform run by C-DAC)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The site footer says \"© 2026 eSanjeevani. All rights reserved.\", and its Website Policy file could not be opened on 2026-11-17. MedAssist copies no text, images or logos: it records the service name, the published OPD days and hours and the FAQ answer on payment in its own words, links to the page each fact came from and credits eSanjeevani, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-17",
+        "recheck_due_on": "2027-02-15",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "mathura-esj-up-gmc-obstetrics-gynaecology",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Obstetrics and Gynaecology",
+      "provider_type": "teleconsultation",
+      "specialty": "Obstetrics and gynaecology",
+      "modes": ["video"],
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "is_fictional": false,
+      "source": {
+        "kind": "reviewed_external",
+        "id": "mathura-esanjeevani-up",
+        "name": "eSanjeevani National Telemedicine Service (Uttar Pradesh OPDs)",
+        "version": "2026-11-17",
+        "url": "https://esanjeevani.mohfw.gov.in/",
+        "last_checked_on": "2026-11-17",
+        "listing_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+        "publisher": "Ministry of Health and Family Welfare, Government of India (platform run by C-DAC)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The site footer says \"© 2026 eSanjeevani. All rights reserved.\", and its Website Policy file could not be opened on 2026-11-17. MedAssist copies no text, images or logos: it records the service name, the published OPD days and hours and the FAQ answer on payment in its own words, links to the page each fact came from and credits eSanjeevani, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-17",
+        "recheck_due_on": "2027-02-15",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "mathura-esj-up-gmc-paediatrics",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Paediatrics",
+      "provider_type": "teleconsultation",
+      "specialty": "Paediatrics",
+      "modes": ["video"],
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "is_fictional": false,
+      "source": {
+        "kind": "reviewed_external",
+        "id": "mathura-esanjeevani-up",
+        "name": "eSanjeevani National Telemedicine Service (Uttar Pradesh OPDs)",
+        "version": "2026-11-17",
+        "url": "https://esanjeevani.mohfw.gov.in/",
+        "last_checked_on": "2026-11-17",
+        "listing_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+        "publisher": "Ministry of Health and Family Welfare, Government of India (platform run by C-DAC)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The site footer says \"© 2026 eSanjeevani. All rights reserved.\", and its Website Policy file could not be opened on 2026-11-17. MedAssist copies no text, images or logos: it records the service name, the published OPD days and hours and the FAQ answer on payment in its own words, links to the page each fact came from and credits eSanjeevani, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-17",
+        "recheck_due_on": "2027-02-15",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "mathura-esj-up-gmc-psychiatry",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Psychiatry",
+      "provider_type": "teleconsultation",
+      "specialty": "Psychiatry",
+      "modes": ["video"],
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "fee": {
+        "state": "free",
+        "amount_minor": 0,
+        "currency": "INR",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "is_fictional": false,
+      "source": {
+        "kind": "reviewed_external",
+        "id": "mathura-esanjeevani-up",
+        "name": "eSanjeevani National Telemedicine Service (Uttar Pradesh OPDs)",
+        "version": "2026-11-17",
+        "url": "https://esanjeevani.mohfw.gov.in/",
+        "last_checked_on": "2026-11-17",
+        "listing_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+        "publisher": "Ministry of Health and Family Welfare, Government of India (platform run by C-DAC)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The site footer says \"© 2026 eSanjeevani. All rights reserved.\", and its Website Policy file could not be opened on 2026-11-17. MedAssist copies no text, images or logos: it records the service name, the published OPD days and hours and the FAQ answer on payment in its own words, links to the page each fact came from and credits eSanjeevani, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-17",
+        "recheck_due_on": "2027-02-15",
+        "free_label_suppressed": false
+      }
+    },
+    {
+      "id": "mathura-tele-manas-helpline",
+      "provider_name": "Tele MANAS mental health helpline",
+      "provider_type": "teleconsultation",
+      "specialty": "Mental health",
+      "modes": ["phone", "video"],
+      "area": "National phone helpline, callable from Mathura (no clinic visit)",
+      "fee": {
+        "state": "unknown",
+        "amount_minor": null,
+        "currency": null,
+        "basis": null
+      },
+      "access_conditions": "Open to anyone with a mental health concern, their family members, and ASHAs or community volunteers calling for someone (FAQ 5). It is not an emergency service: the FAQ says emergencies such as suicide risk need doctors at a hospital.",
+      "languages": [],
+      "hours": null,
+      "notes": "The site lists 14416 and 1-800 891 4416 as toll-free numbers. It does not state whether counselling or consultation has a fee, so MedAssist shows Fee not listed. FAQ 10 says video consultations with e-prescriptions are now offered.",
+      "is_fictional": false,
+      "source": {
+        "kind": "reviewed_external",
+        "id": "mathura-tele-manas",
+        "name": "Tele MANAS National Tele Mental Health Programme",
+        "version": "2026-11-17",
+        "url": "https://telemanas.mohfw.gov.in/home",
+        "last_checked_on": "2026-11-17",
+        "listing_url": "https://telemanas.mohfw.gov.in/home",
+        "publisher": "National Health Mission, Ministry of Health and Family Welfare, Government of India (NIMHANS apex centre)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The home and FAQ pages read on 2026-11-17 link only a Privacy Policy and state no copyright or reuse terms. MedAssist copies no text, images or logos: it records the service name, the toll-free numbers, who may call and the modes offered in its own words, links to the page they came from and credits Tele MANAS, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null
+      },
+      "verification": {
+        "status": "current",
+        "checked_on": "2026-11-17",
+        "recheck_due_on": "2027-02-15",
+        "free_label_suppressed": false
+      }
+    }
+  ],
+  "total": 7,
+  "limit": 20,
+  "offset": 0,
+  "dataset": {
+    "mode": "pilot",
+    "pilot_enabled": true,
+    "freshness_days": 90,
+    "as_of": "2026-11-17",
+    "specialties": [
+      "Dermatology",
+      "General OPD",
+      "Mental health",
+      "Obstetrics and gynaecology",
+      "Paediatrics",
+      "Primary care (ESI dispensary)",
+      "Psychiatry"
+    ],
+    "sources": [
+      {
+        "id": "mathura-esanjeevani-up",
+        "kind": "reviewed_external",
+        "name": "eSanjeevani National Telemedicine Service (Uttar Pradesh OPDs)",
+        "version": "2026-11-17",
+        "url": "https://esanjeevani.mohfw.gov.in/",
+        "publisher": "Ministry of Health and Family Welfare, Government of India (platform run by C-DAC)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The site footer says \"© 2026 eSanjeevani. All rights reserved.\", and its Website Policy file could not be opened on 2026-11-17. MedAssist copies no text, images or logos: it records the service name, the published OPD days and hours and the FAQ answer on payment in its own words, links to the page each fact came from and credits eSanjeevani, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null,
+        "imported_at": "2026-11-17T10:00:00Z",
+        "listing_count": 5
+      },
+      {
+        "id": "mathura-esic",
+        "kind": "reviewed_external",
+        "name": "ESIC dispensary directory and Medical Benefit page",
+        "version": "2026-11-17",
+        "url": "https://esic.gov.in/dispensaries",
+        "publisher": "Employees' State Insurance Corporation, Ministry of Labour and Employment, Government of India",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Reference with acknowledgement. ESIC's Copyright Policy (last reviewed 2024-07-01) says its contents may not be reproduced without ESIC's permission and that a website referring to them must acknowledge the source. MedAssist reproduces no ESIC content: it records the dispensary's name and place and the stated free-care rule in its own words, links to the ESIC pages and credits ESIC.",
+        "reuse_basis_url": "https://esic.gov.in/copyright-policy",
+        "imported_at": "2026-11-17T10:00:00Z",
+        "listing_count": 1
+      },
+      {
+        "id": "mathura-tele-manas",
+        "kind": "reviewed_external",
+        "name": "Tele MANAS National Tele Mental Health Programme",
+        "version": "2026-11-17",
+        "url": "https://telemanas.mohfw.gov.in/home",
+        "publisher": "National Health Mission, Ministry of Health and Family Welfare, Government of India (NIMHANS apex centre)",
+        "locality": "Mathura, Uttar Pradesh",
+        "reuse_basis": "Facts and link only; no reuse licence was found. The home and FAQ pages read on 2026-11-17 link only a Privacy Policy and state no copyright or reuse terms. MedAssist copies no text, images or logos: it records the service name, the toll-free numbers, who may call and the modes offered in its own words, links to the page they came from and credits Tele MANAS, Ministry of Health and Family Welfare.",
+        "reuse_basis_url": null,
+        "imported_at": "2026-11-17T10:00:00Z",
+        "listing_count": 1
+      }
+    ]
+  }
+}

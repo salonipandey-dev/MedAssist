@@ -2,6 +2,7 @@
 // the API's listing shape, so the offline fixtures are adapted to it here.
 import type { ConsultationFilters, ConsultationOption } from '../../data/mock/consultations';
 import type {
+  ConsultationDataset,
   ConsultationListing,
   ConsultationMode,
   ConsultationQuery,
@@ -95,6 +96,20 @@ export function sourceLabel(listing: ConsultationListing): string {
         ? `last checked ${source.last_checked_on}`
         : 'no check date recorded';
   return `${source.name} · version ${source.version} · ${checked}`;
+}
+
+/**
+ * " for Mathura, Uttar Pradesh from 3 sources: A; B; C" style text for the source bar.
+ * One source keeps its version; several are named in the server's order.
+ */
+export function pilotSourcesLabel(sources: ConsultationDataset['sources']): string {
+  if (!sources.length) return '';
+  const localities = [...new Set(sources.map((source) => source.locality).filter(Boolean))];
+  const where = localities.length ? ` for ${localities.join(' and ')}` : '';
+  const [first] = sources;
+  if (sources.length === 1) return `${where} from ${first.name}, version ${first.version}`;
+  const names = sources.map((source) => source.name).join('; ');
+  return `${where} from ${sources.length} sources: ${names}`;
 }
 
 export const LISTING_ROWS: { label: string; value: (listing: ConsultationListing) => string }[] = [

@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import fixture from '../../../tests/e2e/fixtures/consultations.json';
+import mathuraCapture from '../../../tests/e2e/fixtures/consultations-mathura.json';
 import pilotFixture from '../../../tests/e2e/fixtures/consultations-pilot.json';
 import {
   ConsultationApiError,
@@ -28,6 +29,7 @@ const pageOf = (...ids: string[]): ConsultationPage => ({
   requestId: null,
 });
 const pilotPage = { ...pilotFixture, requestId: null } as ConsultationPage;
+const mathuraPage = { ...mathuraCapture, requestId: null } as ConsultationPage;
 const everything = pageOf(...all.map((item) => item.id));
 
 /** A request the test settles by hand, to control the order responses arrive in. */
@@ -402,5 +404,56 @@ describe('Find Consultations with pilot data (fictional fixture)', () => {
     expect(within(fourth.closest('li')!).getByRole('status')).toHaveTextContent(
       'You can compare up to 3 options',
     );
+  });
+});
+
+describe('Find Consultations with the reviewed Mathura listings', () => {
+  const row = (name: string) =>
+    within(screen.getByRole('list', { name: 'Consultation listings' }))
+      .getByText(name, { selector: 'strong' })
+      .closest('li')!;
+
+  beforeEach(() => listConsultations.mockResolvedValue(mathuraPage));
+
+  it('names every source and shows source, check date, fee and eligibility on each card', async () => {
+    renderScreen();
+    await flush();
+
+    expect(names()).toHaveLength(7);
+    expect(screen.getByText('Pilot')).toBeInTheDocument();
+    expect(screen.queryByText('Pilot · fictional fixture')).toBeNull();
+    expect(
+      screen.getByText(/Pilot listings for Mathura, Uttar Pradesh from 3 sources/),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Fictional/)).toBeNull();
+
+    const esic = row('ESI Dispensary, Mathura');
+    expect(esic).toHaveTextContent('Free');
+    expect(esic).toHaveTextContent('Eligibility: Only for people insured under the ESI scheme');
+    expect(esic).toHaveTextContent('Source: ESIC dispensary directory and Medical Benefit page');
+    expect(esic).toHaveTextContent('Checked 17 Nov 2026');
+    const teleManas = row('Tele MANAS mental health helpline');
+    expect(teleManas).toHaveTextContent('Fee not listed');
+    expect(teleManas).not.toHaveTextContent(/Free/);
+  });
+
+  it('links the source page and its reuse terms in the details', async () => {
+    renderScreen();
+    await flush();
+
+    fireEvent.click(
+      within(row('ESI Dispensary, Mathura')).getByRole('button', { name: 'Details' }),
+    );
+    const dialog = screen.getByRole('dialog', { name: /ESI Dispensary, Mathura/ });
+    expect(dialog).toHaveTextContent('Pilot listing · as the source stated it when last checked');
+    expect(within(dialog).getByRole('link', { name: /Open the source page/ })).toHaveAttribute(
+      'href',
+      'https://esic.gov.in/dispensaries',
+    );
+    const terms = within(dialog).getByRole('link', { name: /reuse terms/ });
+    expect(terms).toHaveAttribute('href', 'https://esic.gov.in/copyright-policy');
+    expect(terms).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(dialog).toHaveTextContent('Last checked 17 Nov 2026 · current until 15 Feb 2027');
+    expect(dialog).toHaveTextContent('Reuse basis: Reference with acknowledgement.');
   });
 });

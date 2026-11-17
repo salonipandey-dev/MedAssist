@@ -1,0 +1,33 @@
+{
+  "format": "medassist-consultation-pilot/1",
+  "source": {
+    "id": "mathura-tele-manas",
+    "kind": "reviewed_external",
+    "name": "Tele MANAS National Tele Mental Health Programme",
+    "version": "2026-11-17",
+    "url": "https://telemanas.mohfw.gov.in/home",
+    "publisher": "National Health Mission, Ministry of Health and Family Welfare, Government of India (NIMHANS apex centre)",
+    "locality": "Mathura, Uttar Pradesh",
+    "reuse_basis": "Facts and link only; no reuse licence was found. The home and FAQ pages read on 2026-11-17 link only a Privacy Policy and state no copyright or reuse terms. MedAssist copies no text, images or logos: it records the service name, the toll-free numbers, who may call and the modes offered in its own words, links to the page they came from and credits Tele MANAS, Ministry of Health and Family Welfare.",
+    "reuse_basis_url": null
+  },
+  "listings": [
+    {
+      "id": "mathura-tele-manas-helpline",
+      "provider_name": "Tele MANAS mental health helpline",
+      "provider_type": "teleconsultation",
+      "specialty": "Mental health",
+      "area": "National phone helpline, callable from Mathura (no clinic visit)",
+      "modes": ["phone", "video"],
+      "fee": {
+        "state": "unknown"
+      },
+      "access_conditions": "Open to anyone with a mental health concern, their family members, and ASHAs or community volunteers calling for someone (FAQ 5). It is not an emergency service: the FAQ says emergencies such as suicide risk need doctors at a hospital.",
+      "languages": [],
+      "hours": null,
+      "notes": "The site lists 14416 and 1-800 891 4416 as toll-free numbers. It does not state whether counselling or consultation has a fee, so MedAssist shows Fee not listed. FAQ 10 says video consultations with e-prescriptions are now offered.",
+      "source_url": "https://telemanas.mohfw.gov.in/home",
+      "last_checked_on": "2026-11-17"
+    }
+  ]
+}

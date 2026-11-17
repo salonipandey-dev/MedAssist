@@ -5,13 +5,17 @@ locality in India, each with the page it was checked against, the date it was la
 checked, its fee basis and its eligibility conditions. It is **off by default**.
 While it is off, the directory serves only the fictional demo.
 
-**No approved source has been supplied yet**, so this repository contains no real
-listing. The importer, the database rules, the API and the screen are proved with a
+The first real dataset is **seven reviewed listings for Mathura, Uttar Pradesh**
+(`backend/app/datasets/mathura/`), checked against official eSanjeevani, Tele MANAS and
+ESIC pages on 2026-11-17. [Reviewed consultation listings for Mathura](CONSULTATION_MATHURA_LISTINGS.md)
+gives the evidence, reuse basis, Windows steps and the recheck procedure.
+
+The importer, the database rules, the API and the screen are also proved with a
 clearly labelled **fictional test fixture**
 (`backend/app/fixtures/consultation_pilot_fixture.json`). Its source, providers,
 fees, conditions and URLs are invented. Its URLs use `example.org`, and every name
-says "(fictional)". [Candidate source](#candidate-source-and-what-still-needs-review)
-below lists what a real dataset still needs before it can be imported.
+says "(fictional)". The pilot serves every imported pilot source together, so remove
+the fixture before showing the Mathura listings (see that document).
 
 ## Settings
 
@@ -146,8 +150,9 @@ keeps the file identical to real API output, apart from the import time.
 
 ## Candidate source and what still needs review
 
-These are candidates found by desk research on 2026-11-13. None is approved, and
-nothing from them has been imported.
+These are candidates found by desk research on 2026-11-13; nothing from them has been
+imported. The Mathura dataset later used eSanjeevani's official FAQ for its Free label
+(item 3); see [Reviewed consultation listings for Mathura](CONSULTATION_MATHURA_LISTINGS.md).
 
 1. **National Hospital Directory with Geo Code** (published by the National
    Institute of Health and Family Welfare through the Open Government Data platform):

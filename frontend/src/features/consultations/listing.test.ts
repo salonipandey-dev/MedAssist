@@ -1,18 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import page from '../../../tests/e2e/fixtures/consultations.json';
+import mathuraPage from '../../../tests/e2e/fixtures/consultations-mathura.json';
 import pilotPage from '../../../tests/e2e/fixtures/consultations-pilot.json';
 import {
   CONSULTATION_OPTIONS,
   EMPTY_FILTERS,
   feeLabel as offlineFeeLabel,
 } from '../../data/mock/consultations';
-import type { ConsultationListing } from '../../services/api/consultations';
+import type { ConsultationDataset, ConsultationListing } from '../../services/api/consultations';
 import {
   checkedLabel,
   feeLabel,
   formatDate,
   fromOfflineOption,
   LISTING_ROWS,
+  pilotSourcesLabel,
   sourceLabel,
   toConsultationQuery,
 } from './listing';
@@ -156,6 +158,35 @@ describe('pilot listing labels (fictional fixture)', () => {
       expect(listing.source.kind).toBe('pilot_fixture');
       expect(listing.source.listing_url).toMatch(/^https:\/\/pilot-source\.example\.org\//);
     }
+  });
+});
+
+describe('reviewed Mathura listings', () => {
+  const mathura = mathuraPage.items as ConsultationListing[];
+  const mathuraById = (id: string) => mathura.find((listing) => listing.id === id)!;
+
+  it('shows Free only with its eligibility and leaves an unpublished fee unknown', () => {
+    const esic = mathuraById('mathura-esic-dispensary-sadar');
+    expect(feeLabel(esic)).toBe('Free');
+    expect(row('Eligibility and access')(esic)).toMatch(/^Only for people insured under the ESI/);
+    const teleManas = mathuraById('mathura-tele-manas-helpline');
+    expect(feeLabel(teleManas)).toBe('Fee not listed');
+    expect(row('Fee basis')(teleManas)).toBe('No fee information recorded');
+    expect(row('Hours')(teleManas)).toBe('Not listed');
+    expect(checkedLabel(esic)).toBe('Last checked 17 Nov 2026 · current until 15 Feb 2027');
+  });
+
+  it('summarises one source with its version and several by name', () => {
+    const sources = mathuraPage.dataset.sources as ConsultationDataset['sources'];
+    expect(pilotSourcesLabel([])).toBe('');
+    expect(pilotSourcesLabel(sources.slice(1, 2))).toBe(
+      ' for Mathura, Uttar Pradesh from ESIC dispensary directory and Medical Benefit page, version 2026-11-17',
+    );
+    expect(pilotSourcesLabel(sources)).toBe(
+      ' for Mathura, Uttar Pradesh from 3 sources: eSanjeevani National Telemedicine Service' +
+        ' (Uttar Pradesh OPDs); ESIC dispensary directory and Medical Benefit page;' +
+        ' Tele MANAS National Tele Mental Health Programme',
+    );
   });
 });
 

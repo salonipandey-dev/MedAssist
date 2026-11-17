@@ -2422,8 +2422,13 @@
   font-size: var(--text-xs);
   background: var(--amber-soft);
 }
-.consult-checked {
+.consult-checked,
+.consult-source-name {
   font-size: var(--text-xs);
+}
+.consult-source-name {
+  max-width: 28ch;
+  overflow-wrap: anywhere;
 }
 .consult-source-detail {
   margin-top: var(--space-2);
@@ -2446,7 +2451,8 @@
   overflow-wrap: anywhere;
 }
 @media (max-width: 640px) {
-  .consult-eligibility {
+  .consult-eligibility,
+  .consult-source-name {
     max-width: none;
   }
 }
