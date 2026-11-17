@@ -1,0 +1,34 @@
+{
+  "format": "medassist-consultation-pilot/1",
+  "source": {
+    "id": "mathura-esic",
+    "kind": "reviewed_external",
+    "name": "ESIC dispensary directory and Medical Benefit page",
+    "version": "2026-11-17",
+    "url": "https://esic.gov.in/dispensaries",
+    "publisher": "Employees' State Insurance Corporation, Ministry of Labour and Employment, Government of India",
+    "locality": "Mathura, Uttar Pradesh",
+    "reuse_basis": "Reference with acknowledgement. ESIC's Copyright Policy (last reviewed 2024-07-01) says its contents may not be reproduced without ESIC's permission and that a website referring to them must acknowledge the source. MedAssist reproduces no ESIC content: it records the dispensary's name and place and the stated free-care rule in its own words, links to the ESIC pages and credits ESIC.",
+    "reuse_basis_url": "https://esic.gov.in/copyright-policy"
+  },
+  "listings": [
+    {
+      "id": "mathura-esic-dispensary-sadar",
+      "provider_name": "ESI Dispensary, Mathura",
+      "provider_type": "clinic",
+      "specialty": "Primary care (ESI dispensary)",
+      "area": "Badhpura, Sadar, Mathura (ESIC directory, Uttar Pradesh entry 73)",
+      "modes": ["in_person"],
+      "fee": {
+        "state": "free",
+        "basis": "ESIC Benefits page (reviewed 2026-10-09) describes Medical Benefit as free medical care for Insured Persons and their family members."
+      },
+      "access_conditions": "Only for people insured under the ESI scheme and their family members, from their first day of insurable employment. Retired and permanently disabled insured persons and their spouses can use this care by paying ₹600 a year (ESIC Benefits page).",
+      "languages": [],
+      "hours": null,
+      "notes": "ESIC's directory lists this dispensary without its services or opening hours. Free care rule: https://esic.gov.in/information-benefits",
+      "source_url": "https://esic.gov.in/dispensaries",
+      "last_checked_on": "2026-11-17"
+    }
+  ]
+}

@@ -131,7 +131,7 @@ exist without a basis and an unknown fee cannot carry an amount.
 | --- | --- | --- |
 | `fictional_seed` | `true` | The nine demo records. Every source and verification field is `null`, and `verification.status` is `fictional_demo`. The database refuses a check date or source URL on them. |
 | `pilot_fixture` | `true` | Invented test records shaped like pilot data. Their URLs are on `example.org`/`.com`/`.net`, and their names say "(fictional)". |
-| `reviewed_external` | `false` | A listing checked by hand against an approved source. It may not use `example.*` URLs. No such record exists in this repository yet. |
+| `reviewed_external` | `false` | A listing checked by hand against an official source. It may not use `example.*` URLs. The seven Mathura listings in `backend/app/datasets/mathura/` are of this kind; see [Reviewed consultation listings for Mathura](CONSULTATION_MATHURA_LISTINGS.md). |
 
 Every pilot listing (reviewed or fixture) has `source.listing_url` (the page it was
 checked against), `source.last_checked_on`, and the source's `publisher`,

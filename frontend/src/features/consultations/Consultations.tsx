@@ -35,6 +35,7 @@ import {
   fromOfflineOption,
   LISTING_ROWS,
   MODE_LABELS,
+  pilotSourcesLabel,
   PROVIDER_TYPE_LABELS,
   sourceLabel,
   toConsultationQuery,
@@ -144,7 +145,6 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
   }, [api.ok, queryKey, attempt]);
 
   const dataset = loaded.status === 'error' ? null : (loaded.page?.dataset ?? null);
-  const pilotSource = dataset?.mode === 'pilot' ? dataset.sources[0] : undefined;
   // Any fixture source means the pilot page is fictional, whatever else it holds.
   const pilotFixture = dataset?.sources.some((s) => s.kind === 'pilot_fixture') ?? false;
   const source = (
@@ -167,9 +167,8 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
         'Not connected in this build.'
       ) : dataset?.mode === 'pilot' ? (
         <>
-          Pilot listings{pilotSource?.locality ? ` for ${pilotSource.locality}` : ''}
-          {pilotSource ? ` from ${pilotSource.name}, version ${pilotSource.version}` : ''}. Read
-          from <code>{api.origin}</code> · freshness judged on {formatDate(dataset.as_of)}.
+          Pilot listings{pilotSourcesLabel(dataset.sources)}. Read from <code>{api.origin}</code> ·
+          freshness judged on {formatDate(dataset.as_of)}.
         </>
       ) : (
         <>
@@ -530,6 +529,9 @@ function DirectoryBrowser({
                         {o.source.kind === 'pilot_fixture' && (
                           <span className="consult-flag">Fictional test fixture</span>
                         )}
+                        {o.source.kind !== 'fictional_seed' && (
+                          <span className="consult-source-name">Source: {o.source.name}</span>
+                        )}
                         {o.verification.checked_on && (
                           <span className="consult-checked">
                             Checked {formatDate(o.verification.checked_on)}
@@ -700,6 +702,20 @@ function SourceDetails({ listing }: { listing: ConsultationListing }) {
         </p>
       )}
       {source.reuse_basis && <p className="muted text-small">Reuse basis: {source.reuse_basis}</p>}
+      {source.reuse_basis_url && (
+        <p className="muted text-small">
+          <a
+            className="text-link-inline"
+            href={source.reuse_basis_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read the source's reuse terms
+            <ExternalLink size={13} aria-hidden="true" />
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </p>
+      )}
     </section>
   );
 }

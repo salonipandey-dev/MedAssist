@@ -1,0 +1,136 @@
+{
+  "format": "medassist-consultation-pilot/1",
+  "source": {
+    "id": "mathura-esanjeevani-up",
+    "kind": "reviewed_external",
+    "name": "eSanjeevani National Telemedicine Service (Uttar Pradesh OPDs)",
+    "version": "2026-11-17-id-clash-test",
+    "url": "https://esanjeevani.mohfw.gov.in/",
+    "publisher": "Ministry of Health and Family Welfare, Government of India (platform run by C-DAC)",
+    "locality": "Mathura, Uttar Pradesh",
+    "reuse_basis": "Facts and link only; no reuse licence was found. The site footer says \"© 2026 eSanjeevani. All rights reserved.\", and its Website Policy file could not be opened on 2026-11-17. MedAssist copies no text, images or logos: it records the service name, the published OPD days and hours and the FAQ answer on payment in its own words, links to the page each fact came from and credits eSanjeevani, Ministry of Health and Family Welfare.",
+    "reuse_basis_url": null
+  },
+  "listings": [
+    {
+      "id": "mathura-esj-up-general-opd",
+      "provider_name": "eSanjeevani OPD: Uttar Pradesh General OPD",
+      "provider_type": "teleconsultation",
+      "specialty": "General OPD",
+      "area": "Online video OPD run for Uttar Pradesh; used from home in Mathura (no clinic visit)",
+      "modes": [
+        "video"
+      ],
+      "fee": {
+        "state": "free",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "TEST FILE ONLY: changed hours that must never be saved",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "source_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+      "last_checked_on": "2026-11-17"
+    },
+    {
+      "id": "mathura-esj-up-gmc-paediatrics",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Paediatrics",
+      "provider_type": "teleconsultation",
+      "specialty": "Paediatrics",
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "modes": [
+        "video"
+      ],
+      "fee": {
+        "state": "free",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "source_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+      "last_checked_on": "2026-11-17"
+    },
+    {
+      "id": "mathura-esj-up-gmc-dermatology",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Dermatology",
+      "provider_type": "teleconsultation",
+      "specialty": "Dermatology",
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "modes": [
+        "video"
+      ],
+      "fee": {
+        "state": "free",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "source_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+      "last_checked_on": "2026-11-17"
+    },
+    {
+      "id": "mathura-esj-up-gmc-obstetrics-gynaecology",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Obstetrics and Gynaecology",
+      "provider_type": "teleconsultation",
+      "specialty": "Obstetrics and gynaecology",
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "modes": [
+        "video"
+      ],
+      "fee": {
+        "state": "free",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "source_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+      "last_checked_on": "2026-11-17"
+    },
+    {
+      "id": "mathura-esj-up-gmc-psychiatry",
+      "provider_name": "eSanjeevani OPD: Government Medical Colleges (U.P.) Psychiatry",
+      "provider_type": "teleconsultation",
+      "specialty": "Psychiatry",
+      "area": "Online video OPD run by Uttar Pradesh government medical colleges; used from home in Mathura",
+      "modes": [
+        "video"
+      ],
+      "fee": {
+        "state": "free",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 2:00 PM (Government Medical Colleges (U.P.) speciality OPD)",
+      "notes": "A video consultation, not an in-person visit. Free use is stated in the eSanjeevani FAQ (https://esanjeevani.mohfw.gov.in/#/faq).",
+      "source_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+      "last_checked_on": "2026-11-17"
+    },
+    {
+      "id": "c-01",
+      "provider_name": "eSanjeevani OPD: Uttar Pradesh General OPD",
+      "provider_type": "teleconsultation",
+      "specialty": "General OPD",
+      "area": "Online video OPD run for Uttar Pradesh; used from home in Mathura (no clinic visit)",
+      "modes": [
+        "video"
+      ],
+      "fee": {
+        "state": "free",
+        "basis": "eSanjeevani FAQ 1: \"No, you don't have to pay anything to anybody for using National Telemedicine Service.\""
+      },
+      "access_conditions": "Register on eSanjeevani (website or app) with a mobile number; the Patient ID stays linked to it. Needs an internet-connected device with a camera. The site asks patients to give an ABHA ID in every consultation.",
+      "languages": [],
+      "hours": "Monday to Saturday, 9:00 AM to 5:00 PM (Uttar Pradesh State eSanjeevaniOPD)",
+      "notes": "TEST FILE ONLY: this copy reuses the demo ID c-01 so the import fails inside the database and must roll back.",
+      "source_url": "https://esanjeevani.mohfw.gov.in/#/opd-timing",
+      "last_checked_on": "2026-11-17"
+    }
+  ]
+}

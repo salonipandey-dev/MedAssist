@@ -17,6 +17,9 @@ import { defineConfig } from '@playwright/test';
 //   (that phase stops and restarts FastAPI itself to prove the error and Retry flow)
 //   (restart FastAPI with MEDASSIST_CONSULTATION_PILOT=on)
 //   npx playwright test -c playwright.fullstack.config.ts --grep @consultation-pilot
+//   (remove the fixture, import backend/app/datasets/mathura/*.json, restart FastAPI with the
+//   pilot on and MEDASSIST_PILOT_AS_OF=2026-11-17)
+//   npx playwright test -c playwright.fullstack.config.ts --grep @consultation-mathura
 export default defineConfig({
   testDir: './tests/fullstack',
   fullyParallel: false,

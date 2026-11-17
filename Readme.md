@@ -29,9 +29,11 @@ demonstration data; this is not a clinically deployed healthcare service.
 - Implemented: a consultation pilot with verified listings (MA-06), off by default.
   A transactional importer loads one source's listings by stable ID. Each listing
   records its source page, check date, fee basis and eligibility. Listings older
-  than the 90-day freshness window show **Needs recheck** and never show Free. No
-  approved source has been supplied yet, so only a clearly labelled fictional
-  fixture is included. See [Consultation pilot](docs/CONSULTATION_PILOT.md).
+  than the 90-day freshness window show **Needs recheck** and never show Free. The
+  first real dataset holds seven listings for Mathura, Uttar Pradesh, checked against
+  official eSanjeevani, Tele MANAS and ESIC pages; a labelled fictional fixture
+  remains for tests. See [Consultation pilot](docs/CONSULTATION_PILOT.md) and
+  [Reviewed consultation listings for Mathura](docs/CONSULTATION_MATHURA_LISTINGS.md).
 - Release candidate (MA-07): [clean Windows setup, journey checks and a three-minute
   demo script](docs/RELEASE_CANDIDATE.md).
 - Frontend: public product website and distinct patient, doctor and administrator
@@ -378,7 +380,10 @@ sign-out, a two-tab conflict and an expired session, and confirms that `/health`
 consultation search still work without signing in. It then imports the fictional
 pilot fixture twice (same count and IDs), runs a failing import (previous data
 unchanged), checks that the disabled pilot serves only the demo, restarts FastAPI
-with the pilot on and checks the pilot listings in Chromium.
+with the pilot on and checks the pilot listings in Chromium. Finally it replaces the
+fixture with the reviewed Mathura listings, imports them twice, runs two failing
+imports (previous data unchanged) and checks search, filters, fee labels, source links
+and the comparison limit at 375px.
 
 ## Repository layout
 
@@ -404,6 +409,8 @@ with the pilot on and checks the pilot listings in Chromium.
 - `backend/app/consultation_pilot.py`, `backend/app/import_consultations.py`: the
   pilot dataset format, freshness rules and the transactional import command.
 - `docs/CONSULTATION_PILOT.md`: pilot settings, import, candidate source and file map.
+- `backend/app/datasets/mathura/`, `docs/CONSULTATION_MATHURA_LISTINGS.md`: the reviewed
+  Mathura listings, their evidence and reuse basis, and how to recheck them.
 - `backend/app/models.py`, `backend/app/db.py`: database tables and engine settings.
 - `backend/app/seed.py`: repeatable fictional seed command.
 - `backend/alembic.ini`, `backend/migrations/`: database migrations.

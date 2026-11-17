@@ -4,8 +4,9 @@ name: Health profile (full stack)
 # and the consultation pilot (MA-06) end to end with nothing mocked: a real PostgreSQL
 # service, the FastAPI app under uvicorn and the compiled React build in Chromium.
 # FastAPI is stopped and started again between the browser phases, and Patient B's
-# sessions are expired directly in PostgreSQL before phase 3. All accounts, entries and
-# pilot listings are fictional; the pilot data is the labelled test fixture.
+# sessions are expired directly in PostgreSQL before phase 3. All accounts and entries are
+# fictional. Phase 6 uses the labelled pilot test fixture; phase 7 replaces it with the
+# reviewed Mathura listings (real services recorded from official pages on 2026-11-17).
 on:
   push:
     branches: [main]
@@ -260,6 +261,67 @@ jobs:
       - name: "Phase 6: the browser loads pilot listings from PostgreSQL through FastAPI"
         working-directory: frontend
         run: npx playwright test -c playwright.fullstack.config.ts --grep @consultation-pilot
+      - name: Replace the fixture with the reviewed Mathura listings, import twice, then failing files
+        working-directory: backend
+        env:
+          MEDASSIST_PILOT_AS_OF: "2026-11-17"
+        run: |
+          snapshot() {
+            psql -d medassist_test -Atc "SELECT count(*) || ' ' || md5(string_agg(id, ',' ORDER BY id)) FROM consultation_listings WHERE source_kind = 'reviewed_external'"
+          }
+          rows() {
+            psql -d medassist_test -Atc "SELECT md5(string_agg(to_jsonb(l)::text, '|' ORDER BY id)) FROM consultation_listings l"
+          }
+          everything() {
+            psql -d medassist_test -Atc "SELECT md5((SELECT string_agg(to_jsonb(l)::text, '|' ORDER BY id) FROM consultation_listings l) || (SELECT string_agg(to_jsonb(s)::text, '|' ORDER BY id) FROM consultation_sources s))"
+          }
+          import_all() {
+            for file in app/datasets/mathura/*.json; do python -m app.import_consultations "$file"; done
+          }
+          # The pilot serves every pilot source, so the fictional fixture is removed first.
+          psql -d medassist_test -v ON_ERROR_STOP=1 \
+            -c "DELETE FROM consultation_listings WHERE source_kind = 'pilot_fixture'" \
+            -c "DELETE FROM consultation_sources WHERE kind = 'pilot_fixture'"
+          import_all
+          first="$(snapshot)"
+          first_rows="$(rows)"
+          import_all
+          second="$(snapshot)"
+          echo "After import 1 (count, ID md5): $first"
+          echo "After import 2 (count, ID md5): $second"
+          test "$first" = "$second"
+          test "${first%% *}" = "7"
+          test "$first_rows" = "$(rows)"
+          before_failure="$(everything)"
+          for broken in tests/fixtures/consultation_mathura_id_clash.json tests/fixtures/consultation_pilot_invalid.json; do
+            if python -m app.import_consultations "$broken"; then
+              echo "The failing import $broken unexpectedly succeeded." >&2
+              exit 1
+            fi
+          done
+          after_failure="$(everything)"
+          echo "Before the failed imports: $before_failure"
+          echo "After the failed imports:  $after_failure"
+          test "$before_failure" = "$after_failure"
+          psql -d medassist_test -c "SELECT id, kind, version, listing_count FROM consultation_sources ORDER BY id"
+          psql -d medassist_test -c "SELECT id, fee_state, last_checked_on FROM consultation_listings WHERE source_kind = 'reviewed_external' ORDER BY id"
+      - name: Restart FastAPI with the pilot on for the Mathura listings
+        working-directory: backend
+        env:
+          MEDASSIST_CONSULTATION_PILOT: "on"
+          MEDASSIST_PILOT_AS_OF: "2026-11-17"
+        run: |
+          old="$(cat "$RUNNER_TEMP/api.pid")"
+          kill "$old"
+          for attempt in $(seq 1 30); do kill -0 "$old" 2>/dev/null || break; sleep 1; done
+          if kill -0 "$old" 2>/dev/null; then echo "The old FastAPI process is still running." >&2; exit 1; fi
+          nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > "$RUNNER_TEMP/api-mathura.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/api.pid"
+          for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 1; done
+          curl -fsS 'http://127.0.0.1:8000/api/v1/consultations?fee_state=unknown' | python -c "import json,sys; p=json.load(sys.stdin); ids=[i['id'] for i in p['items']]; print(p['dataset']['mode'], ids); assert ids == ['mathura-tele-manas-helpline']"
+      - name: "Phase 7: the browser reads the reviewed Mathura listings at 375px"
+        working-directory: frontend
+        run: npx playwright test -c playwright.fullstack.config.ts --grep @consultation-mathura
       - name: Check that API logs hold no credentials or profile contents
         run: |
           cat "$RUNNER_TEMP"/api-*.log | tail -n 40
