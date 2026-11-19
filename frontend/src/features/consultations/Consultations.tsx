@@ -26,6 +26,7 @@ import {
   type ConsultationDataset,
   type ConsultationListing,
   type ConsultationPage,
+  type ConsultationQuery,
 } from '../../services/api/consultations';
 import { readApiOrigin } from '../../services/api/origin';
 import {
@@ -71,6 +72,7 @@ function PilotNotice({ dataset }: { dataset: ConsultationDataset }) {
 }
 const COMPARE_LIMIT_MESSAGE = `You can compare up to ${COMPARE_LIMIT} options. Remove one to add another.`;
 const SEARCH_DEBOUNCE_MS = 300;
+const MAX_DIRECTORY_OFFSET = 10_000; // Upper bound in the directory API contract.
 const OFFLINE_LISTINGS = CONSULTATION_OPTIONS.map(fromOfflineOption);
 
 export function Consultations() {
@@ -119,18 +121,31 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
   const searchText = useDebouncedText(filters.query, SEARCH_DEBOUNCE_MS);
   // Only changes to the effective server filters start a request.
   const queryKey = JSON.stringify(toConsultationQuery({ ...filters, query: searchText }));
+  const [pageRequest, setPageRequest] = useState({ queryKey, offset: 0 });
+  const offset = pageRequest.queryKey === queryKey ? pageRequest.offset : 0;
 
   useEffect(() => {
     if (!api.ok) return;
+    setPageRequest((previous) =>
+      previous.queryKey === queryKey ? previous : { queryKey, offset: 0 },
+    );
     // Aborting on cleanup means an older response can never replace a newer one.
     const controller = new AbortController();
     setLoaded((previous) => ({
       status: 'loading',
       page: previous.status === 'error' ? null : previous.page,
     }));
-    listConsultations(JSON.parse(queryKey), { signal: controller.signal }).then(
+    const query: ConsultationQuery = JSON.parse(queryKey);
+    if (offset > 0) query.offset = offset;
+    listConsultations(query, { signal: controller.signal }).then(
       (page) => {
-        if (!controller.signal.aborted) setLoaded({ status: 'ready', page });
+        if (controller.signal.aborted) return;
+        // An import can remove the requested page between requests.
+        if (offset > 0 && page.items.length === 0 && offset >= page.total) {
+          setPageRequest({ queryKey, offset: 0 });
+          return;
+        }
+        setLoaded({ status: 'ready', page });
       },
       (error: unknown) => {
         if (controller.signal.aborted) return;
@@ -142,7 +157,7 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
       },
     );
     return () => controller.abort();
-  }, [api.ok, queryKey, attempt]);
+  }, [api.ok, queryKey, offset, attempt]);
 
   const dataset = loaded.status === 'error' ? null : (loaded.page?.dataset ?? null);
   // Any fixture source means the pilot page is fictional, whatever else it holds.
@@ -218,8 +233,8 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
   else if (page) {
     const noun = `${filtered ? 'matching ' : ''}listing${page.total === 1 ? '' : 's'}`;
     description =
-      page.items.length < page.total
-        ? `Showing ${page.items.length} of ${page.total} ${noun}`
+      page.items.length > 0 && page.items.length < page.total
+        ? `Showing ${page.offset + 1}–${page.offset + page.items.length} of ${page.total} ${noun}`
         : `${page.total} ${noun}`;
     if (loaded.status === 'loading') description += ' · updating…';
   }
@@ -266,6 +281,15 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
       items={page?.items ?? []}
       busy={loaded.status === 'loading'}
       body={body}
+      pagination={
+        page && (page.offset > 0 || page.total > page.limit) ? (
+          <DirectoryPagination
+            page={page}
+            busy={loaded.status === 'loading' || page.offset !== offset}
+            onChange={(nextOffset) => setPageRequest({ queryKey, offset: nextOffset })}
+          />
+        ) : null
+      }
       emptyTitle="No listings match"
       emptyDescription="The directory has no listing for these filters. Change or clear them to see more."
       specialties={dataset?.specialties}
@@ -276,6 +300,42 @@ function ApiDirectory({ onOpenOffline }: { onOpenOffline: () => void }) {
         !dataset ? null : dataset.mode === 'pilot' ? <PilotNotice dataset={dataset} /> : DEMO_NOTICE
       }
     />
+  );
+}
+
+function DirectoryPagination({
+  page,
+  busy,
+  onChange,
+}: {
+  page: ConsultationPage;
+  busy: boolean;
+  onChange: (offset: number) => void;
+}) {
+  const nextOffset = page.offset + page.limit;
+  const moreResults = nextOffset < page.total;
+  return (
+    <nav className="consult-pagination" aria-label="Consultation result pages">
+      <Button
+        variant="secondary"
+        size="sm"
+        disabled={busy || page.offset === 0}
+        onClick={() => onChange(Math.max(0, page.offset - page.limit))}
+      >
+        Previous page
+      </Button>
+      <Button
+        variant="secondary"
+        size="sm"
+        disabled={busy || !moreResults || nextOffset > MAX_DIRECTORY_OFFSET}
+        onClick={() => onChange(nextOffset)}
+      >
+        Next page
+      </Button>
+      {moreResults && nextOffset > MAX_DIRECTORY_OFFSET && (
+        <p className="muted text-small">Refine your filters to see additional matches.</p>
+      )}
+    </nav>
   );
 }
 
@@ -367,6 +427,7 @@ function DirectoryBrowser({
   items,
   busy = false,
   body,
+  pagination,
   emptyTitle = '',
   emptyDescription = '',
   specialties = CONSULTATION_SPECIALTIES,
@@ -385,6 +446,7 @@ function DirectoryBrowser({
   busy?: boolean;
   /** Replaces the list with a loading, error or configuration state. */
   body: ReactNode;
+  pagination?: ReactNode;
   emptyTitle?: string;
   emptyDescription?: string;
   /** Specialties in the served data; the built-in list when unknown. */
@@ -493,6 +555,7 @@ function DirectoryBrowser({
               )}
             </div>
           )}
+          {pagination}
           {body ??
             (items.length ? (
               <ul className="consult-list" aria-label={listLabel} aria-busy={busy}>

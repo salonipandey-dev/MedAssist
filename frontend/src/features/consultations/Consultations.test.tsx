@@ -32,6 +32,18 @@ const pilotPage = { ...pilotFixture, requestId: null } as ConsultationPage;
 const mathuraPage = { ...mathuraCapture, requestId: null } as ConsultationPage;
 const everything = pageOf(...all.map((item) => item.id));
 
+const multiPageListings = Array.from({ length: 53 }, (_, index) => ({
+  ...all[0],
+  id: `page-fixture-${index + 1}`,
+  provider_name: `Fictional clinic ${index + 1}`,
+}));
+const multiPage = (offset = 0): ConsultationPage => ({
+  ...everything,
+  items: multiPageListings.slice(offset, offset + everything.limit),
+  total: multiPageListings.length,
+  offset,
+});
+
 /** A request the test settles by hand, to control the order responses arrive in. */
 function deferred() {
   let resolve!: (page: ConsultationPage) => void;
@@ -84,13 +96,90 @@ describe('Find Consultations with the directory API', () => {
     expect(screen.queryByRole('list', { name: 'Consultation listings' })).toBeNull();
     expect(queries()).toEqual([{}]);
 
-    await act(async () => first.resolve({ ...everything, total: 12 }));
+    await act(async () => first.resolve(everything));
 
     expect(names()).toHaveLength(9);
     expect(screen.getByRole('heading', { name: 'Consultation directory' })).toBeInTheDocument();
-    expect(screen.getAllByText('Showing 9 of 12 listings')).not.toHaveLength(0);
+    expect(screen.getAllByText('9 listings')).not.toHaveLength(0);
+    expect(screen.queryByRole('navigation', { name: 'Consultation result pages' })).toBeNull();
     expect(screen.getAllByText('Fictional record')).toHaveLength(9);
     expect(screen.getByText('http://127.0.0.1:8000')).toBeInTheDocument();
+  });
+
+  it('browses all 53 results and preserves comparisons across pages', async () => {
+    listConsultations.mockImplementation(async (query: ConsultationQuery) =>
+      multiPage(query.offset),
+    );
+    renderScreen();
+    await flush();
+
+    const firstPageNames = names();
+    expect(firstPageNames).toHaveLength(50);
+    expect(screen.getAllByText('Showing 1–50 of 53 listings')).not.toHaveLength(0);
+    expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /^Compare\s*Fictional clinic 1$/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    await flush();
+
+    expect(queries()).toEqual([{}, { offset: 50 }]);
+    expect([...firstPageNames, ...names()]).toEqual(
+      multiPageListings.map((entry) => entry.provider_name),
+    );
+    expect(screen.getAllByText('Showing 51–53 of 53 listings')).not.toHaveLength(0);
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+    const table = screen.getByRole('table', { name: 'consultation comparison' });
+    expect(within(table).getByText('Fictional clinic 1')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^Compare\s*Fictional clinic 53$/ }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+    await flush();
+    expect(queries().at(-1)).toEqual({});
+    expect(names()).toEqual(firstPageNames);
+    expect(within(table).getByText('Fictional clinic 53')).toBeInTheDocument();
+  });
+
+  it('retries the requested page and resets paging when the effective search changes', async () => {
+    listConsultations
+      .mockResolvedValueOnce(multiPage())
+      .mockRejectedValueOnce(new ConsultationApiError('unavailable'))
+      .mockResolvedValueOnce(multiPage(50))
+      .mockResolvedValueOnce(pageOf('c-01'))
+      .mockResolvedValueOnce(multiPage());
+    renderScreen();
+    await flush();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    await flush();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    await flush();
+    expect(queries()).toEqual([{}, { offset: 50 }, { offset: 50 }]);
+
+    type('riverside');
+    await act(async () => vi.advanceTimersByTime(299));
+    expect(queries()).toHaveLength(3);
+    await act(async () => vi.advanceTimersByTime(1));
+    expect(queries().at(-1)).toEqual({ q: 'riverside' });
+    expect(names()).toEqual(['Riverside Family Clinic (fictional)']);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
+    await flush();
+    expect(queries().at(-1)).toEqual({});
+  });
+
+  it('returns to page one when refreshed directory data removes the requested page', async () => {
+    listConsultations
+      .mockResolvedValueOnce(multiPage())
+      .mockResolvedValueOnce({ ...multiPage(50), items: [], total: everything.total })
+      .mockResolvedValueOnce(everything);
+    renderScreen();
+    await flush();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    await flush();
+
+    expect(queries()).toEqual([{}, { offset: 50 }, {}]);
+    expect(names()).toHaveLength(9);
+    expect(screen.queryByRole('heading', { name: 'No listings match' })).toBeNull();
   });
 
   it('sends each filter to the server and uses its total', async () => {

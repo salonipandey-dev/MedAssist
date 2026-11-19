@@ -27,7 +27,15 @@ function search(items: Listing[], params: URLSearchParams) {
       (maxFee === null || (item.fee.amount_minor !== null && item.fee.amount_minor <= +maxFee))
     );
   });
-  return { items: matches, total: matches.length, limit: 50, offset: 0, dataset: fixture.dataset };
+  const limit = Number(params.get('limit') ?? 20);
+  const offset = Number(params.get('offset') ?? 0);
+  return {
+    items: matches.slice(offset, offset + limit),
+    total: matches.length,
+    limit,
+    offset,
+    dataset: fixture.dataset,
+  };
 }
 
 async function mockDirectory(page: Page) {
@@ -112,6 +120,37 @@ test('lists API records, labels them fictional and filters on the server', async
   expect(directory.queries().at(-1)).toBe(
     '?specialty=Dermatology&mode=video&fee_state=unknown&limit=50',
   );
+});
+
+test('pages through consultation results at 375px and keeps the selection', async ({ page }) => {
+  const directory = await mockDirectory(page);
+  directory.items = Array.from({ length: 53 }, (_, index) => ({
+    ...fixture.items[0],
+    id: `page-fixture-${index + 1}`,
+    provider_name: `Fictional clinic ${index + 1}`,
+  }));
+  await page.goto(ROUTE);
+
+  await expect(listings(page)).toHaveCount(50);
+  await page.getByRole('button', { name: /^Compare\s*Fictional clinic 1$/ }).click();
+  await page.getByRole('button', { name: 'Next page' }).press('Enter');
+
+  await expect(listings(page)).toHaveCount(3);
+  await expect(page.getByRole('button', { name: 'Next page' })).toBeDisabled();
+  expect(await names(page)).toEqual([
+    'Fictional clinic 51',
+    'Fictional clinic 52',
+    'Fictional clinic 53',
+  ]);
+  expect(directory.queries()).toEqual(['?limit=50', '?limit=50&offset=50']);
+  await expect(
+    page.getByRole('table', { name: 'consultation comparison' }).getByText('Fictional clinic 1'),
+  ).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+
+  await page.getByRole('searchbox', { name: 'Search consultations' }).fill('Fictional clinic 53');
+  await expect(listings(page)).toHaveCount(1);
+  expect(directory.requests.at(-1)?.url.searchParams.get('offset')).toBeNull();
 });
 
 test('debounces search, shows an empty result and resets with one control', async ({ page }) => {

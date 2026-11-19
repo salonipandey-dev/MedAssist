@@ -147,6 +147,8 @@ export interface ConsultationQuery {
   feeState?: ConsultationFeeState;
   /** Inclusive maximum in paise; matches free and known fees, never unknown ones. */
   maxFeeMinor?: number;
+  /** Number of matching listings to skip, up to 10,000. Defaults to the first page. */
+  offset?: number;
 }
 
 export type ConsultationApiErrorKind =
@@ -195,6 +197,7 @@ function buildUrl(origin: string, query: ConsultationQuery): string {
   if (query.feeState) params.set('fee_state', query.feeState);
   if (query.maxFeeMinor !== undefined) params.set('max_fee_minor', String(query.maxFeeMinor));
   params.set('limit', String(CONSULTATION_PAGE_LIMIT));
+  if (query.offset) params.set('offset', String(query.offset));
   return `${origin}/api/v1/consultations?${params}`;
 }
 
