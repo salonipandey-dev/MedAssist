@@ -57,6 +57,40 @@ test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 });
 
+test('pilot fixture: an incomplete verification date shows a recoverable directory error', async ({
+  page,
+}) => {
+  const broken = structuredClone(fixture);
+  broken.items[1].verification.recheck_due_on = null as never;
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.route(`${API}/**`, (route) =>
+    route.fulfill({
+      headers: {
+        'access-control-allow-origin': '*',
+        'access-control-expose-headers': 'X-Request-ID',
+        'x-request-id': 'missing-recheck-date',
+      },
+      json: broken,
+    }),
+  );
+
+  await page.goto(ROUTE);
+
+  const alert = page.getByRole('alert');
+  await expect(alert).toContainText('The directory request failed');
+  await expect(alert).toContainText('Request ID: missing-recheck-date');
+  await expect(page.getByRole('list', { name: 'Consultation listings' })).toHaveCount(0);
+  await expect(alert.getByRole('button', { name: 'Retry' })).toBeVisible();
+  expect(errors).toEqual([]);
+
+  await page.unroute(`${API}/**`);
+  await mockPilot(page);
+  await alert.getByRole('button', { name: 'Retry' }).click();
+  await expect(listings(page)).toHaveCount(6);
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
 test('pilot fixture: known fee, current free fee with eligibility, unknown fee and a stale listing', async ({
   page,
 }) => {
