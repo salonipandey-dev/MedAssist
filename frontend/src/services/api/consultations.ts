@@ -86,14 +86,18 @@ const listingSchema = z
           source.last_checked_on === null &&
           source.listing_url === null &&
           verification.status === 'fictional_demo' &&
+          verification.checked_on === null &&
+          verification.recheck_due_on === null &&
           !verification.free_label_suppressed
         );
       // Pilot listings always carry the page and date they were checked against,
-      // and "Free" is only possible while that check is current.
+      // plus the recheck date used in details and comparisons. "Free" is only
+      // possible while that check is current.
       return (
         source.listing_url !== null &&
         source.last_checked_on !== null &&
         verification.checked_on === source.last_checked_on &&
+        verification.recheck_due_on !== null &&
         verification.status !== 'fictional_demo' &&
         !(fee.state === 'free' && verification.status !== 'current') &&
         (!verification.free_label_suppressed ||

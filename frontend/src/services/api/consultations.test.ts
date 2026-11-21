@@ -125,6 +125,8 @@ describe('consultation directory client', () => {
       (body) => (body.items[0].provider_type = 'pharmacy'),
       (body) => (body.items[0].source.last_checked_on = '2026-01-01' as never), // fictional yet "checked"
       (body) => (body.items[0].source.url = 'https://example.invalid' as never),
+      (body) => (body.items[0].verification.checked_on = '2026-11-02' as never),
+      (body) => (body.items[0].verification.recheck_due_on = '2027-01-31' as never),
       (body) => (body.items[0].is_fictional = false), // flag disagrees with the source kind
     ];
     for (const [index, change] of broken.entries()) {
@@ -157,6 +159,21 @@ describe('consultation directory client', () => {
       'current',
       'current',
     ]);
+  });
+
+  it.each([
+    ['current', 1],
+    ['needs_recheck', 0],
+  ] as const)('rejects a %s pilot listing without a recheck date', async (_status, index) => {
+    vi.stubEnv('VITE_API_BASE_URL', ORIGIN);
+    const body = clonePilot();
+    body.items[index].verification.recheck_due_on = null as never;
+    stubFetch(json(body, { headers: { 'X-Request-ID': 'missing-recheck-date' } }));
+
+    const error = await failure(listConsultations());
+
+    expect(error.kind).toBe('unexpected');
+    expect(error.requestId).toBe('missing-recheck-date');
   });
 
   it('rejects pilot listings that could pass for verified or show a stale Free', async () => {

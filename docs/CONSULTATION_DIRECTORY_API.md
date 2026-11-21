@@ -129,7 +129,7 @@ exist without a basis and an unknown fee cannot carry an amount.
 
 | `source.kind` | `is_fictional` | Meaning |
 | --- | --- | --- |
-| `fictional_seed` | `true` | The nine demo records. Every source and verification field is `null`, and `verification.status` is `fictional_demo`. The database refuses a check date or source URL on them. |
+| `fictional_seed` | `true` | The nine demo records. Source URLs and verification dates are `null`, and `verification.status` is `fictional_demo`. The database refuses a check date or source URL on them. |
 | `pilot_fixture` | `true` | Invented test records shaped like pilot data. Their URLs are on `example.org`/`.com`/`.net`, and their names say "(fictional)". |
 | `reviewed_external` | `false` | A listing checked by hand against an official source. It may not use `example.*` URLs. The seven Mathura listings in `backend/app/datasets/mathura/` are of this kind; see [Reviewed consultation listings for Mathura](CONSULTATION_MATHURA_LISTINGS.md). |
 
@@ -143,6 +143,11 @@ checked against), `source.last_checked_on`, and the source's `publisher`,
 | `checked_on` | Same as `source.last_checked_on`. |
 | `recheck_due_on` | The last day the check counts as current (`checked_on` + freshness days). |
 | `free_label_suppressed` | `true` when the source said free but the check is stale. The fee is then returned as `unknown`, and the `fee_state=free` and `max_fee_minor` filters leave the listing out. |
+
+Pilot listings must include both verification dates, even when they need a recheck.
+The frontend rejects a pilot listing without `recheck_due_on` or a fictional seed
+with verification dates. It shows the directory error with a Retry action and the
+response's request ID, when available, before rendering details or comparisons.
 
 `hours` is `null` for the two fixtures whose text was "Not listed in this
 sample" (`c-06`, `c-09`). `access_conditions` is `null` when none are recorded.
